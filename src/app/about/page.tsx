@@ -147,7 +147,7 @@ export default function AboutPage() {
                 <div className="relative aspect-square max-w-md mx-auto">
                   <div className="absolute inset-0 rounded-3xl overflow-hidden border border-border">
                     <Image
-                      src="/images/about.png"
+                      src="/images/geo.png"
                       alt="Владимир - Full-Stack разработчик"
                       fill
                       className="object-cover"
