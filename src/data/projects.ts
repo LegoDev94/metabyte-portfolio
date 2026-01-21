@@ -1746,57 +1746,210 @@ Real-time обновления через Socket.IO, авторизация че
     title: "NeoProxy",
     subtitle: "Proxy Management SaaS",
     description:
-      "SaaS панель управления прокси-сервисом: мониторинг трафика, биллинг, админка с аналитикой выручки.",
-    fullDescription: `NeoProxy — комплексная панель управления для прокси-сервиса. Включает личный кабинет пользователя, админ-панель и публичный сайт.
+      "SaaS панель управления прокси-сервисом: мониторинг USB-модемов, ротация IP, биллинг с подписками и аналитика выручки.",
+    fullDescription: `NeoProxy — полноценная SaaS-платформа для управления прокси-сервисом на базе USB-модемов. Включает личный кабинет пользователя, админ-панель и публичный лендинг.
 
-Пользователи могут управлять своими прокси, отслеживать трафик в реальном времени, настраивать режимы работы. Админы имеют доступ к аналитике выручки, управлению пользователями и тарифными планами.
+Пользователи управляют своими прокси: просматривают статус модемов, контролируют трафик (download/upload), настраивают автоматическую ротацию IP по интервалам. Dashboard показывает статистику использования полосы пропускания и активности прокси.
 
-🔧 **Функционал:**
-- Dashboard с графиками использования и активности
-- Управление мобильными и shared прокси
-- Система биллинга с тарифными планами
-- Мониторинг в реальном времени
-- API логи для отладки интеграций
-- Аналитика выручки для администраторов`,
+Система биллинга с 3 тарифными планами (Basic, Professional, Enterprise), привязкой карт Visa/Mastercard/PayPal, историей платежей и скачиванием инвойсов.
+
+Админ-панель включает: управление пользователями, настройку тарифных планов, аналитику выручки с графиками динамики доходов по периодам, API логи для отладки интеграций клиентов.`,
     category: "enterprise",
     categoryLabel: "SaaS / Infrastructure",
     image: "/images/projects/neoproxy.jpg",
     technologies: [
       { name: "Vue.js 3", icon: "vuejs", color: "#42b883" },
-      { name: "Pinia", icon: "database", color: "#ffd859" },
-      { name: "Tailwind", icon: "wind", color: "#06b6d4" },
+      { name: "Pinia", icon: "layers", color: "#ffd859" },
+      { name: "Vue Router", icon: "navigation", color: "#42b883" },
+      { name: "Tailwind CSS", icon: "wind", color: "#06b6d4" },
       { name: "Chart.js", icon: "bar-chart", color: "#ff6384" },
       { name: "Vite", icon: "zap", color: "#646cff" },
+      { name: "Axios", icon: "wifi", color: "#5a29e4" },
+      { name: "HeadlessUI", icon: "component", color: "#66e3ff" },
     ],
     features: [
       {
+        title: "USB Модемы",
+        description: "Мониторинг LTE модемов с ротацией IP",
+        icon: "smartphone",
+      },
+      {
         title: "Dashboard",
-        description: "Графики использования и трафика",
+        description: "Графики bandwidth и активности",
         icon: "bar-chart",
       },
       {
-        title: "Прокси менеджмент",
-        description: "Mobile и Shared прокси",
-        icon: "wifi",
-      },
-      {
         title: "Биллинг",
-        description: "Тарифные планы и оплата",
+        description: "3 тарифа, карты, PayPal, инвойсы",
         icon: "credit-card",
       },
       {
-        title: "Админ-панель",
-        description: "Управление и аналитика",
+        title: "Аналитика выручки",
+        description: "Динамика доходов, retention rate",
+        icon: "trending-up",
+      },
+      {
+        title: "Управление планами",
+        description: "CRUD для тарифных планов",
         icon: "settings",
+      },
+      {
+        title: "API Логи",
+        description: "Отладка клиентских интеграций",
+        icon: "file-text",
       },
     ],
     links: {
       github: "https://github.com/LegoDev94/neoproxy",
     },
     metrics: [
-      { label: "Страниц", value: "15+", icon: "layout-grid" },
+      { label: "Страниц", value: "27", icon: "layout-grid" },
       { label: "Ролей", value: "3", icon: "users" },
+      { label: "Компонентов", value: "30+", icon: "component" },
     ],
+    caseStudy: {
+      challenge: "Заказчику нужна была панель управления для прокси-сервиса на базе USB LTE-модемов. Требовался полный цикл: от мониторинга модемов и трафика до системы биллинга с подписками и админ-панели с аналитикой для отслеживания выручки бизнеса.",
+      solution: "Разработал SPA на Vue 3 с feature-based архитектурой: 3 layout-а (public, auth, dashboard), Pinia store для state management, Chart.js для визуализации данных. Реализовал систему ролей (user, admin, superadmin), полную систему биллинга с привязкой карт и PayPal, детальную аналитику выручки с экспортом в CSV.",
+      results: [
+        "27 страниц приложения с 3 разными layout-ами",
+        "Real-time мониторинг 8+ USB модемов с отображением signal strength",
+        "Система биллинга: 3 тарифа, Visa/Mastercard/PayPal, история платежей",
+        "Аналитика выручки с графиками за 7/30/90/365 дней",
+        "Экспорт данных в CSV для бухгалтерии",
+        "Мобильная адаптация всех страниц",
+      ],
+      userFlows: [
+        {
+          id: "user-dashboard",
+          title: "Личный кабинет пользователя",
+          description: "Управление прокси и подпиской",
+          icon: "user",
+          steps: [
+            { title: "Авторизация", description: "Email/Password login", icon: "log-in" },
+            { title: "Dashboard", description: "Статистика прокси, bandwidth, ротации", icon: "bar-chart" },
+            { title: "Proxy List", description: "Список USB модемов с IP и статусом", icon: "list" },
+            { title: "IP Rotation", description: "Ручная или автоматическая смена IP", icon: "refresh-cw" },
+            { title: "Billing", description: "Текущий план, способы оплаты, история", icon: "credit-card" },
+            { title: "Settings", description: "Настройки профиля и уведомлений", icon: "settings" },
+          ],
+        },
+        {
+          id: "admin-panel",
+          title: "Админ-панель",
+          description: "Управление бизнесом",
+          icon: "shield",
+          steps: [
+            { title: "Revenue Analytics", description: "Динамика доходов по периодам", icon: "trending-up" },
+            { title: "Users Management", description: "Список пользователей, блокировка", icon: "users" },
+            { title: "Plan Management", description: "CRUD для тарифных планов", icon: "sliders" },
+            { title: "API Logs", description: "Логи запросов для отладки", icon: "file-text" },
+            { title: "Export Data", description: "Выгрузка отчётов в CSV", icon: "download" },
+          ],
+        },
+        {
+          id: "proxy-monitoring",
+          title: "Мониторинг прокси",
+          description: "Real-time статус модемов",
+          icon: "wifi",
+          steps: [
+            { title: "Modem Status", description: "Индекс, модель, IP, carrier", icon: "smartphone" },
+            { title: "Signal Strength", description: "Визуальный индикатор сигнала LTE", icon: "signal" },
+            { title: "Data Usage", description: "Download/Upload в реальном времени", icon: "activity" },
+            { title: "Online Time", description: "Uptime модема (дни, часы, минуты)", icon: "clock" },
+            { title: "Change IP", description: "Кнопка ротации IP для модема", icon: "refresh-cw" },
+          ],
+        },
+      ],
+      technicalHighlights: [
+        {
+          title: "Feature-Based Architecture",
+          description: "Каждая фича (dashboard, proxies, billing, admin) изолирована в своей папке с views, components, stores. Три layout-а: PublicLayout, AuthLayout, DashboardLayout для разных секций приложения.",
+          icon: "folder",
+          tags: ["Vue 3", "Clean Architecture", "Modular"],
+        },
+        {
+          title: "Pinia State Management",
+          description: "Централизованное хранилище состояния для прокси, пользователя, биллинга. Actions для API-запросов, getters для фильтрации и поиска. Persist plugin для сохранения сессии.",
+          icon: "database",
+          tags: ["Pinia", "Reactive State", "TypeSafe"],
+        },
+        {
+          title: "Chart.js Visualization",
+          description: "Интерактивные графики: Line chart для динамики выручки, Doughnut chart для распределения по тарифам, Bar chart для bandwidth usage. Адаптивный resize.",
+          icon: "bar-chart",
+          tags: ["Chart.js", "Data Viz", "Responsive"],
+        },
+        {
+          title: "Billing System",
+          description: "Полная система биллинга: 3 тарифных плана с разными лимитами, привязка карт с маскированием номера, PayPal интеграция, история платежей со скачиванием инвойсов.",
+          icon: "credit-card",
+          tags: ["Subscriptions", "Payment Methods", "Invoices"],
+        },
+      ],
+      architecture: {
+        description: "Vue 3 SPA с feature-based структурой. Axios для API-запросов, Vue Router для навигации, Pinia для состояния.",
+        layers: [
+          {
+            name: "Views Layer",
+            components: ["Public Pages", "Auth Pages", "Dashboard", "Admin Panel", "Billing"],
+            color: "#42b883",
+          },
+          {
+            name: "Components Layer",
+            components: ["UsageChart", "ActivityChart", "TrafficChart", "ProxyTable", "PaymentForm"],
+            color: "#35495e",
+          },
+          {
+            name: "State Layer (Pinia)",
+            components: ["proxyStore", "userStore", "billingStore", "adminStore"],
+            color: "#ffd859",
+          },
+          {
+            name: "API Layer (Axios)",
+            components: ["Proxy API", "Auth API", "Billing API", "Admin API", "Monitoring API"],
+            color: "#5a29e4",
+          },
+        ],
+      },
+      integrations: [
+        {
+          name: "Vue 3 Composition API",
+          logo: "vuejs",
+          description: "Reactive refs, computed, watch, lifecycle hooks с <script setup>",
+          color: "#42b883",
+        },
+        {
+          name: "Pinia",
+          logo: "database",
+          description: "State management с actions, getters и persist plugin",
+          color: "#ffd859",
+        },
+        {
+          name: "Chart.js",
+          logo: "bar-chart",
+          description: "Line, Doughnut, Bar charts для аналитики и дашборда",
+          color: "#ff6384",
+        },
+        {
+          name: "Tailwind CSS",
+          logo: "wind",
+          description: "Utility-first CSS с кастомной неоновой темой",
+          color: "#06b6d4",
+        },
+        {
+          name: "HeadlessUI",
+          logo: "component",
+          description: "Доступные UI компоненты: Dialogs, Dropdowns, Tabs",
+          color: "#66e3ff",
+        },
+        {
+          name: "VueUse",
+          logo: "zap",
+          description: "Утилиты: useStorage, useDark, useClipboard",
+          color: "#41b883",
+        },
+      ],
+    },
   },
   {
     slug: "fancy-app",
