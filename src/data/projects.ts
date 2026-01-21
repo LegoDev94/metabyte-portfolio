@@ -1757,6 +1757,7 @@ Real-time обновления через Socket.IO, авторизация че
     category: "enterprise",
     categoryLabel: "SaaS / Infrastructure",
     image: "/images/projects/neoproxy.jpg",
+    video: { type: "file", src: "/images/projects/neoproxy/demo.mp4" },
     technologies: [
       { name: "Vue.js 3", icon: "vuejs", color: "#42b883" },
       { name: "Pinia", icon: "layers", color: "#ffd859" },
