@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  Code2,
   Gamepad2,
   Send,
   Globe,
@@ -144,13 +143,16 @@ export default function AboutPage() {
                 transition={{ duration: 0.5, delay: 0.2 }}
                 className="relative"
               >
-                {/* Avatar Placeholder */}
+                {/* Photo */}
                 <div className="relative aspect-square max-w-md mx-auto">
-                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-primary/20 to-accent/20 border border-border" />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-32 h-32 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Code2 className="w-16 h-16 text-primary" />
-                    </div>
+                  <div className="absolute inset-0 rounded-3xl overflow-hidden border border-border">
+                    <Image
+                      src="/images/about.png"
+                      alt="Владимир - Full-Stack разработчик"
+                      fill
+                      className="object-cover"
+                      priority
+                    />
                   </div>
                   {/* Decorative */}
                   <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl" />
