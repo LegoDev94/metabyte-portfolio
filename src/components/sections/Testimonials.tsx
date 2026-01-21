@@ -70,23 +70,23 @@ export function Testimonials() {
           </p>
 
           {/* Stats */}
-          <div className="flex items-center justify-center gap-8 mt-6">
-            <div className="text-center">
+          <div className="flex items-center justify-center gap-4 sm:gap-8 mt-6 flex-wrap">
+            <div className="text-center min-w-[80px]">
               <div className="flex items-center justify-center gap-1 mb-1">
-                <span className="text-3xl font-display text-primary">{stats.rating}</span>
-                <Star className="w-6 h-6 text-yellow-500 fill-yellow-500" />
+                <span className="text-2xl sm:text-3xl font-display text-primary">{stats.rating}</span>
+                <Star className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500 fill-yellow-500" />
               </div>
-              <div className="text-sm text-muted-foreground">Средняя оценка</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Средняя<br className="sm:hidden" /> оценка</div>
             </div>
-            <div className="w-px h-12 bg-border" />
-            <div className="text-center">
-              <div className="text-3xl font-display text-green-500">{stats.positive}</div>
-              <div className="text-sm text-muted-foreground">Положительных</div>
+            <div className="w-px h-10 sm:h-12 bg-border hidden sm:block" />
+            <div className="text-center min-w-[80px]">
+              <div className="text-2xl sm:text-3xl font-display text-green-500">{stats.positive}</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Положительных</div>
             </div>
-            <div className="w-px h-12 bg-border" />
-            <div className="text-center">
-              <div className="text-3xl font-display text-muted-foreground">{stats.negative}</div>
-              <div className="text-sm text-muted-foreground">Отрицательных</div>
+            <div className="w-px h-10 sm:h-12 bg-border hidden sm:block" />
+            <div className="text-center min-w-[80px]">
+              <div className="text-2xl sm:text-3xl font-display text-muted-foreground">{stats.negative}</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Отрицательных</div>
             </div>
           </div>
         </motion.div>
