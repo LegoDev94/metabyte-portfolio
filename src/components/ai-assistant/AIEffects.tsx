@@ -187,8 +187,7 @@ export function AIBubbleComponent({ bubble, onClose }: { bubble: AIBubble; onClo
       initial={{ opacity: 0, scale: 0.8, y: 10 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.8, y: -10 }}
-      className="fixed z-[100] max-w-xs"
-      style={{ left: bubble.x, top: bubble.y }}
+      className="fixed z-[100] max-w-xs right-6 bottom-24"
     >
       <div className="relative bg-card border border-primary/30 rounded-2xl p-3 shadow-lg shadow-primary/10">
         {/* Arrow pointing down to AI button */}
