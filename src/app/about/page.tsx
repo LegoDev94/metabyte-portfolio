@@ -109,8 +109,8 @@ export default function AboutPage() {
                   Обо мне
                 </span>
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-display tracking-wide mb-6">
-                  <span className="text-foreground">Привет, я </span>
-                  <span className="text-primary text-glow-cyan">Metabyte</span>
+                  <span className="text-foreground">Привет. Я </span>
+                  <span className="text-primary text-glow-cyan">Владимир</span>
                 </h1>
                 <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
                   Full-Stack разработчик и основатель IT-студии METABYTE.
