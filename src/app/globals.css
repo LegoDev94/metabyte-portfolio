@@ -1,26 +1,273 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
+/* ===== CYBERPUNK THEME ===== */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains);
+  --font-display: var(--font-orbitron);
+
+  /* Neon colors */
+  --color-neon-cyan: var(--neon-cyan);
+  --color-neon-magenta: var(--neon-magenta);
+  --color-neon-green: var(--neon-green);
+  --color-neon-yellow: var(--neon-yellow);
+  --color-neon-red: var(--neon-red);
+
+  /* UI colors */
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Radius */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ===== ROOT VARIABLES (Dark by default) ===== */
+:root {
+  --radius: 0.625rem;
+
+  /* Background */
+  --background: #0a0a0f;
+  --foreground: #f2f2f2;
+
+  /* Cards & Surfaces */
+  --card: #12121a;
+  --card-foreground: #f2f2f2;
+  --popover: #12121a;
+  --popover-foreground: #f2f2f2;
+
+  /* Primary (Cyan Neon) */
+  --primary: #00ffff;
+  --primary-foreground: #0a0a0f;
+
+  /* Secondary */
+  --secondary: #1a1a24;
+  --secondary-foreground: #f2f2f2;
+
+  /* Muted */
+  --muted: #1a1a24;
+  --muted-foreground: #a6a6a6;
+
+  /* Accent (Magenta Neon) */
+  --accent: #ff00ff;
+  --accent-foreground: #0a0a0f;
+
+  /* Destructive */
+  --destructive: #ff0040;
+
+  /* Borders & Input */
+  --border: #262630;
+  --input: #1a1a24;
+  --ring: #00ffff;
+
+  /* ===== NEON COLORS ===== */
+  --neon-cyan: #00ffff;
+  --neon-cyan-dim: #009999;
+  --neon-cyan-glow: rgba(0, 255, 255, 0.4);
+
+  --neon-magenta: #ff00ff;
+  --neon-magenta-dim: #990099;
+  --neon-magenta-glow: rgba(255, 0, 255, 0.4);
+
+  --neon-green: #00ff00;
+  --neon-green-dim: #009900;
+
+  --neon-yellow: #ffff00;
+  --neon-yellow-dim: #b3b300;
+
+  --neon-red: #ff0040;
+  --neon-red-dim: #b3002d;
+}
+
+/* ===== BASE STYLES ===== */
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-inter), system-ui, sans-serif;
+  }
+
+  /* Selection */
+  ::selection {
+    background: var(--neon-cyan);
+    color: var(--background);
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--background);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--neon-cyan-dim);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ===== UTILITY CLASSES ===== */
+@layer utilities {
+  /* Neon Text Glow */
+  .text-glow-cyan {
+    text-shadow:
+      0 0 10px var(--neon-cyan-glow),
+      0 0 20px var(--neon-cyan-glow),
+      0 0 40px var(--neon-cyan-glow);
+  }
+
+  .text-glow-magenta {
+    text-shadow:
+      0 0 10px var(--neon-magenta-glow),
+      0 0 20px var(--neon-magenta-glow),
+      0 0 40px var(--neon-magenta-glow);
+  }
+
+  /* Neon Box Glow */
+  .glow-cyan {
+    box-shadow:
+      0 0 20px var(--neon-cyan-glow),
+      0 0 40px var(--neon-cyan-glow);
+  }
+
+  .glow-magenta {
+    box-shadow:
+      0 0 20px var(--neon-magenta-glow),
+      0 0 40px var(--neon-magenta-glow);
+  }
+
+  /* Gradient Text */
+  .gradient-text {
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Cyber Grid Background */
+  .cyber-grid {
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+
+  /* Glass Effect */
+  .glass {
+    background: rgba(18, 18, 26, 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+  }
+
+  /* Neon Border */
+  .neon-border {
+    border: 1px solid var(--neon-cyan);
+    box-shadow:
+      0 0 5px var(--neon-cyan-glow),
+      inset 0 0 5px var(--neon-cyan-glow);
+  }
+
+  /* Animation: Pulse Glow */
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  /* Animation: Float */
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+}
+
+/* ===== KEYFRAMES ===== */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px var(--neon-cyan-glow);
+  }
+  50% {
+    box-shadow: 0 0 40px var(--neon-cyan-glow), 0 0 60px var(--neon-cyan-glow);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes typewriter {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes blink {
+  50% {
+    border-color: transparent;
+  }
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* ===== FONT DISPLAY ===== */
+.font-display {
+  font-family: var(--font-orbitron), sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.font-mono {
+  font-family: var(--font-jetbrains), monospace;
 }
