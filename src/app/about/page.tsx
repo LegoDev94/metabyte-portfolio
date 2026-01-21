@@ -21,18 +21,18 @@ const team = [
   {
     name: "Сергей",
     age: 31,
-    role: "Программист",
-    description: "Разработка игр, сайтов",
+    role: "Full-Stack разработчик",
+    description: "Архитектор игровых систем и веб-приложений. Специализируется на создании сложных мультиплеерных проектов с нуля. Превращает идеи в работающий код за рекордные сроки.",
     photo: "/images/team/zergo.png",
-    skills: ["Game Dev", "Web", "Full-Stack"],
+    skills: ["Game Dev", "React", "Node.js", "WebSocket"],
   },
   {
     name: "Юрий",
     age: 30,
-    role: "Маркетолог & DevOps",
-    description: "SEO, DevOps, VibeCoding",
-    photo: "/images/team/iurii.png",
-    skills: ["SEO", "DevOps", "Marketing"],
+    role: "DevOps & SEO-специалист",
+    description: "Мастер продвижения и инфраструктуры. Обеспечивает стабильную работу проектов и их видимость в поисковых системах. Автоматизирует всё, что можно автоматизировать.",
+    photo: "/images/team/yuri.png",
+    skills: ["SEO", "DevOps", "CI/CD", "Analytics"],
   },
 ];
 
@@ -309,52 +309,81 @@ export default function AboutPage() {
               </p>
             </motion.div>
 
-            <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+            <div className="max-w-5xl mx-auto space-y-16">
               {team.map((member, index) => (
                 <motion.div
                   key={member.name}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                  transition={{ duration: 0.5, delay: index * 0.15 }}
                   className="relative group"
                 >
-                  <div className="p-6 rounded-2xl bg-card border border-border hover:border-accent/30 transition-all duration-300">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="relative w-20 h-20 rounded-xl overflow-hidden border-2 border-accent/30">
+                  {/* Seamless connector line between cards */}
+                  {index > 0 && (
+                    <div className="absolute left-1/2 -top-8 w-px h-8 bg-gradient-to-b from-transparent via-accent/50 to-accent/30" />
+                  )}
+
+                  <div className={`flex flex-col ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} items-center gap-8 p-8 rounded-3xl bg-card border border-border hover:border-accent/50 transition-all duration-500 hover:shadow-xl hover:shadow-accent/10`}>
+                    {/* Photo with neon glow - Large */}
+                    <div className="relative w-48 h-48 md:w-56 md:h-56 flex-shrink-0">
+                      {/* Outer neon glow */}
+                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary via-accent to-primary opacity-30 blur-xl group-hover:opacity-50 transition-opacity duration-500" />
+                      {/* Inner container */}
+                      <div className="absolute inset-2 rounded-2xl overflow-hidden border-2 border-accent/60 shadow-[0_0_30px_rgba(255,0,255,0.3)]">
                         <Image
                           src={member.photo}
                           alt={member.name}
                           fill
                           className="object-cover"
                         />
+                        {/* Inner neon glow overlay */}
+                        <div className="absolute inset-0 shadow-[inset_0_0_40px_rgba(0,255,255,0.25),inset_0_0_80px_rgba(255,0,255,0.15)]" />
+                        {/* Gradient overlay for depth */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
                       </div>
-                      <div>
-                        <h3 className="text-xl font-semibold text-foreground">
-                          {member.name}
-                        </h3>
-                        <p className="text-sm text-muted-foreground">
-                          {member.age} лет
-                        </p>
-                        <p className="text-accent font-medium">
-                          {member.role}
-                        </p>
-                      </div>
+                      {/* Corner accents */}
+                      <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-primary rounded-tl-lg" />
+                      <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-accent rounded-tr-lg" />
+                      <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-accent rounded-bl-lg" />
+                      <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-primary rounded-br-lg" />
                     </div>
-                    <p className="text-muted-foreground mb-4">
-                      {member.description}
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {member.skills.map((skill) => (
-                        <span
-                          key={skill}
-                          className="px-2 py-1 text-xs rounded-md bg-accent/10 text-accent border border-accent/20"
-                        >
-                          {skill}
-                        </span>
-                      ))}
+
+                    {/* Info block */}
+                    <div className={`flex-1 ${index % 2 === 0 ? 'text-left md:text-left' : 'text-left md:text-right'}`}>
+                      <h3 className="text-3xl font-bold text-foreground mb-2">
+                        {member.name}
+                      </h3>
+                      <p className="text-accent font-semibold text-xl mb-1">
+                        {member.role}
+                      </p>
+                      <p className="text-sm text-muted-foreground/70 mb-4">
+                        {member.age} лет
+                      </p>
+
+                      {/* Description */}
+                      <p className="text-muted-foreground mb-6 leading-relaxed text-lg">
+                        {member.description}
+                      </p>
+
+                      {/* Skills */}
+                      <div className={`flex flex-wrap gap-2 ${index % 2 === 0 ? 'justify-start md:justify-start' : 'justify-start md:justify-end'}`}>
+                        {member.skills.map((skill) => (
+                          <span
+                            key={skill}
+                            className="px-4 py-2 text-sm rounded-xl bg-accent/10 text-accent border border-accent/30 hover:bg-accent/20 hover:border-accent/50 transition-all duration-300"
+                          >
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </div>
+
+                  {/* Seamless connector to next card */}
+                  {index < team.length - 1 && (
+                    <div className="absolute left-1/2 -bottom-8 w-px h-8 bg-gradient-to-b from-accent/30 via-accent/50 to-transparent" />
+                  )}
                 </motion.div>
               ))}
             </div>
