@@ -11,5 +11,7 @@ services:
         value: production
       - key: NEXT_TELEMETRY_DISABLED
         value: "1"
+      - key: OPENAI_API_KEY
+        sync: false  # Нужно добавить вручную в Dashboard Render
     healthCheckPath: /
     autoDeploy: true
