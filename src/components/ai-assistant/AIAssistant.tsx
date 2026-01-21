@@ -205,8 +205,8 @@ export function AIAssistant() {
 
   const fetchUserCity = async () => {
     try {
-      // Используем бесплатный сервис ip-api.com
-      const response = await fetch("http://ip-api.com/json/?fields=city&lang=ru");
+      // Используем ipapi.co (поддерживает HTTPS)
+      const response = await fetch("https://ipapi.co/json/");
       if (response.ok) {
         const data = await response.json();
         if (data.city) {

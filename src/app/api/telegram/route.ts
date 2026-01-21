@@ -10,8 +10,11 @@ interface ContactFormData {
   message: string;
 }
 
-function escapeMarkdown(text: string): string {
-  return text.replace(/[_*[\]()~`>#+=|{}.!-]/g, "\\$&");
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }
 
 export async function POST(request: NextRequest) {
@@ -44,17 +47,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Format message for Telegram
-    const telegramMessage = `
-🔔 *Новое сообщение с портфолио*
-
-👤 *Имя:* ${escapeMarkdown(data.name)}
-📧 *Email:* ${escapeMarkdown(data.email)}
-${data.subject ? `📝 *Тема:* ${escapeMarkdown(data.subject)}\n` : ""}
-💬 *Сообщение:*
-${escapeMarkdown(data.message)}
-
-⏰ ${new Date().toLocaleString("ru-RU", { timeZone: "Europe/Moscow" })}
-    `.trim();
+    const telegramMessage =
+      `<b>🔔 Новое сообщение с портфолио</b>\n\n` +
+      `👤 <b>Имя:</b> ${escapeHtml(data.name)}\n` +
+      `📧 <b>Email:</b> ${escapeHtml(data.email)}\n` +
+      `${data.subject ? `📝 <b>Тема:</b> ${escapeHtml(data.subject)}\n` : ""}` +
+      `💬 <b>Сообщение:</b>\n${escapeHtml(data.message)}\n\n` +
+      `⏰ ${new Date().toLocaleString("ru-RU", { timeZone: "Europe/Moscow" })}`;
 
     // Send to Telegram
     const response = await fetch(
@@ -65,7 +64,7 @@ ${escapeMarkdown(data.message)}
         body: JSON.stringify({
           chat_id: TELEGRAM_CHAT_ID,
           text: telegramMessage,
-          parse_mode: "MarkdownV2",
+          parse_mode: "HTML",
         }),
       }
     );
