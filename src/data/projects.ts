@@ -932,55 +932,215 @@ export const projects: Project[] = [
   },
   {
     slug: "vibe-taxi",
-    title: "Vibe Taxi",
-    subtitle: "Full-Stack Taxi Application",
+    title: "VIBE GO",
+    subtitle: "Flutter Taxi Application",
     description:
-      "Monorepo такси-приложение: клиент, водитель, админ панель и API. Turborepo + Next.js + Fastify.",
-    fullDescription: `Vibe Taxi — полноценная экосистема для такси-сервиса, построенная как monorepo с использованием Turborepo и pnpm workspaces.
+      "Мобильное такси-приложение на Flutter: клиент, водитель, веб-админка. Supabase + Яндекс Карты + Telegram Bot.",
+    fullDescription: `VIBE GO — полноценная экосистема для такси-сервиса, построенная на Flutter с использованием Supabase в качестве бэкенда.
 
-Включает 4 приложения: Client (заказ такси), Driver (для водителей), Admin (панель управления) и API (Fastify сервер). Все фронтенд приложения на Next.js 14.
+Включает 3 приложения: Client (заказ такси для пассажиров), Driver (для водителей с верификацией), Admin (веб-панель управления). Все мобильные приложения на Flutter с единой кодовой базой.
 
-Реализована геолокация в реальном времени через Socket.IO, интеграция с Яндекс Картами, авторизация через Telegram.`,
+Реализована геолокация в реальном времени через Supabase Realtime, интеграция с Яндекс Картами для маршрутов, авторизация через Telegram Bot с deep linking. Система тарифов (Эконом/Комфорт/Бизнес), рейтинги, чат между клиентом и водителем, реферальная программа.`,
     category: "enterprise",
     categoryLabel: "Transportation",
-    image: "/images/projects/vibe-taxi.jpg",
+    image: "/images/projects/vibe-taxi/cover.jpg",
     technologies: [
-      { name: "Next.js 14", icon: "triangle", color: "#ffffff" },
-      { name: "Fastify", icon: "zap", color: "#ffffff" },
-      { name: "Prisma", icon: "database", color: "#5a67d8" },
+      { name: "Flutter", icon: "smartphone", color: "#02569B" },
+      { name: "Supabase", icon: "database", color: "#3ECF8E" },
       { name: "PostgreSQL", icon: "database", color: "#336791" },
-      { name: "Socket.IO", icon: "wifi", color: "#ffffff" },
-      { name: "Turborepo", icon: "boxes", color: "#ef4444" },
+      { name: "Yandex MapKit", icon: "map", color: "#FC3F1D" },
+      { name: "Telegram Bot", icon: "send", color: "#0088cc" },
+      { name: "Flutter BLoC", icon: "layers", color: "#02569B" },
     ],
     features: [
       {
-        title: "Monorepo",
-        description: "Turborepo + pnpm workspaces",
-        icon: "boxes",
-      },
-      {
-        title: "4 приложения",
-        description: "Client, Driver, Admin, API",
+        title: "3 приложения",
+        description: "Client, Driver, Admin (Web)",
         icon: "layout-grid",
       },
       {
-        title: "Real-time",
-        description: "Socket.IO для геолокации",
+        title: "Supabase Backend",
+        description: "Auth, Database, Realtime, Storage",
+        icon: "database",
+      },
+      {
+        title: "Яндекс Карты",
+        description: "Геолокация и построение маршрутов",
         icon: "map-pin",
       },
       {
         title: "Telegram Auth",
-        description: "Авторизация через Telegram",
+        description: "Авторизация через бота с deep links",
         icon: "send",
+      },
+      {
+        title: "Система тарифов",
+        description: "Эконом, Комфорт, Бизнес",
+        icon: "credit-card",
+      },
+      {
+        title: "Верификация водителей",
+        description: "Фото документов, проверка админом",
+        icon: "shield-check",
       },
     ],
     links: {
-      github: "https://github.com/Metabyte-Corp/vibe-taxi",
+      github: "https://github.com/LegoDev94/flutter-vibe-go",
     },
     metrics: [
-      { label: "Приложений", value: "4", icon: "layout-grid" },
-      { label: "Пакетов", value: "5", icon: "package" },
+      { label: "Приложений", value: "3", icon: "layout-grid" },
+      { label: "Таблиц БД", value: "10+", icon: "database" },
+      { label: "Edge Functions", value: "5", icon: "zap" },
     ],
+    caseStudy: {
+      challenge: "Заказчику нужно было мобильное такси-приложение для локального рынка — аналог Uber/Яндекс.Такси, но с Telegram-авторизацией, так как пользователи региона привыкли к мессенджеру. Требовались три отдельных приложения: для пассажиров, водителей и администраторов.",
+      solution: "Я разработал единую кодовую базу на Flutter с тремя entry points для разных приложений. Supabase обеспечивает бэкенд: PostgreSQL для данных, Realtime для отслеживания водителей, Edge Functions для бизнес-логики (расчёт цены, поиск водителей), Storage для фото верификации. Telegram Bot с deep linking для бесшовной авторизации.",
+      results: [
+        "Единая кодовая база Flutter для 3 приложений — экономия 40% времени разработки",
+        "Telegram-авторизация за 2 клика без ввода телефона и пароля",
+        "Realtime-отслеживание водителей на карте с обновлением каждые 2 секунды",
+        "Система верификации водителей с загрузкой документов и проверкой админом",
+        "3 тарифа (Эконом/Комфорт/Бизнес) с автоматическим расчётом стоимости",
+        "Чат между клиентом и водителем во время поездки",
+      ],
+      userFlows: [
+        {
+          id: "client-order",
+          title: "Заказ такси (клиент)",
+          description: "От открытия приложения до поездки",
+          icon: "car",
+          steps: [
+            { title: "Авторизация", description: "Вход через Telegram бота за 2 клика", icon: "send" },
+            { title: "Выбор маршрута", description: "Откуда/Куда на карте Яндекс", icon: "map-pin" },
+            { title: "Выбор тарифа", description: "Эконом, Комфорт или Бизнес", icon: "credit-card" },
+            { title: "Поиск водителя", description: "Edge Function ищет ближайших онлайн-водителей", icon: "search" },
+            { title: "Отслеживание", description: "Realtime-позиция водителя на карте", icon: "navigation" },
+            { title: "Поездка и оплата", description: "Чат, оценка, оплата наличными/картой", icon: "check-circle" },
+          ],
+        },
+        {
+          id: "driver-flow",
+          title: "Работа водителя",
+          description: "От регистрации до выполнения заказов",
+          icon: "user",
+          steps: [
+            { title: "Регистрация", description: "Данные + фото автомобиля + документы", icon: "file-text" },
+            { title: "Верификация", description: "Админ проверяет документы в панели", icon: "shield-check" },
+            { title: "Выход на линию", description: "Переключение статуса Online/Offline", icon: "toggle-right" },
+            { title: "Получение заказа", description: "Push-уведомление с деталями поездки", icon: "bell" },
+            { title: "Навигация", description: "Маршрут к клиенту на Яндекс Картах", icon: "navigation" },
+            { title: "Завершение", description: "Оценка клиента, статистика заработка", icon: "star" },
+          ],
+        },
+        {
+          id: "admin-panel",
+          title: "Админ-панель (Web)",
+          description: "Управление платформой",
+          icon: "settings",
+          steps: [
+            { title: "Dashboard", description: "Статистика: заказы, водители, выручка", icon: "bar-chart" },
+            { title: "Верификация", description: "Проверка документов новых водителей", icon: "user-check" },
+            { title: "Управление тарифами", description: "Настройка цен: база, км, минута", icon: "sliders" },
+            { title: "Мониторинг заказов", description: "Все поездки в реальном времени", icon: "activity" },
+            { title: "Клиенты и водители", description: "Просмотр профилей, блокировка", icon: "users" },
+          ],
+        },
+      ],
+      technicalHighlights: [
+        {
+          title: "Flutter + единая кодовая база",
+          description: "Три приложения (Client, Driver, Admin) из одного проекта с разными entry points. Общие компоненты, модели, сервисы. Экономия 40% времени на разработку и поддержку.",
+          icon: "smartphone",
+          tags: ["Flutter", "Code reuse", "Multi-app"],
+        },
+        {
+          title: "Supabase Backend",
+          description: "PostgreSQL с Row Level Security для безопасности данных. Realtime subscriptions для отслеживания водителей. Edge Functions (Deno) для серверной логики. Storage для фото документов.",
+          icon: "database",
+          tags: ["PostgreSQL", "Realtime", "Edge Functions", "RLS"],
+        },
+        {
+          title: "Telegram Deep Linking",
+          description: "Авторизация через Telegram бота: пользователь нажимает кнопку → бот создаёт сессию → deep link открывает приложение с токеном. Никаких паролей, OTP-кодов.",
+          icon: "send",
+          tags: ["Telegram Bot API", "Deep Links", "Passwordless"],
+        },
+        {
+          title: "Яндекс MapKit",
+          description: "Интеграция с Яндекс Картами для геолокации, построения маршрутов, расчёта расстояния и времени. Отображение водителей в реальном времени.",
+          icon: "map",
+          tags: ["Yandex MapKit", "Routing", "Geocoding"],
+        },
+      ],
+      architecture: {
+        description: "Flutter-приложения общаются с Supabase напрямую. Edge Functions обрабатывают сложную логику. Telegram Bot через webhook авторизует пользователей.",
+        layers: [
+          {
+            name: "Mobile Apps (Flutter)",
+            components: ["Client App", "Driver App", "BLoC State Management", "GoRouter Navigation"],
+            color: "#02569B",
+          },
+          {
+            name: "Admin Panel (Flutter Web)",
+            components: ["Dashboard", "Driver Verification", "Tariffs Management", "Orders Monitor"],
+            color: "#02569B",
+          },
+          {
+            name: "Supabase Backend",
+            components: ["PostgreSQL + RLS", "Realtime Subscriptions", "Storage (Photos)", "Auth"],
+            color: "#3ECF8E",
+          },
+          {
+            name: "Edge Functions (Deno)",
+            components: ["telegram-auth", "calculate-price", "process-order", "find-drivers"],
+            color: "#ffffff",
+          },
+          {
+            name: "External Services",
+            components: ["Telegram Bot API", "Yandex MapKit", "Push Notifications"],
+            color: "#0088cc",
+          },
+        ],
+      },
+      integrations: [
+        {
+          name: "Supabase",
+          logo: "database",
+          description: "Backend-as-a-Service: PostgreSQL, Auth, Realtime, Storage, Edge Functions",
+          color: "#3ECF8E",
+        },
+        {
+          name: "Flutter BLoC",
+          logo: "layers",
+          description: "State management с разделением бизнес-логики и UI",
+          color: "#02569B",
+        },
+        {
+          name: "Yandex MapKit",
+          logo: "map",
+          description: "Карты, геолокация, маршруты, геокодинг",
+          color: "#FC3F1D",
+        },
+        {
+          name: "Telegram Bot",
+          logo: "send",
+          description: "Авторизация через бота с deep links в приложение",
+          color: "#0088cc",
+        },
+        {
+          name: "GoRouter",
+          logo: "navigation",
+          description: "Декларативный роутинг с deep link поддержкой",
+          color: "#02569B",
+        },
+        {
+          name: "Geolocator",
+          logo: "map-pin",
+          description: "Отслеживание позиции водителя в фоне",
+          color: "#42b883",
+        },
+      ],
+    },
   },
   {
     slug: "404-dispatch",
