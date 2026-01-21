@@ -395,48 +395,11 @@ export function AIAssistant() {
   }, [trackAction]);
 
   // ============================================
-  // PERIODIC AI CHECK
+  // PERIODIC AI CHECK - DISABLED to prevent AI talking to itself
   // ============================================
 
-  useEffect(() => {
-    if (!hasSeenIntro) return; // Ждём intro
-
-    const checkAI = async () => {
-      const now = Date.now();
-      if (now - lastAICheckRef.current < 60000) return; // Раз в минуту
-      if (actionBufferRef.current.length < 3) return;
-      if (isLoading || isOpen) return; // Не прерываем если чат открыт
-
-      lastAICheckRef.current = now;
-
-      try {
-        const response = await fetch("/api/ai-assistant", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            actions: actionBufferRef.current,
-            conversationHistory: messages.slice(-10),
-            currentPage: pathname,
-            userCity,
-          }),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          if (data.message && data.message.trim()) {
-            setMessages((prev) => [...prev, { role: "assistant", content: data.message }]);
-            setHasNewMessage(true);
-            executeFunctionCalls(data.functionCalls);
-          }
-        }
-      } catch (error) {
-        console.error("AI check error:", error);
-      }
-    };
-
-    const interval = setInterval(checkAI, 30000);
-    return () => clearInterval(interval);
-  }, [pathname, isLoading, messages, userCity, hasSeenIntro, isOpen]);
+  // Removed automatic periodic AI checks that caused AI to generate
+  // messages without user input, making it appear to "talk to itself"
 
   // ============================================
   // FUNCTION EXECUTION

@@ -608,22 +608,21 @@ export async function POST(request: NextRequest) {
       ...conversationHistory,
     ];
 
-    // Если нет сообщений от пользователя — AI начинает сам
+    // Если это Introduction - AI представляется
+    if (isIntroduction && conversationHistory.length === 0) {
+      messages.push({
+        role: "user",
+        content: "Представься клиенту! Это первый визит, момент знакомства. Будь эффектным но кратким.",
+      });
+    }
+
+    // Если последнее сообщение не от пользователя и это не introduction - не отвечаем
     if (
-      conversationHistory.length === 0 ||
+      !isIntroduction &&
+      conversationHistory.length > 0 &&
       conversationHistory[conversationHistory.length - 1]?.role !== "user"
     ) {
-      if (isIntroduction) {
-        messages.push({
-          role: "user",
-          content: "Представься клиенту! Это первый визит, момент знакомства. Будь эффектным но кратким.",
-        });
-      } else {
-        messages.push({
-          role: "user",
-          content: "Реагируй на действия пользователя если уместно. Отвечай КРАТКО.",
-        });
-      }
+      return NextResponse.json({ message: "", functionCalls: [] });
     }
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
