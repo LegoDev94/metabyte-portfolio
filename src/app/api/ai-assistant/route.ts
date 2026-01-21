@@ -1,6 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+
+// Функция отправки уведомления в Telegram
+async function sendTelegramNotification(text: string) {
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+    console.log("Telegram not configured, skipping notification");
+    return;
+  }
+
+  try {
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text,
+        parse_mode: "HTML",
+      }),
+    });
+  } catch (error) {
+    console.error("Failed to send Telegram notification:", error);
+  }
+}
 
 interface UserAction {
   type: string;
@@ -508,6 +532,31 @@ export async function POST(request: NextRequest) {
       wonDiscount?: boolean;
     };
 
+    // Уведомление о новом посетителе
+    if (isIntroduction && isFirstVisit) {
+      const cityInfo = userCity ? ` iz ${userCity}` : "";
+      await sendTelegramNotification(
+        `<b>🆕 Novyj posetitel' na sajte!</b>\n\n` +
+        `📍 Stranica: ${currentPage}\n` +
+        `🌆 Gorod: ${userCity || "Neopredelyon"}\n` +
+        `⏰ ${new Date().toLocaleString("ru-RU", { timeZone: "Europe/Moscow" })}`
+      );
+    }
+
+    // Уведомление о новом сообщении от пользователя
+    const lastUserMessage = conversationHistory.filter(m => m.role === "user").pop();
+    if (lastUserMessage && conversationHistory.length <= 2) {
+      // Первое сообщение от пользователя - начало диалога
+      await sendTelegramNotification(
+        `<b>💬 Nachalas' perepiska s AI!</b>\n\n` +
+        `👤 Klient: ${userName || "Anonim"}\n` +
+        `🌆 Gorod: ${userCity || "Neopredelyon"}\n` +
+        `📍 Stranica: ${currentPage}\n` +
+        `💭 Soobshchenie: ${lastUserMessage.content.slice(0, 200)}${lastUserMessage.content.length > 200 ? "..." : ""}\n\n` +
+        `⏰ ${new Date().toLocaleString("ru-RU", { timeZone: "Europe/Moscow" })}`
+      );
+    }
+
     // Формируем контекст
     let contextInfo = `\n\n═══ ТЕКУЩИЙ КОНТЕКСТ ═══\n`;
     contextInfo += `📍 Страница: ${currentPage}\n`;
@@ -615,6 +664,56 @@ export async function POST(request: NextRequest) {
           arguments: JSON.parse(call.function.arguments),
         })
       );
+
+      // Уведомления о важных действиях
+      for (const call of functionCalls) {
+        if (call.name === "collectContactInfo") {
+          const args = call.arguments as { name: string; contact: string; message?: string };
+          await sendTelegramNotification(
+            `<b>🎯 AI sobral kontakty!</b>\n\n` +
+            `👤 Imya: ${args.name}\n` +
+            `📱 Kontakt: ${args.contact}\n` +
+            `${args.message ? `💬 Soobshchenie: ${args.message}\n` : ""}` +
+            `🌆 Gorod: ${userCity || "Neopredelyon"}\n` +
+            `📍 Stranica: ${currentPage}\n\n` +
+            `⏰ ${new Date().toLocaleString("ru-RU", { timeZone: "Europe/Moscow" })}`
+          );
+        }
+
+        if (call.name === "askForContact") {
+          await sendTelegramNotification(
+            `<b>📋 AI zaprosil kontakty u klienta</b>\n\n` +
+            `👤 Klient: ${userName || "Anonim"}\n` +
+            `🌆 Gorod: ${userCity || "Neopredelyon"}\n` +
+            `📍 Stranica: ${currentPage}\n\n` +
+            `⏰ ${new Date().toLocaleString("ru-RU", { timeZone: "Europe/Moscow" })}`
+          );
+        }
+
+        if (call.name === "startGame") {
+          await sendTelegramNotification(
+            `<b>🎮 Klient nachal igru v krestiki-noliki!</b>\n\n` +
+            `👤 Klient: ${userName || "Anonim"}\n` +
+            `🌆 Gorod: ${userCity || "Neopredelyon"}\n` +
+            `🎁 Stavka: skidka 10%\n\n` +
+            `⏰ ${new Date().toLocaleString("ru-RU", { timeZone: "Europe/Moscow" })}`
+          );
+        }
+
+        if (call.name === "navigateTo") {
+          const args = call.arguments as { path: string };
+          // Уведомляем только о переходах на страницы проектов
+          if (args.path.startsWith("/projects/")) {
+            await sendTelegramNotification(
+              `<b>👀 Klient smotrit proekt</b>\n\n` +
+              `👤 Klient: ${userName || "Anonim"}\n` +
+              `📂 Proekt: ${args.path.replace("/projects/", "")}\n` +
+              `🌆 Gorod: ${userCity || "Neopredelyon"}\n\n` +
+              `⏰ ${new Date().toLocaleString("ru-RU", { timeZone: "Europe/Moscow" })}`
+            );
+          }
+        }
+      }
     }
 
     return NextResponse.json({
