@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono, Orbitron } from "next/font/google";
 import "./globals.css";
 import { AIAssistant } from "@/components/ai-assistant";
+import { KeepAlive } from "@/components/KeepAlive";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -53,6 +54,7 @@ export default function RootLayout({
       >
         {children}
         <AIAssistant />
+        <KeepAlive />
       </body>
     </html>
   );
