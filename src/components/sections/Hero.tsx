@@ -60,7 +60,7 @@ export function Hero() {
           className="h-10 md:h-12 flex items-center justify-center mb-8"
         >
           <span className="text-xl md:text-2xl font-mono gradient-text">
-            <Typewriter text="Веб-приложения • Игры • Telegram Mini Apps" delay={0.5} speed={50} />
+            <Typewriter text="SaaS • FinTech • E-commerce • Игры • Mobile Apps" delay={0.5} speed={50} />
           </span>
         </motion.div>
 
@@ -71,7 +71,7 @@ export function Hero() {
           transition={{ duration: 0.5, delay: 0.4 }}
           className="flex flex-wrap items-center justify-center gap-3 mb-12"
         >
-          {["React", "Next.js", "Node.js", "TypeScript"].map((tech) => (
+          {["React", "Next.js", "Flutter", "Node.js", "TypeScript"].map((tech) => (
             <span
               key={tech}
               className="px-3 py-1 text-sm font-mono bg-muted/50 border border-border rounded-full text-foreground"
