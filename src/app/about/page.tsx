@@ -122,6 +122,7 @@ export default function AboutPage() {
                       src="/images/team/vladimir.png"
                       alt="Владимир - Full-Stack разработчик"
                       fill
+                      sizes="(max-width: 768px) 100vw, 448px"
                       className="object-cover"
                       priority
                     />
@@ -231,6 +232,7 @@ export default function AboutPage() {
                           src={member.photo}
                           alt={member.name}
                           fill
+                          sizes="(max-width: 768px) 160px, 192px"
                           className="object-cover"
                         />
                         <div className="absolute inset-0 shadow-[inset_0_0_40px_rgba(0,255,255,0.25),inset_0_0_80px_rgba(255,0,255,0.15)]" />

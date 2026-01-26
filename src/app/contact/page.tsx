@@ -263,7 +263,7 @@ export default function ContactPage() {
                   </h3>
                   <div className="space-y-4">
                     <a
-                      href="https://github.com/Metabyte-Corp"
+                      href="https://github.com/LegoDev94"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-3 p-4 rounded-lg bg-card border border-border hover:border-primary/30 transition-colors group"
@@ -276,13 +276,13 @@ export default function ContactPage() {
                           GitHub
                         </div>
                         <div className="text-sm text-muted-foreground">
-                          @Metabyte-Corp
+                          @LegoDev94
                         </div>
                       </div>
                     </a>
 
                     <a
-                      href="mailto:contact@metabyte.dev"
+                      href="mailto:vm@metabyte.md"
                       className="flex items-center gap-3 p-4 rounded-lg bg-card border border-border hover:border-primary/30 transition-colors group"
                     >
                       <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center">
@@ -293,7 +293,7 @@ export default function ContactPage() {
                           Email
                         </div>
                         <div className="text-sm text-muted-foreground">
-                          contact@metabyte.dev
+                          vm@metabyte.md
                         </div>
                       </div>
                     </a>
@@ -313,7 +313,7 @@ export default function ContactPage() {
                           <span className="text-xs text-yellow-500">4.9 ★</span>
                         </div>
                         <div className="text-sm text-muted-foreground">
-                          27 положительных отзывов
+                          28 положительных отзывов
                         </div>
                       </div>
                     </a>

@@ -45,7 +45,7 @@ const testimonials = [
 
 const stats = {
   rating: 4.9,
-  positive: 27,
+  positive: 28,
   negative: 0,
 };
 

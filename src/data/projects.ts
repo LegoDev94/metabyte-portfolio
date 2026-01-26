@@ -690,7 +690,7 @@ export const projects: Project[] = [
     ],
     links: {
       demo: "https://monopoly-lux.onrender.com",
-      github: "https://github.com/Metabyte-Corp/monopoly-lux",
+      github: "https://github.com/LegoDev94/monopoly-lux",
     },
     metrics: [
       { label: "Модулей", value: "50+", icon: "boxes" },
@@ -1186,7 +1186,7 @@ export const projects: Project[] = [
       },
     ],
     links: {
-      github: "https://github.com/Metabyte-Corp/404dispatch",
+      github: "https://github.com/LegoDev94/404dispatch",
     },
     metrics: [
       { label: "Ролей", value: "3", icon: "users" },
@@ -1237,7 +1237,7 @@ Real-time обновления через Socket.IO, авторизация че
       },
     ],
     links: {
-      github: "https://github.com/Metabyte-Corp/exchanger_pmr",
+      github: "https://github.com/LegoDev94/exchanger_pmr",
     },
   },
   {
@@ -1277,7 +1277,7 @@ Real-time обновления через Socket.IO, авторизация че
       },
     ],
     links: {
-      github: "https://github.com/Metabyte-Corp/fns-tg-scan",
+      github: "https://github.com/LegoDev94/fns-tg-scan",
     },
   },
   {
@@ -2299,7 +2299,7 @@ Premium-фичи: безлимитные лайки, просмотр кто л�
       },
     ],
     links: {
-      github: "https://github.com/Metabyte-Corp/fitpulse",
+      github: "https://github.com/LegoDev94/fitpulse",
     },
     metrics: [
       { label: "Упражнений", value: "500+", icon: "dumbbell" },
@@ -2351,7 +2351,7 @@ Premium-фичи: безлимитные лайки, просмотр кто л�
     ],
     links: {
       demo: "https://learnhub.metabyte.dev",
-      github: "https://github.com/Metabyte-Corp/learnhub",
+      github: "https://github.com/LegoDev94/learnhub",
     },
     metrics: [
       { label: "Курсов", value: "100+", icon: "book-open" },
@@ -2402,7 +2402,7 @@ Real-time аналитика: выручка, средний чек, попул�
       },
     ],
     links: {
-      github: "https://github.com/Metabyte-Corp/quickserve-pos",
+      github: "https://github.com/LegoDev94/quickserve-pos",
     },
     metrics: [
       { label: "Заведений", value: "50+", icon: "store" },
@@ -2454,7 +2454,7 @@ AI-ассистент для генерации текстов, хэштегов
     ],
     links: {
       demo: "https://postflow.metabyte.dev",
-      github: "https://github.com/Metabyte-Corp/postflow",
+      github: "https://github.com/LegoDev94/postflow",
     },
     metrics: [
       { label: "Соцсетей", value: "5", icon: "share-2" },

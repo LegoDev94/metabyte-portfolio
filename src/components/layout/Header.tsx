@@ -82,7 +82,7 @@ export function Header() {
           {/* Desktop Social Links */}
           <div className="hidden md:flex items-center gap-4">
             <a
-              href="https://github.com/Metabyte-Corp"
+              href="https://github.com/LegoDev94"
               target="_blank"
               rel="noopener noreferrer"
               className="p-2 text-muted-foreground hover:text-primary transition-colors"
@@ -146,7 +146,7 @@ export function Header() {
               </ul>
               <div className="flex items-center gap-4 mt-6 pt-6 border-t border-border">
                 <a
-                  href="https://github.com/Metabyte-Corp"
+                  href="https://github.com/LegoDev94"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 flex items-center justify-center gap-2 py-3 rounded-lg bg-secondary text-foreground"

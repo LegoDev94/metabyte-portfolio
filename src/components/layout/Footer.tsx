@@ -6,13 +6,13 @@ import { Github, Send, Mail, Heart } from "lucide-react";
 const footerLinks = [
   { href: "/", label: "Главная" },
   { href: "/projects", label: "Проекты" },
-  { href: "/about", label: "Обо мне" },
+  { href: "/about", label: "Команда" },
   { href: "/contact", label: "Контакты" },
 ];
 
 const socialLinks = [
   {
-    href: "https://github.com/Metabyte-Corp",
+    href: "https://github.com/LegoDev94",
     icon: Github,
     label: "GitHub",
   },
@@ -22,7 +22,7 @@ const socialLinks = [
     label: "Telegram",
   },
   {
-    href: "mailto:contact@metabyte.dev",
+    href: "mailto:vm@metabyte.md",
     icon: Mail,
     label: "Email",
   },
