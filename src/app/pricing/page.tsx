@@ -18,7 +18,7 @@ import Link from "next/link";
 const packages = [
   {
     name: "Landing Page",
-    price: "от $500",
+    price: "от 50 000 ₽",
     description: "Одностраничный сайт для продукта или услуги",
     icon: Zap,
     color: "#00ffff",
@@ -40,7 +40,7 @@ const packages = [
   },
   {
     name: "Web Application",
-    price: "от $2,000",
+    price: "от 200 000 ₽",
     description: "Полноценное веб-приложение с бэкендом",
     icon: Rocket,
     color: "#ff00ff",
@@ -60,7 +60,7 @@ const packages = [
   },
   {
     name: "Mobile App",
-    price: "от $3,000",
+    price: "от 300 000 ₽",
     description: "Кросс-платформенное приложение на Flutter",
     icon: Crown,
     color: "#ffaa00",
@@ -79,12 +79,12 @@ const packages = [
 ];
 
 const additionalServices = [
-  { name: "Telegram Bot", price: "от $300", description: "Бот с любым функционалом" },
-  { name: "Telegram Mini App", price: "от $800", description: "Приложение внутри Telegram" },
-  { name: "Интеграция с 1С", price: "от $500", description: "Синхронизация данных с 1С" },
-  { name: "AI интеграция", price: "от $400", description: "ChatGPT, Claude, генерация контента" },
-  { name: "Поддержка/месяц", price: "от $100", description: "Хостинг, мониторинг, багфиксы" },
-  { name: "UI/UX дизайн", price: "от $300", description: "Дизайн с Figma файлами" },
+  { name: "Telegram Bot", price: "от 30 000 ₽", description: "Бот с любым функционалом" },
+  { name: "Telegram Mini App", price: "от 80 000 ₽", description: "Приложение внутри Telegram" },
+  { name: "Интеграция с 1С", price: "от 50 000 ₽", description: "Синхронизация данных с 1С" },
+  { name: "AI интеграция", price: "от 40 000 ₽", description: "ChatGPT, Claude, генерация контента" },
+  { name: "Поддержка/месяц", price: "от 10 000 ₽", description: "Хостинг, мониторинг, багфиксы" },
+  { name: "UI/UX дизайн", price: "от 30 000 ₽", description: "Дизайн с Figma файлами" },
 ];
 
 export default function PricingPage() {
