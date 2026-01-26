@@ -15,20 +15,9 @@ import {
   Smartphone,
   ArrowRight,
   Users,
-  Code2,
-  Rocket,
-  Star,
-  Briefcase,
 } from "lucide-react";
 
 const team = [
-  {
-    name: "Владимир",
-    role: "Основатель & Lead Developer",
-    description: "Основатель METABYTE. 17+ коммерческих проектов: от FinTech платформ до 3D браузерных игр. Архитектура сложных систем, Full-Stack разработка, интеграция AI.",
-    photo: "/images/team/vladimir.png",
-    skills: ["React", "Next.js", "Node.js", "Flutter", "AI"],
-  },
   {
     name: "Сергей",
     role: "Full-Stack разработчик",
@@ -72,58 +61,39 @@ const skills = [
   },
 ];
 
-const stats = [
-  { icon: Briefcase, value: "17+", label: "проектов" },
-  { icon: Star, value: "4.9", label: "рейтинг" },
-  { icon: Globe, value: "5+", label: "стран" },
-  { icon: Code2, value: "2025", label: "год основания" },
-];
-
 export default function AboutPage() {
   return (
     <>
       <Header />
       <main className="min-h-screen pt-24">
-        {/* Hero */}
+        {/* Founder Hero */}
         <section className="py-16 relative">
           <div className="absolute inset-0 cyber-grid opacity-20" />
-          <div className="absolute top-1/4 -left-32 w-96 h-96 bg-primary/20 rounded-full blur-[128px]" />
-          <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-accent/20 rounded-full blur-[128px]" />
-
           <div className="container mx-auto px-4 lg:px-8 relative">
-            <div className="max-w-4xl mx-auto text-center">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
-                  <Users className="w-4 h-4 text-primary" />
-                  <span className="text-sm font-medium text-primary">Команда</span>
-                </div>
+                <span className="inline-block px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
+                  Основатель
+                </span>
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-display tracking-wide mb-6">
-                  <span className="text-primary text-glow-cyan">METABYTE</span>
-                  <span className="text-foreground"> — команда</span>
+                  <span className="text-foreground">Привет. Я </span>
+                  <span className="text-primary text-glow-cyan">Владимир</span>
                 </h1>
-                <p className="text-xl text-muted-foreground mb-8 leading-relaxed max-w-3xl mx-auto">
-                  Создаём веб-приложения, мобильные приложения, браузерные игры
-                  и системы автоматизации. От идеи до запуска — полный цикл разработки.
+                <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
+                  Full-Stack разработчик и основатель IT-студии METABYTE.
+                  Создаю веб-приложения, мобильные приложения на Flutter,
+                  браузерные мультиплеерные игры и системы с AI-интеграцией.
                 </p>
-
-                {/* Stats */}
-                <div className="flex flex-wrap justify-center gap-8 md:gap-12 mb-10">
-                  {stats.map((stat) => (
-                    <div key={stat.label} className="text-center">
-                      <div className="flex items-center justify-center gap-2 mb-1">
-                        <stat.icon className="w-5 h-5 text-primary" />
-                        <span className="text-3xl font-bold text-foreground">{stat.value}</span>
-                      </div>
-                      <div className="text-sm text-muted-foreground">{stat.label}</div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="flex flex-wrap justify-center gap-4">
+                <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+                  За плечами 17+ коммерческих проектов: от FinTech платформ и
+                  EdTech приложений до 3D браузерных игр с real-time мультиплеером.
+                  Работаю с React, Next.js, Vue, Flutter, Node.js и современными AI API.
+                </p>
+                <div className="flex flex-wrap gap-4">
                   <Button
                     asChild
                     className="bg-primary text-primary-foreground hover:bg-primary/90"
@@ -134,10 +104,87 @@ export default function AboutPage() {
                     </Link>
                   </Button>
                   <Button asChild variant="outline">
-                    <Link href="/pricing">Узнать цены</Link>
+                    <Link href="/contact">Связаться</Link>
                   </Button>
                 </div>
               </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="relative"
+              >
+                {/* Photo */}
+                <div className="relative aspect-square max-w-md mx-auto">
+                  <div className="absolute inset-0 rounded-3xl overflow-hidden border border-border">
+                    <Image
+                      src="/images/team/vladimir.png"
+                      alt="Владимир - Full-Stack разработчик"
+                      fill
+                      className="object-cover"
+                      priority
+                    />
+                  </div>
+                  {/* Decorative */}
+                  <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl" />
+                  <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-accent/20 rounded-full blur-2xl" />
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* Skills */}
+        <section className="py-16 border-t border-border bg-card/30">
+          <div className="container mx-auto px-4 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-3xl md:text-4xl font-display tracking-wide">
+                <span className="text-foreground">Наши </span>
+                <span className="text-accent text-glow-magenta">компетенции</span>
+              </h2>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {skills.map((skill, index) => (
+                <motion.div
+                  key={skill.category}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                  className="p-6 rounded-2xl bg-card border border-border hover:border-primary/30 transition-all duration-300"
+                >
+                  <div
+                    className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
+                    style={{ backgroundColor: `${skill.color}15` }}
+                  >
+                    <skill.icon
+                      className="w-6 h-6"
+                      style={{ color: skill.color }}
+                    />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground mb-3">
+                    {skill.category}
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {skill.items.map((item) => (
+                      <span
+                        key={item}
+                        className="px-2 py-1 text-xs rounded-md bg-secondary text-muted-foreground"
+                      >
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </motion.div>
+              ))}
             </div>
           </div>
         </section>
@@ -152,6 +199,10 @@ export default function AboutPage() {
               transition={{ duration: 0.5 }}
               className="text-center mb-12"
             >
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 mb-4">
+                <Users className="w-4 h-4 text-accent" />
+                <span className="text-sm font-medium text-accent">Команда</span>
+              </div>
               <h2 className="text-3xl md:text-4xl font-display tracking-wide">
                 <span className="text-foreground">Наша </span>
                 <span className="text-accent text-glow-magenta">команда</span>
@@ -212,63 +263,6 @@ export default function AboutPage() {
                         ))}
                       </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Skills */}
-        <section className="py-16 border-t border-border bg-card/30">
-          <div className="container mx-auto px-4 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="text-center mb-12"
-            >
-              <h2 className="text-3xl md:text-4xl font-display tracking-wide">
-                <span className="text-foreground">Наши </span>
-                <span className="text-primary text-glow-cyan">компетенции</span>
-              </h2>
-              <p className="text-muted-foreground mt-3 max-w-2xl mx-auto">
-                Технологии, которые мы используем для создания продуктов
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {skills.map((skill, index) => (
-                <motion.div
-                  key={skill.category}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
-                  className="p-6 rounded-2xl bg-card border border-border hover:border-primary/30 transition-all duration-300"
-                >
-                  <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-                    style={{ backgroundColor: `${skill.color}15` }}
-                  >
-                    <skill.icon
-                      className="w-6 h-6"
-                      style={{ color: skill.color }}
-                    />
-                  </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-3">
-                    {skill.category}
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {skill.items.map((item) => (
-                      <span
-                        key={item}
-                        className="px-2 py-1 text-xs rounded-md bg-secondary text-muted-foreground"
-                      >
-                        {item}
-                      </span>
-                    ))}
                   </div>
                 </motion.div>
               ))}
