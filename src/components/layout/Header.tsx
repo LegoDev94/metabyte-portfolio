@@ -11,7 +11,7 @@ const navLinks = [
   { href: "/", label: "Главная" },
   { href: "/projects", label: "Проекты" },
   { href: "/pricing", label: "Цены" },
-  { href: "/about", label: "О студии" },
+  { href: "/about", label: "Обо мне" },
   { href: "/contact", label: "Контакты" },
 ];
 
