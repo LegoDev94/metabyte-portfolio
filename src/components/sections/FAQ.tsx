@@ -4,43 +4,63 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, HelpCircle } from "lucide-react";
 
-const faqs = [
+export interface FAQItem {
+  id?: string;
+  question: string;
+  answer: string;
+  category?: string;
+}
+
+interface FAQProps {
+  items?: FAQItem[];
+}
+
+const defaultFAQs: FAQItem[] = [
   {
+    id: "1",
     question: "Сколько стоит разработка?",
     answer: "Стоимость зависит от сложности проекта. Landing page — от $500, Web-приложение — от $2000, Mobile app — от $3000. Точную оценку дадим после обсуждения требований. Первая консультация бесплатно."
   },
   {
+    id: "2",
     question: "Какие сроки разработки?",
     answer: "Landing page — 1-2 недели. Web-приложение средней сложности — 1-2 месяца. Сложные проекты — 2-4 месяца. Сроки фиксируем в договоре."
   },
   {
+    id: "3",
     question: "Как происходит оплата?",
     answer: "Работаем по предоплате 50%. Оставшиеся 50% — после сдачи проекта. Для крупных проектов возможна помесячная оплата. Принимаем переводы на карту, криптовалюту, PayPal."
   },
   {
+    id: "4",
     question: "Что если результат не понравится?",
     answer: "На каждом этапе согласовываем результат с вами. Дизайн утверждаем до начала разработки. Если что-то не устраивает — вносим правки. Гарантия на исправление багов — 30 дней после запуска."
   },
   {
+    id: "5",
     question: "Делаете ли поддержку после запуска?",
     answer: "Да, предлагаем пакеты поддержки: исправление багов, мелкие доработки, хостинг и мониторинг. Первые 30 дней поддержки включены в стоимость проекта."
   },
   {
+    id: "6",
     question: "Работаете ли с иностранными клиентами?",
     answer: "Да, работаем с клиентами из любых стран. Общаемся на русском и английском. Оплата в USD, EUR или криптовалюте."
   },
   {
+    id: "7",
     question: "Какие технологии используете?",
     answer: "Frontend: React, Next.js, Vue, Flutter. Backend: Node.js, Python. Базы данных: PostgreSQL, MongoDB, Supabase. Выбираем стек под задачу клиента."
   },
   {
+    id: "8",
     question: "Можно ли посмотреть код после завершения?",
     answer: "Да, передаём полный исходный код и все доступы. Код остаётся вашей собственностью. Используем Git для версионирования."
   },
 ];
 
-export function FAQ() {
+export function FAQ({ items }: FAQProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const faqs = items && items.length > 0 ? items : defaultFAQs;
 
   return (
     <section className="py-24 relative overflow-hidden">
@@ -74,7 +94,7 @@ export function FAQ() {
         <div className="max-w-3xl mx-auto space-y-4">
           {faqs.map((faq, index) => (
             <motion.div
-              key={index}
+              key={faq.id || index}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}

@@ -5,10 +5,17 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProjectCard } from "@/components/project/ProjectCard";
-import { getFeaturedProjects } from "@/data/projects";
+import type { Project } from "@/data/projects";
 
-export function FeaturedProjects() {
-  const featuredProjects = getFeaturedProjects();
+interface FeaturedProjectsProps {
+  projects?: Project[];
+}
+
+export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
+  // If no projects passed, return null (data should come from parent)
+  if (!projects || projects.length === 0) {
+    return null;
+  }
 
   return (
     <section className="py-24 relative">
@@ -39,7 +46,7 @@ export function FeaturedProjects() {
 
         {/* Projects Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          {featuredProjects.map((project, index) => (
+          {projects.map((project, index) => (
             <ProjectCard key={project.slug} project={project} index={index} />
           ))}
         </div>

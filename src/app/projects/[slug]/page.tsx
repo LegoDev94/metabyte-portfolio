@@ -3,13 +3,16 @@ import { Metadata } from "next";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ProjectDetail } from "@/components/project/ProjectDetail";
-import { projects, getProjectBySlug } from "@/data/projects";
+import { getProjectBySlug, getProjects } from "@/lib/db";
+
+export const dynamic = "force-dynamic";
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
 
 export async function generateStaticParams() {
+  const projects = await getProjects();
   return projects.map((project) => ({
     slug: project.slug,
   }));
@@ -17,7 +20,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const project = getProjectBySlug(slug);
+  const project = await getProjectBySlug(slug);
 
   if (!project) {
     return {
@@ -38,7 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProjectPage({ params }: Props) {
   const { slug } = await params;
-  const project = getProjectBySlug(slug);
+  const project = await getProjectBySlug(slug);
 
   if (!project) {
     notFound();
