@@ -10,7 +10,8 @@ import { cn } from "@/lib/utils";
 const navLinks = [
   { href: "/", label: "Главная" },
   { href: "/projects", label: "Проекты" },
-  { href: "/about", label: "Обо мне" },
+  { href: "/pricing", label: "Цены" },
+  { href: "/about", label: "О студии" },
   { href: "/contact", label: "Контакты" },
 ];
 

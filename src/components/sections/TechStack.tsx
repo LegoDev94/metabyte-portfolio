@@ -2,26 +2,15 @@
 
 import { motion } from "framer-motion";
 import {
-  Atom,
   Triangle,
   Hexagon,
   Database,
-  Wifi,
   Cloud,
-  Box,
-  Send,
-  Braces,
   FileCode,
-  Wind,
+  Smartphone,
 } from "lucide-react";
 
 const technologies = [
-  {
-    name: "React",
-    icon: Atom,
-    color: "#61dafb",
-    category: "Frontend",
-  },
   {
     name: "Next.js",
     icon: Triangle,
@@ -41,46 +30,16 @@ const technologies = [
     category: "Backend",
   },
   {
-    name: "MongoDB",
-    icon: Database,
-    color: "#00ed64",
-    category: "Database",
+    name: "Flutter",
+    icon: Smartphone,
+    color: "#02569B",
+    category: "Mobile",
   },
   {
     name: "PostgreSQL",
     icon: Database,
     color: "#336791",
     category: "Database",
-  },
-  {
-    name: "Socket.IO",
-    icon: Wifi,
-    color: "#ffffff",
-    category: "Real-time",
-  },
-  {
-    name: "Babylon.js",
-    icon: Box,
-    color: "#00ffff",
-    category: "3D",
-  },
-  {
-    name: "Telegram SDK",
-    icon: Send,
-    color: "#0088cc",
-    category: "Integration",
-  },
-  {
-    name: "Vue.js",
-    icon: Braces,
-    color: "#42b883",
-    category: "Frontend",
-  },
-  {
-    name: "Tailwind CSS",
-    icon: Wind,
-    color: "#06b6d4",
-    category: "Styling",
   },
   {
     name: "Docker",
@@ -109,17 +68,17 @@ export function TechStack() {
             Технологии
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-display tracking-wide mb-4">
-            <span className="text-foreground">Мой </span>
+            <span className="text-foreground">Наш </span>
             <span className="text-accent text-glow-magenta">стек</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Инструменты и технологии, которые я использую для создания
-            современных приложений
+            Ключевые технологии, которые мы используем для создания
+            надёжных решений
           </p>
         </motion.div>
 
         {/* Tech Grid */}
-        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6 max-w-4xl mx-auto lg:max-w-none">
           {technologies.map((tech, index) => (
             <motion.div
               key={tech.name}

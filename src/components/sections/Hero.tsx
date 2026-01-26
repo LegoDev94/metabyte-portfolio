@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowDown, Sparkles } from "lucide-react";
+import { ArrowDown, Sparkles, Star, Briefcase, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Typewriter } from "@/components/animations/motion";
@@ -103,6 +103,30 @@ export function Hero() {
           >
             <Link href="/contact">Связаться</Link>
           </Button>
+        </motion.div>
+
+        {/* Trust Badges */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.6 }}
+          className="flex flex-wrap items-center justify-center gap-6 md:gap-10 mt-12 pt-8 border-t border-border/30"
+        >
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Briefcase className="w-5 h-5 text-primary" />
+            <span className="text-2xl font-bold text-foreground">17+</span>
+            <span className="text-sm">проектов</span>
+          </div>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+            <span className="text-2xl font-bold text-foreground">4.9</span>
+            <span className="text-sm">рейтинг</span>
+          </div>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Globe className="w-5 h-5 text-primary" />
+            <span className="text-2xl font-bold text-foreground">5+</span>
+            <span className="text-sm">стран</span>
+          </div>
         </motion.div>
       </div>
 
