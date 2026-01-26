@@ -20,9 +20,46 @@ import {
   Shield,
   Clock,
   HeartHandshake,
+  Rocket,
 } from "lucide-react";
 
+const founderJourney = [
+  {
+    year: "2012",
+    title: "Первый код",
+    description: "Начал изучать программирование в 12 лет. Первые игры на Pascal и Delphi.",
+  },
+  {
+    year: "2016",
+    title: "Веб-разработка",
+    description: "Перешёл на веб: HTML, CSS, JavaScript. Первые заказы на фрилансе.",
+  },
+  {
+    year: "2019",
+    title: "Full-Stack",
+    description: "Освоил React и Node.js. Начал работать над серьёзными коммерческими проектами.",
+  },
+  {
+    year: "2022",
+    title: "Game Dev",
+    description: "Углубился в разработку браузерных игр. Babylon.js, Colyseus, мультиплеер.",
+  },
+  {
+    year: "2025",
+    title: "METABYTE",
+    description: "Основал студию. Собрал команду единомышленников для масштабных проектов.",
+  },
+];
+
 const team = [
+  {
+    name: "Владимир",
+    role: "Основатель & Lead Developer",
+    description: "Создатель студии METABYTE. Начал путь в программировании с 12 лет, прошёл путь от любительских игр до коммерческих проектов. За плечами — десятки проектов: от стартапов до enterprise-решений. Специализируется на архитектуре сложных систем и менторстве команды.",
+    photo: "/images/team/vladimir.png",
+    skills: ["Architecture", "React", "Node.js", "Leadership"],
+    isFounder: true,
+  },
   {
     name: "Сергей",
     role: "Full-Stack разработчик",
@@ -277,6 +314,65 @@ export default function AboutPage() {
                   </div>
                 </motion.div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Founder Journey */}
+        <section className="py-16 border-t border-border">
+          <div className="container mx-auto px-4 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="text-center mb-12"
+            >
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
+                <Rocket className="w-4 h-4 text-primary" />
+                <span className="text-sm font-medium text-primary">История</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-display tracking-wide">
+                <span className="text-foreground">Путь </span>
+                <span className="text-primary text-glow-cyan">основателя</span>
+              </h2>
+              <p className="text-muted-foreground mt-3 max-w-2xl mx-auto">
+                От первых строк кода до создания студии
+              </p>
+            </motion.div>
+
+            <div className="max-w-3xl mx-auto">
+              <div className="relative">
+                {/* Timeline line */}
+                <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-primary via-accent to-primary" />
+
+                {founderJourney.map((item, index) => (
+                  <motion.div
+                    key={item.year}
+                    initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: index * 0.1 }}
+                    className={`relative flex items-center gap-6 mb-8 ${
+                      index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'
+                    }`}
+                  >
+                    {/* Year badge */}
+                    <div className="absolute left-0 md:left-1/2 md:-translate-x-1/2 w-8 h-8 rounded-full bg-primary flex items-center justify-center z-10">
+                      <div className="w-3 h-3 rounded-full bg-background" />
+                    </div>
+
+                    {/* Content */}
+                    <div className={`ml-12 md:ml-0 md:w-1/2 ${index % 2 === 0 ? 'md:pr-12 md:text-right' : 'md:pl-12 md:text-left'}`}>
+                      <div className="p-5 rounded-xl bg-card border border-border hover:border-primary/30 transition-all duration-300">
+                        <span className="text-primary font-bold text-lg">{item.year}</span>
+                        <h3 className="text-foreground font-semibold mt-1">{item.title}</h3>
+                        <p className="text-muted-foreground text-sm mt-2">{item.description}</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
