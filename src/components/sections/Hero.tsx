@@ -5,8 +5,40 @@ import { ArrowDown, Sparkles, Star, Briefcase, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Typewriter } from "@/components/animations/motion";
+import type { SiteSettings } from "@/lib/db/site";
 
-export function Hero() {
+interface HeroProps {
+  settings?: SiteSettings | null;
+}
+
+// Default fallback values
+const defaultSettings: SiteSettings = {
+  companyName: "METABYTE",
+  subtitle: "Full-Stack Development Studio",
+  badgeText: "Открыт для предложений",
+  heroServices: ["SaaS", "FinTech", "E-commerce", "Игры", "Mobile Apps"],
+  heroTechStack: ["React", "Next.js", "Flutter", "Node.js", "TypeScript"],
+  projectsCount: 17,
+  rating: 4.9,
+  countriesCount: 5,
+  founderName: "Владимир",
+  founderTitle: "Full-Stack разработчик",
+  founderBioShort: "",
+  founderBioLong: null,
+  founderPhoto: "/images/team/vladimir.png",
+};
+
+export function Hero({ settings }: HeroProps) {
+  const data = settings || defaultSettings;
+
+  // Split company name for styling (assumes format like "METABYTE" -> "META" + "BYTE")
+  const nameParts = data.companyName.match(/^([A-Z]+)([A-Z]+)$/i);
+  const firstName = nameParts ? nameParts[1] : data.companyName.slice(0, 4);
+  const lastName = nameParts ? nameParts[2] : data.companyName.slice(4);
+
+  // Format services for typewriter
+  const servicesText = data.heroServices.join(" • ");
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Cyber Grid Background */}
@@ -27,7 +59,7 @@ export function Hero() {
         >
           <Sparkles className="w-4 h-4 text-primary" />
           <span className="text-sm text-primary font-medium">
-            Открыт для предложений
+            {data.badgeText}
           </span>
         </motion.div>
 
@@ -38,8 +70,8 @@ export function Hero() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="text-5xl md:text-7xl lg:text-8xl font-display tracking-wider mb-4"
         >
-          <span className="text-primary text-glow-cyan">META</span>
-          <span className="text-foreground">BYTE</span>
+          <span className="text-primary text-glow-cyan">{firstName}</span>
+          <span className="text-foreground">{lastName}</span>
         </motion.h1>
 
         {/* Subtitle */}
@@ -49,7 +81,7 @@ export function Hero() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="text-lg md:text-xl text-muted-foreground mb-6"
         >
-          Full-Stack Development Studio
+          {data.subtitle}
         </motion.p>
 
         {/* Services Typewriter */}
@@ -60,7 +92,7 @@ export function Hero() {
           className="h-10 md:h-12 flex items-center justify-center mb-8"
         >
           <span className="text-xl md:text-2xl font-mono gradient-text">
-            <Typewriter text="SaaS • FinTech • E-commerce • Игры • Mobile Apps" delay={0.5} speed={50} />
+            <Typewriter text={servicesText} delay={0.5} speed={50} />
           </span>
         </motion.div>
 
@@ -71,7 +103,7 @@ export function Hero() {
           transition={{ duration: 0.5, delay: 0.4 }}
           className="flex flex-wrap items-center justify-center gap-3 mb-12"
         >
-          {["React", "Next.js", "Flutter", "Node.js", "TypeScript"].map((tech) => (
+          {data.heroTechStack.map((tech) => (
             <span
               key={tech}
               className="px-3 py-1 text-sm font-mono bg-muted/50 border border-border rounded-full text-foreground"
@@ -114,23 +146,23 @@ export function Hero() {
         >
           <div className="flex items-center gap-2 text-muted-foreground">
             <Briefcase className="w-5 h-5 text-primary" />
-            <span className="text-2xl font-bold text-foreground">17+</span>
+            <span className="text-2xl font-bold text-foreground">{data.projectsCount}+</span>
             <span className="text-sm">проектов</span>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
             <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
-            <span className="text-2xl font-bold text-foreground">4.9</span>
+            <span className="text-2xl font-bold text-foreground">{data.rating}</span>
             <span className="text-sm">рейтинг</span>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
             <Globe className="w-5 h-5 text-primary" />
-            <span className="text-2xl font-bold text-foreground">5+</span>
+            <span className="text-2xl font-bold text-foreground">{data.countriesCount}+</span>
             <span className="text-sm">стран</span>
           </div>
         </motion.div>
       </div>
 
-      {/* Scroll Indicator - вынесен на уровень секции */}
+      {/* Scroll Indicator */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

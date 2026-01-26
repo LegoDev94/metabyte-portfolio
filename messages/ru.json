@@ -1,0 +1,159 @@
+{
+  "common": {
+    "loading": "Загрузка...",
+    "error": "Произошла ошибка",
+    "retry": "Попробовать снова",
+    "close": "Закрыть",
+    "back": "Назад",
+    "next": "Далее",
+    "submit": "Отправить",
+    "cancel": "Отмена",
+    "save": "Сохранить",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "view": "Смотреть",
+    "viewAll": "Смотреть все",
+    "readMore": "Читать далее",
+    "learnMore": "Узнать больше"
+  },
+  "nav": {
+    "home": "Главная",
+    "projects": "Проекты",
+    "about": "Обо мне",
+    "pricing": "Цены",
+    "contact": "Контакты"
+  },
+  "hero": {
+    "badge": "Открыт для предложений",
+    "title": "Full-Stack Development Studio",
+    "stats": {
+      "projects": "проектов",
+      "rating": "рейтинг",
+      "countries": "стран"
+    },
+    "cta": {
+      "projects": "Смотреть проекты",
+      "contact": "Связаться"
+    }
+  },
+  "projects": {
+    "title": "Проекты",
+    "subtitle": "Мои работы",
+    "description": "Избранные проекты, демонстрирующие мой опыт в различных технологиях и отраслях.",
+    "featured": "Избранные проекты",
+    "featuredDescription": "Проекты, которыми я особенно горжусь",
+    "all": "Все проекты",
+    "filter": {
+      "all": "Все",
+      "games": "Игры",
+      "fintech": "FinTech",
+      "mobile": "Mobile",
+      "enterprise": "Enterprise",
+      "edtech": "EdTech",
+      "transport": "Transport"
+    },
+    "viewProject": "Смотреть проект",
+    "viewCase": "Кейс-стади",
+    "liveDemo": "Демо",
+    "sourceCode": "Исходный код",
+    "technologies": "Технологии",
+    "features": "Ключевые особенности",
+    "challenge": "Задача",
+    "solution": "Решение",
+    "results": "Результаты"
+  },
+  "techStack": {
+    "title": "Технологии",
+    "subtitle": "Мой стек",
+    "description": "Инструменты и технологии, которые я использую для создания современных приложений"
+  },
+  "workProcess": {
+    "title": "Процесс работы",
+    "subtitle": "Как я работаю",
+    "description": "Прозрачный и эффективный процесс от идеи до запуска"
+  },
+  "faq": {
+    "title": "Частые вопросы",
+    "subtitle": "FAQ",
+    "description": "Ответы на популярные вопросы о сотрудничестве"
+  },
+  "about": {
+    "title": "Обо мне",
+    "subtitle": "Познакомимся",
+    "description": "Full-Stack разработчик с опытом создания сложных веб-приложений",
+    "skills": "Навыки",
+    "experience": "Опыт",
+    "education": "Образование",
+    "team": "Команда",
+    "teamDescription": "Специалисты, с которыми я работаю",
+    "testimonials": "Отзывы",
+    "testimonialsDescription": "Что говорят клиенты"
+  },
+  "pricing": {
+    "title": "Цены",
+    "subtitle": "Тарифы",
+    "description": "Прозрачное ценообразование для проектов любого масштаба",
+    "popular": "Популярный",
+    "perProject": "за проект",
+    "perHour": "в час",
+    "perMonth": "в месяц",
+    "features": "Что включено",
+    "cta": "Выбрать",
+    "contact": "Обсудить проект",
+    "custom": "Индивидуально",
+    "currency": {
+      "rub": "₽",
+      "mdl": "lei"
+    }
+  },
+  "contact": {
+    "title": "Контакты",
+    "subtitle": "Связаться",
+    "heading": "Давайте поговорим",
+    "description": "Есть вопросы или предложение? Напишите мне, и я отвечу в ближайшее время.",
+    "directTitle": "Или напишите напрямую",
+    "directDescription": "Предпочитаете мессенджеры? Напишите мне в Telegram — я отвечу в течение",
+    "telegramButton": "Написать в Telegram",
+    "alsoAvailable": "Также доступен",
+    "responseTime": "Время ответа",
+    "responseDescription": "Обычно отвечаю в течение",
+    "urgentNote": "Для срочных вопросов лучше писать в Telegram.",
+    "form": {
+      "name": "Имя",
+      "namePlaceholder": "Ваше имя",
+      "email": "Email",
+      "emailPlaceholder": "email@example.com",
+      "subject": "Тема",
+      "subjectPlaceholder": "Тема сообщения",
+      "message": "Сообщение",
+      "messagePlaceholder": "Расскажите о вашем проекте или вопросе...",
+      "submit": "Отправить сообщение",
+      "sending": "Отправка...",
+      "success": "Сообщение отправлено! Я отвечу в ближайшее время.",
+      "error": "Ошибка отправки. Попробуйте написать напрямую в Telegram."
+    },
+    "youdo": {
+      "reviews": "положительных отзывов"
+    }
+  },
+  "cta": {
+    "title": "Готовы начать проект?",
+    "description": "Обсудим ваши идеи и найдём лучшее решение",
+    "button": "Связаться со мной"
+  },
+  "footer": {
+    "copyright": "Все права защищены",
+    "madeWith": "Сделано с",
+    "navigation": "Навигация",
+    "social": "Социальные сети"
+  },
+  "testimonials": {
+    "title": "Отзывы",
+    "subtitle": "Что говорят клиенты",
+    "stats": {
+      "total": "всего отзывов",
+      "avgRating": "средний рейтинг",
+      "platforms": "платформ"
+    }
+  }
+}

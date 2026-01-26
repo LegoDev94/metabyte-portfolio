@@ -1,0 +1,159 @@
+{
+  "common": {
+    "loading": "Se incarca...",
+    "error": "A aparut o eroare",
+    "retry": "Incercati din nou",
+    "close": "Inchide",
+    "back": "Inapoi",
+    "next": "Inainte",
+    "submit": "Trimite",
+    "cancel": "Anuleaza",
+    "save": "Salveaza",
+    "delete": "Sterge",
+    "edit": "Editeaza",
+    "view": "Vezi",
+    "viewAll": "Vezi toate",
+    "readMore": "Citeste mai mult",
+    "learnMore": "Afla mai mult"
+  },
+  "nav": {
+    "home": "Acasa",
+    "projects": "Proiecte",
+    "about": "Despre mine",
+    "pricing": "Preturi",
+    "contact": "Contact"
+  },
+  "hero": {
+    "badge": "Disponibil pentru colaborare",
+    "title": "Full-Stack Development Studio",
+    "stats": {
+      "projects": "proiecte",
+      "rating": "rating",
+      "countries": "tari"
+    },
+    "cta": {
+      "projects": "Vezi proiecte",
+      "contact": "Contacteaza-ma"
+    }
+  },
+  "projects": {
+    "title": "Proiecte",
+    "subtitle": "Portofoliu",
+    "description": "Proiecte selectate care demonstreaza experienta mea in diverse tehnologii si industrii.",
+    "featured": "Proiecte recomandate",
+    "featuredDescription": "Proiecte de care sunt deosebit de mandru",
+    "all": "Toate proiectele",
+    "filter": {
+      "all": "Toate",
+      "games": "Jocuri",
+      "fintech": "FinTech",
+      "mobile": "Mobile",
+      "enterprise": "Enterprise",
+      "edtech": "EdTech",
+      "transport": "Transport"
+    },
+    "viewProject": "Vezi proiect",
+    "viewCase": "Studiu de caz",
+    "liveDemo": "Demo",
+    "sourceCode": "Cod sursa",
+    "technologies": "Tehnologii",
+    "features": "Caracteristici principale",
+    "challenge": "Provocare",
+    "solution": "Solutie",
+    "results": "Rezultate"
+  },
+  "techStack": {
+    "title": "Tehnologii",
+    "subtitle": "Stack-ul meu",
+    "description": "Instrumente si tehnologii pe care le folosesc pentru a crea aplicatii moderne"
+  },
+  "workProcess": {
+    "title": "Proces de lucru",
+    "subtitle": "Cum lucrez",
+    "description": "Proces transparent si eficient de la idee pana la lansare"
+  },
+  "faq": {
+    "title": "Intrebari frecvente",
+    "subtitle": "FAQ",
+    "description": "Raspunsuri la intrebarile populare despre colaborare"
+  },
+  "about": {
+    "title": "Despre mine",
+    "subtitle": "Sa ne cunoastem",
+    "description": "Dezvoltator Full-Stack cu experienta in crearea aplicatiilor web complexe",
+    "skills": "Abilitati",
+    "experience": "Experienta",
+    "education": "Educatie",
+    "team": "Echipa",
+    "teamDescription": "Specialisti cu care colaborez",
+    "testimonials": "Recenzii",
+    "testimonialsDescription": "Ce spun clientii"
+  },
+  "pricing": {
+    "title": "Preturi",
+    "subtitle": "Tarife",
+    "description": "Preturi transparente pentru proiecte de orice dimensiune",
+    "popular": "Popular",
+    "perProject": "per proiect",
+    "perHour": "pe ora",
+    "perMonth": "pe luna",
+    "features": "Ce este inclus",
+    "cta": "Alege",
+    "contact": "Discuta proiectul",
+    "custom": "Individual",
+    "currency": {
+      "rub": "₽",
+      "mdl": "lei"
+    }
+  },
+  "contact": {
+    "title": "Contact",
+    "subtitle": "Contacteaza-ma",
+    "heading": "Hai sa discutam",
+    "description": "Ai intrebari sau o propunere? Scrie-mi si voi raspunde in cel mai scurt timp.",
+    "directTitle": "Sau scrie direct",
+    "directDescription": "Preferi mesageria? Scrie-mi pe Telegram - voi raspunde in",
+    "telegramButton": "Scrie pe Telegram",
+    "alsoAvailable": "De asemenea disponibil",
+    "responseTime": "Timp de raspuns",
+    "responseDescription": "De obicei raspund in",
+    "urgentNote": "Pentru intrebari urgente, este mai bine sa scrieti pe Telegram.",
+    "form": {
+      "name": "Nume",
+      "namePlaceholder": "Numele tau",
+      "email": "Email",
+      "emailPlaceholder": "email@exemplu.com",
+      "subject": "Subiect",
+      "subjectPlaceholder": "Subiectul mesajului",
+      "message": "Mesaj",
+      "messagePlaceholder": "Povesteste-mi despre proiectul sau intrebarea ta...",
+      "submit": "Trimite mesajul",
+      "sending": "Se trimite...",
+      "success": "Mesajul a fost trimis! Voi raspunde in cel mai scurt timp.",
+      "error": "Eroare la trimitere. Incercati sa scrieti direct pe Telegram."
+    },
+    "youdo": {
+      "reviews": "recenzii pozitive"
+    }
+  },
+  "cta": {
+    "title": "Pregatit sa incepi un proiect?",
+    "description": "Sa discutam ideile tale si sa gasim cea mai buna solutie",
+    "button": "Contacteaza-ma"
+  },
+  "footer": {
+    "copyright": "Toate drepturile rezervate",
+    "madeWith": "Facut cu",
+    "navigation": "Navigare",
+    "social": "Retele sociale"
+  },
+  "testimonials": {
+    "title": "Recenzii",
+    "subtitle": "Ce spun clientii",
+    "stats": {
+      "total": "recenzii totale",
+      "avgRating": "rating mediu",
+      "platforms": "platforme"
+    }
+  }
+}

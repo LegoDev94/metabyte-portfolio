@@ -3,88 +3,71 @@
 import { motion } from "framer-motion";
 import { Star, ExternalLink, Quote } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-export interface TestimonialItem {
-  id: string;
-  name: string;
-  role: string;
-  company: string;
-  content: string;
-  avatar: string;
-  rating: number;
-}
+import type { Testimonial, TestimonialStats } from "@/lib/db/testimonials";
 
 interface TestimonialsProps {
-  testimonials?: TestimonialItem[];
-  stats?: {
-    rating: number;
-    positive: number;
-    negative: number;
-  };
+  testimonials?: Testimonial[];
+  stats?: TestimonialStats | null;
 }
 
 // Default hardcoded data for fallback
-const defaultTestimonials: TestimonialItem[] = [
+const defaultTestimonials: Testimonial[] = [
   {
     id: "1",
-    name: "Inna N.",
-    role: "Сложный телеграм бот",
-    company: "YouDo",
-    content: "Владимир проделал отличную работу по созданию Telegram-бота, который взаимодействует с нашим API. Задание было выполнено на высоком уровне, все требования были учтены, и бот работает безупречно.",
-    avatar: "",
+    author: "Inna N.",
+    task: "Сложный телеграм бот",
+    text: "Владимир проделал отличную работу по созданию Telegram-бота, который взаимодействует с нашим API. Задание было выполнено на высоком уровне, все требования были учтены, и бот работает безупречно.",
     rating: 5,
+    source: "YouDo",
   },
   {
     id: "2",
-    name: "Татьяна М.",
-    role: "Доделать сайт на React",
-    company: "YouDo",
-    content: "Огромное спасибо Владимиру за проделанную работу. В процессе нам потребовалось сделать даже больше, чем мы планировали, и Владимир отлично со всем справился, сделав все очень качественно.",
-    avatar: "",
+    author: "Татьяна М.",
+    task: "Доделать сайт на React",
+    text: "Огромное спасибо Владимиру за проделанную работу. В процессе нам потребовалось сделать даже больше, чем мы планировали, и Владимир отлично со всем справился, сделав все очень качественно.",
     rating: 5,
+    source: "YouDo",
   },
   {
     id: "3",
-    name: "Иван И.",
-    role: "Разработка сайта",
-    company: "YouDo",
-    content: "Профессионально и четко проговорили, спланировали и реализовали проект сайта. Рекомендую!",
-    avatar: "",
+    author: "Иван И.",
+    task: "Разработка сайта",
+    text: "Профессионально и четко проговорили, спланировали и реализовали проект сайта. Рекомендую!",
     rating: 5,
+    source: "YouDo",
   },
   {
     id: "4",
-    name: "Елизавета",
-    role: "Создать мобильное приложение",
-    company: "YouDo",
-    content: "Владимир сделал именно то, что было нужно, был внимателен к мельчайшим деталям и изменениям, которые я вносила по ходу.",
-    avatar: "",
+    author: "Елизавета",
+    task: "Создать мобильное приложение",
+    text: "Владимир сделал именно то, что было нужно, был внимателен к мельчайшим деталям и изменениям, которые я вносила по ходу.",
     rating: 5,
+    source: "YouDo",
   },
   {
     id: "5",
-    name: "Ростислав К.",
-    role: "Разработка в Telegram",
-    company: "YouDo",
-    content: "Очень рекомендую этого человека для сотрудничества: он вежлив, доброжелателен и всегда придерживается установленных сроков.",
-    avatar: "",
+    author: "Ростислав К.",
+    task: "Разработка в Telegram",
+    text: "Очень рекомендую этого человека для сотрудничества: он вежлив, доброжелателен и всегда придерживается установленных сроков.",
     rating: 5,
+    source: "YouDo",
   },
   {
     id: "6",
-    name: "Роман",
-    role: "Сделать сайт рулетку кс",
-    company: "YouDo",
-    content: "Все максимально внятно, понятно, а главное быстро. Созвонились по видео, обсудили все детали и рабочие моменты, спустя пару часов приступили к работе. Рекомендую",
-    avatar: "",
+    author: "Роман",
+    task: "Сделать сайт рулетку кс",
+    text: "Все максимально внятно, понятно, а главное быстро. Созвонились по видео, обсудили все детали и рабочие моменты, спустя пару часов приступили к работе. Рекомендую",
     rating: 5,
+    source: "YouDo",
   },
 ];
 
-const defaultStats = {
-  rating: 4.9,
-  positive: 28,
-  negative: 0,
+const defaultStats: TestimonialStats = {
+  avgRating: 4.9,
+  totalPositive: 28,
+  totalNegative: 0,
+  platform: "YouDo",
+  platformUrl: "https://youdo.com/u11536152",
 };
 
 export function Testimonials({ testimonials, stats }: TestimonialsProps) {
@@ -107,26 +90,26 @@ export function Testimonials({ testimonials, stats }: TestimonialsProps) {
             <span className="text-primary text-glow-cyan">клиентов</span>
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            Реальные отзывы заказчиков с платформы YouDo
+            Реальные отзывы заказчиков с платформы {displayStats.platform}
           </p>
 
           {/* Stats */}
           <div className="flex items-center justify-center gap-4 sm:gap-8 mt-6 flex-wrap">
             <div className="text-center min-w-[80px]">
               <div className="flex items-center justify-center gap-1 mb-1">
-                <span className="text-2xl sm:text-3xl font-display text-primary">{displayStats.rating}</span>
+                <span className="text-2xl sm:text-3xl font-display text-primary">{displayStats.avgRating}</span>
                 <Star className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500 fill-yellow-500" />
               </div>
               <div className="text-xs sm:text-sm text-muted-foreground">Средняя<br className="sm:hidden" /> оценка</div>
             </div>
             <div className="w-px h-10 sm:h-12 bg-border hidden sm:block" />
             <div className="text-center min-w-[80px]">
-              <div className="text-2xl sm:text-3xl font-display text-green-500">{displayStats.positive}</div>
+              <div className="text-2xl sm:text-3xl font-display text-green-500">{displayStats.totalPositive}</div>
               <div className="text-xs sm:text-sm text-muted-foreground">Положительных</div>
             </div>
             <div className="w-px h-10 sm:h-12 bg-border hidden sm:block" />
             <div className="text-center min-w-[80px]">
-              <div className="text-2xl sm:text-3xl font-display text-muted-foreground">{displayStats.negative}</div>
+              <div className="text-2xl sm:text-3xl font-display text-muted-foreground">{displayStats.totalNegative}</div>
               <div className="text-xs sm:text-sm text-muted-foreground">Отрицательных</div>
             </div>
           </div>
@@ -153,19 +136,19 @@ export function Testimonials({ testimonials, stats }: TestimonialsProps) {
                 ))}
               </div>
 
-              {/* Task/Role */}
+              {/* Task */}
               <div className="text-xs text-primary font-mono mb-2">
-                {testimonial.role}
+                {testimonial.task}
               </div>
 
               {/* Text */}
               <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                &ldquo;{testimonial.content}&rdquo;
+                &ldquo;{testimonial.text}&rdquo;
               </p>
 
               {/* Author */}
               <div className="text-sm font-medium text-foreground">
-                {testimonial.name}
+                {testimonial.author}
               </div>
             </motion.div>
           ))}
@@ -185,12 +168,12 @@ export function Testimonials({ testimonials, stats }: TestimonialsProps) {
             className="border-border hover:border-primary hover:text-primary"
           >
             <a
-              href="https://youdo.com/u11536152"
+              href={displayStats.platformUrl || "https://youdo.com/u11536152"}
               target="_blank"
               rel="noopener noreferrer"
             >
               <ExternalLink className="w-4 h-4 mr-2" />
-              Все отзывы на YouDo
+              Все отзывы на {displayStats.platform}
             </a>
           </Button>
         </motion.div>

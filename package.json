@@ -11,6 +11,9 @@
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
+    "db:seed:projects": "tsx prisma/seed-projects.ts",
+    "db:seed:cases": "tsx prisma/seed-case-studies.ts",
+    "db:seed:all": "npm run db:seed && npm run db:seed:projects && npm run db:seed:cases",
     "db:studio": "prisma studio",
     "db:reset": "prisma migrate reset"
   },
@@ -31,6 +34,7 @@
     "framer-motion": "^12.27.5",
     "lucide-react": "^0.562.0",
     "next": "16.1.4",
+    "next-intl": "^4.7.0",
     "pg": "^8.17.2",
     "prisma": "^7.3.0",
     "react": "19.2.3",

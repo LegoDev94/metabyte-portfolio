@@ -3,22 +3,28 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Github, Send } from "lucide-react";
+import { Menu, X, Github, Send, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLocaleContext } from "@/components/providers/LocaleProvider";
+import type { Locale } from "@/i18n/config";
 
-const navLinks = [
-  { href: "/", label: "Главная" },
-  { href: "/projects", label: "Проекты" },
-  { href: "/pricing", label: "Цены" },
-  { href: "/about", label: "Команда" },
-  { href: "/contact", label: "Контакты" },
-];
+const navLinkKeys = [
+  { href: "/", key: "home" },
+  { href: "/projects", key: "projects" },
+  { href: "/pricing", key: "pricing" },
+  { href: "/about", key: "about" },
+  { href: "/contact", key: "contact" },
+] as const;
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const pathname = usePathname();
+  const t = useTranslations("nav");
+  const { locale, setLocale, isLoading } = useLocaleContext();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,6 +38,27 @@ export function Header() {
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [pathname]);
+
+  // Close language menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => setIsLangMenuOpen(false);
+    if (isLangMenuOpen) {
+      document.addEventListener("click", handleClickOutside);
+      return () => document.removeEventListener("click", handleClickOutside);
+    }
+  }, [isLangMenuOpen]);
+
+  const handleLanguageChange = async (newLocale: Locale) => {
+    setIsLangMenuOpen(false);
+    if (newLocale !== locale) {
+      await setLocale(newLocale);
+    }
+  };
+
+  const navLinks = navLinkKeys.map((link) => ({
+    href: link.href,
+    label: t(link.key),
+  }));
 
   return (
     <header
@@ -79,8 +106,54 @@ export function Header() {
             ))}
           </ul>
 
-          {/* Desktop Social Links */}
+          {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-4">
+            {/* Language Switcher */}
+            <div className="relative">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsLangMenuOpen(!isLangMenuOpen);
+                }}
+                disabled={isLoading}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                aria-label="Change language"
+              >
+                <Globe className="w-4 h-4" />
+                <span className="text-sm font-medium uppercase">{locale}</span>
+              </button>
+
+              <AnimatePresence>
+                {isLangMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute top-full right-0 mt-2 py-2 w-32 rounded-lg bg-card border border-border shadow-lg"
+                  >
+                    <button
+                      onClick={() => handleLanguageChange("ru")}
+                      className={cn(
+                        "w-full px-4 py-2 text-left text-sm hover:bg-secondary transition-colors",
+                        locale === "ru" ? "text-primary" : "text-foreground"
+                      )}
+                    >
+                      Русский
+                    </button>
+                    <button
+                      onClick={() => handleLanguageChange("ro")}
+                      className={cn(
+                        "w-full px-4 py-2 text-left text-sm hover:bg-secondary transition-colors",
+                        locale === "ro" ? "text-primary" : "text-foreground"
+                      )}
+                    >
+                      Romana
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
             <a
               href="https://github.com/LegoDev94"
               target="_blank"
@@ -144,7 +217,36 @@ export function Header() {
                   </li>
                 ))}
               </ul>
-              <div className="flex items-center gap-4 mt-6 pt-6 border-t border-border">
+
+              {/* Mobile Language Switcher */}
+              <div className="flex gap-2 mt-6 pt-6 border-t border-border">
+                <button
+                  onClick={() => handleLanguageChange("ru")}
+                  disabled={isLoading}
+                  className={cn(
+                    "flex-1 py-3 rounded-lg text-sm font-medium transition-colors",
+                    locale === "ru"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-secondary text-foreground hover:bg-secondary/80"
+                  )}
+                >
+                  Русский
+                </button>
+                <button
+                  onClick={() => handleLanguageChange("ro")}
+                  disabled={isLoading}
+                  className={cn(
+                    "flex-1 py-3 rounded-lg text-sm font-medium transition-colors",
+                    locale === "ro"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-secondary text-foreground hover:bg-secondary/80"
+                  )}
+                >
+                  Romana
+                </button>
+              </div>
+
+              <div className="flex items-center gap-4 mt-4">
                 <a
                   href="https://github.com/LegoDev94"
                   target="_blank"

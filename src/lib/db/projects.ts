@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
-import type { Project, Technology, Feature, Metric } from "@/data/projects";
+import type { Project, Technology, Feature, Metric, CaseStudy } from "@/data/projects";
 
-// Project include config for all queries
+// Project include config for all queries - includes full case study data
 const projectInclude = {
   technologies: true,
   features: true,
@@ -9,7 +9,22 @@ const projectInclude = {
   links: true,
   caseStudy: {
     include: {
-      gallery: true,
+      gallery: { orderBy: { order: "asc" as const } },
+      performance: true,
+      architecture: {
+        include: {
+          layers: { orderBy: { order: "asc" as const } },
+        },
+      },
+      userFlows: {
+        include: {
+          steps: { orderBy: { order: "asc" as const } },
+        },
+        orderBy: { order: "asc" as const },
+      },
+      technicalHighlights: { orderBy: { order: "asc" as const } },
+      integrations: { orderBy: { order: "asc" as const } },
+      testimonial: true,
     },
   },
 };
@@ -133,19 +148,8 @@ function mapDbProjectToProject(dbProject: any): Project {
     telegram: dbProject.links?.telegram || undefined,
   };
 
-  // Map case study from relation
-  const caseStudy = dbProject.caseStudy
-    ? {
-        challenge: dbProject.caseStudy.challenge,
-        solution: dbProject.caseStudy.solution,
-        results: dbProject.caseStudy.results,
-        gallery: dbProject.caseStudy.gallery?.map((g: any) => ({
-          src: g.src,
-          alt: g.alt,
-          caption: g.caption,
-        })),
-      }
-    : undefined;
+  // Map full case study from relation
+  const caseStudy = mapCaseStudy(dbProject.caseStudy);
 
   return {
     slug: dbProject.slug,
@@ -163,5 +167,98 @@ function mapDbProjectToProject(dbProject: any): Project {
     metrics,
     featured: dbProject.featured,
     caseStudy,
+  };
+}
+
+// Map case study with all nested relations
+function mapCaseStudy(dbCaseStudy: any): CaseStudy | undefined {
+  if (!dbCaseStudy) return undefined;
+
+  return {
+    challenge: dbCaseStudy.challenge || undefined,
+    solution: dbCaseStudy.solution || undefined,
+    results: dbCaseStudy.results?.length > 0 ? dbCaseStudy.results : undefined,
+
+    // Gallery
+    gallery: dbCaseStudy.gallery?.length > 0
+      ? dbCaseStudy.gallery.map((g: any) => ({
+          src: g.src,
+          alt: g.alt,
+          caption: g.caption || undefined,
+        }))
+      : undefined,
+
+    // Performance metrics
+    performance: dbCaseStudy.performance
+      ? {
+          score: dbCaseStudy.performance.score,
+          accessibility: dbCaseStudy.performance.accessibility,
+          bestPractices: dbCaseStudy.performance.bestPractices,
+          seo: dbCaseStudy.performance.seo,
+          fcp: dbCaseStudy.performance.fcp,
+          lcp: dbCaseStudy.performance.lcp,
+          tbt: dbCaseStudy.performance.tbt,
+          cls: dbCaseStudy.performance.cls,
+          speedIndex: dbCaseStudy.performance.speedIndex,
+        }
+      : undefined,
+
+    // Architecture diagram
+    architecture: dbCaseStudy.architecture
+      ? {
+          description: dbCaseStudy.architecture.description,
+          layers: dbCaseStudy.architecture.layers?.map((l: any) => ({
+            name: l.name,
+            components: l.components,
+            color: l.color,
+          })) || [],
+        }
+      : undefined,
+
+    // User flows
+    userFlows: dbCaseStudy.userFlows?.length > 0
+      ? dbCaseStudy.userFlows.map((f: any) => ({
+          id: f.id,
+          title: f.title,
+          description: f.description,
+          icon: f.icon,
+          steps: f.steps?.map((s: any) => ({
+            title: s.title,
+            description: s.description,
+            icon: s.icon || undefined,
+          })) || [],
+        }))
+      : undefined,
+
+    // Technical highlights
+    technicalHighlights: dbCaseStudy.technicalHighlights?.length > 0
+      ? dbCaseStudy.technicalHighlights.map((h: any) => ({
+          title: h.title,
+          description: h.description,
+          icon: h.icon,
+          codePreview: h.codePreview || undefined,
+          tags: h.tags?.length > 0 ? h.tags : undefined,
+        }))
+      : undefined,
+
+    // Integrations
+    integrations: dbCaseStudy.integrations?.length > 0
+      ? dbCaseStudy.integrations.map((i: any) => ({
+          name: i.name,
+          logo: i.logo,
+          description: i.description,
+          color: i.color,
+        }))
+      : undefined,
+
+    // Testimonial
+    testimonial: dbCaseStudy.testimonial
+      ? {
+          quote: dbCaseStudy.testimonial.quote,
+          author: dbCaseStudy.testimonial.author,
+          role: dbCaseStudy.testimonial.role,
+          avatar: dbCaseStudy.testimonial.avatar || undefined,
+        }
+      : undefined,
   };
 }

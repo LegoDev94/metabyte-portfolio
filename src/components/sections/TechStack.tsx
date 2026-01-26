@@ -1,55 +1,37 @@
 "use client";
 
 import { motion } from "framer-motion";
-import {
-  Triangle,
-  Hexagon,
-  Database,
-  Cloud,
-  FileCode,
-  Smartphone,
-} from "lucide-react";
+import * as LucideIcons from "lucide-react";
+import type { TechStackItem } from "@/lib/db/site";
 
-const technologies = [
-  {
-    name: "Next.js",
-    icon: Triangle,
-    color: "#ffffff",
-    category: "Frontend",
-  },
-  {
-    name: "TypeScript",
-    icon: FileCode,
-    color: "#3178c6",
-    category: "Language",
-  },
-  {
-    name: "Node.js",
-    icon: Hexagon,
-    color: "#339933",
-    category: "Backend",
-  },
-  {
-    name: "Flutter",
-    icon: Smartphone,
-    color: "#02569B",
-    category: "Mobile",
-  },
-  {
-    name: "PostgreSQL",
-    icon: Database,
-    color: "#336791",
-    category: "Database",
-  },
-  {
-    name: "Docker",
-    icon: Cloud,
-    color: "#2496ed",
-    category: "DevOps",
-  },
+interface TechStackProps {
+  items?: TechStackItem[];
+}
+
+// Default fallback data
+const defaultTechStack: TechStackItem[] = [
+  { id: "1", name: "Next.js", icon: "Triangle", color: "#ffffff", category: "Frontend", featured: true },
+  { id: "2", name: "TypeScript", icon: "FileCode", color: "#3178c6", category: "Language", featured: true },
+  { id: "3", name: "Node.js", icon: "Hexagon", color: "#339933", category: "Backend", featured: true },
+  { id: "4", name: "Flutter", icon: "Smartphone", color: "#02569B", category: "Mobile", featured: true },
+  { id: "5", name: "PostgreSQL", icon: "Database", color: "#336791", category: "Database", featured: true },
+  { id: "6", name: "Docker", icon: "Cloud", color: "#2496ed", category: "DevOps", featured: true },
 ];
 
-export function TechStack() {
+// Dynamic icon component
+function DynamicIcon({ name, className, style }: { name: string; className?: string; style?: React.CSSProperties }) {
+  const iconName = name
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join("") as keyof typeof LucideIcons;
+
+  const Icon = (LucideIcons[iconName] as React.ComponentType<{ className?: string; style?: React.CSSProperties }>) || LucideIcons.Code;
+  return <Icon className={className} style={style} />;
+}
+
+export function TechStack({ items }: TechStackProps) {
+  const technologies = items && items.length > 0 ? items : defaultTechStack;
+
   return (
     <section className="py-24 relative overflow-hidden">
       {/* Background Gradient */}
@@ -81,7 +63,7 @@ export function TechStack() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6 max-w-4xl mx-auto lg:max-w-none">
           {technologies.map((tech, index) => (
             <motion.div
-              key={tech.name}
+              key={tech.id}
               initial={{ opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
@@ -98,7 +80,8 @@ export function TechStack() {
                       backgroundColor: `${tech.color}15`,
                     }}
                   >
-                    <tech.icon
+                    <DynamicIcon
+                      name={tech.icon}
                       className="w-6 h-6 transition-transform duration-300 group-hover:scale-110"
                       style={{ color: tech.color }}
                     />

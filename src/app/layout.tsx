@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono, Orbitron } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 import "./globals.css";
 import { AIAssistant } from "@/components/ai-assistant";
 import { KeepAlive } from "@/components/KeepAlive";
+import { LocaleProvider } from "@/components/providers/LocaleProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -42,19 +45,26 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="ru" className="dark">
+    <html lang={locale} className="dark">
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} ${orbitron.variable} antialiased min-h-screen`}
       >
-        {children}
-        <AIAssistant />
-        <KeepAlive />
+        <NextIntlClientProvider messages={messages}>
+          <LocaleProvider>
+            {children}
+            <AIAssistant />
+            <KeepAlive />
+          </LocaleProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );
