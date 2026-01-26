@@ -1,6 +1,6 @@
 # fly.toml - Fly.io configuration for METABYTE Portfolio
 
-app = "app-hidden-breeze-9993"
+app = "metabyte"
 primary_region = "ams"
 
 [build]
