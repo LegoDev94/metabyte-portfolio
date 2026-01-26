@@ -1,0 +1,418 @@
+// Portfolio Database Schema
+// Prisma ORM for PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== PROJECTS ====================
+
+model Project {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  title           String
+  subtitle        String
+  description     String
+  fullDescription String   @db.Text
+  category        Category
+  categoryLabel   String
+  image           String
+  video           Json?    // { type: "file" | "vimeo", id?: string, src?: string }
+  featured        Boolean  @default(false)
+  order           Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  technologies Technology[]
+  features     Feature[]
+  metrics      Metric[]
+  links        ProjectLink?
+  caseStudy    CaseStudy?
+
+  @@index([category])
+  @@index([featured])
+}
+
+enum Category {
+  games
+  fintech
+  mobile
+  enterprise
+  automation
+}
+
+model Technology {
+  id        String  @id @default(cuid())
+  projectId String
+  name      String
+  icon      String
+  color     String
+  order     Int     @default(0)
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+model Feature {
+  id          String @id @default(cuid())
+  projectId   String
+  title       String
+  description String
+  icon        String
+  order       Int    @default(0)
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+model Metric {
+  id        String @id @default(cuid())
+  projectId String
+  label     String
+  value     String
+  icon      String
+  order     Int    @default(0)
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+model ProjectLink {
+  id        String  @id @default(cuid())
+  projectId String  @unique
+  demo      String?
+  github    String?
+  telegram  String?
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+// ==================== CASE STUDIES ====================
+
+model CaseStudy {
+  id        String   @id @default(cuid())
+  projectId String   @unique
+  challenge String   @db.Text
+  solution  String   @db.Text
+  results   String[] // Array of result strings
+
+  project             Project              @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  performance         Performance?
+  architecture        Architecture?
+  userFlows           UserFlow[]
+  technicalHighlights TechnicalHighlight[]
+  integrations        Integration[]
+  gallery             GalleryItem[]
+  testimonial         CaseStudyTestimonial?
+}
+
+model Performance {
+  id            String @id @default(cuid())
+  caseStudyId   String @unique
+  score         Int
+  accessibility Int
+  bestPractices Int
+  seo           Int
+  fcp           String
+  lcp           String
+  tbt           String
+  cls           String
+  speedIndex    String
+
+  caseStudy CaseStudy @relation(fields: [caseStudyId], references: [id], onDelete: Cascade)
+}
+
+model Architecture {
+  id          String  @id @default(cuid())
+  caseStudyId String  @unique
+  description String  @db.Text
+
+  caseStudy CaseStudy           @relation(fields: [caseStudyId], references: [id], onDelete: Cascade)
+  layers    ArchitectureLayer[]
+}
+
+model ArchitectureLayer {
+  id             String   @id @default(cuid())
+  architectureId String
+  name           String
+  components     String[] // Array of component names
+  color          String
+  order          Int      @default(0)
+
+  architecture Architecture @relation(fields: [architectureId], references: [id], onDelete: Cascade)
+
+  @@index([architectureId])
+}
+
+model UserFlow {
+  id          String @id @default(cuid())
+  caseStudyId String
+  title       String
+  description String
+  icon        String
+  order       Int    @default(0)
+
+  caseStudy CaseStudy      @relation(fields: [caseStudyId], references: [id], onDelete: Cascade)
+  steps     UserFlowStep[]
+
+  @@index([caseStudyId])
+}
+
+model UserFlowStep {
+  id          String  @id @default(cuid())
+  flowId      String
+  title       String
+  description String
+  icon        String?
+  order       Int     @default(0)
+
+  flow UserFlow @relation(fields: [flowId], references: [id], onDelete: Cascade)
+
+  @@index([flowId])
+}
+
+model TechnicalHighlight {
+  id          String   @id @default(cuid())
+  caseStudyId String
+  title       String
+  description String   @db.Text
+  icon        String
+  codePreview String?  @db.Text
+  tags        String[]
+  order       Int      @default(0)
+
+  caseStudy CaseStudy @relation(fields: [caseStudyId], references: [id], onDelete: Cascade)
+
+  @@index([caseStudyId])
+}
+
+model Integration {
+  id          String @id @default(cuid())
+  caseStudyId String
+  name        String
+  logo        String
+  description String
+  color       String
+  order       Int    @default(0)
+
+  caseStudy CaseStudy @relation(fields: [caseStudyId], references: [id], onDelete: Cascade)
+
+  @@index([caseStudyId])
+}
+
+model GalleryItem {
+  id          String  @id @default(cuid())
+  caseStudyId String
+  src         String
+  alt         String
+  caption     String?
+  order       Int     @default(0)
+
+  caseStudy CaseStudy @relation(fields: [caseStudyId], references: [id], onDelete: Cascade)
+
+  @@index([caseStudyId])
+}
+
+model CaseStudyTestimonial {
+  id          String  @id @default(cuid())
+  caseStudyId String  @unique
+  quote       String  @db.Text
+  author      String
+  role        String
+  avatar      String?
+
+  caseStudy CaseStudy @relation(fields: [caseStudyId], references: [id], onDelete: Cascade)
+}
+
+// ==================== TESTIMONIALS ====================
+
+model Testimonial {
+  id        String   @id @default(cuid())
+  author    String
+  task      String
+  text      String   @db.Text
+  rating    Int      @default(5)
+  source    String?  @default("YouDo")
+  createdAt DateTime @default(now())
+  order     Int      @default(0)
+
+  @@index([rating])
+}
+
+model TestimonialStats {
+  id            String   @id @default("default")
+  avgRating     Float    @default(4.9)
+  totalPositive Int      @default(0)
+  totalNegative Int      @default(0)
+  platform      String   @default("YouDo")
+  platformUrl   String?
+  updatedAt     DateTime @updatedAt
+}
+
+// ==================== TEAM ====================
+
+model TeamMember {
+  id          String   @id @default(cuid())
+  name        String
+  role        String
+  description String   @db.Text
+  photo       String
+  skills      String[]
+  bio         String?  @db.Text
+  isFounder   Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  socialLinks TeamMemberSocial?
+}
+
+model TeamMemberSocial {
+  id       String  @id @default(cuid())
+  memberId String  @unique
+  github   String?
+  telegram String?
+  linkedin String?
+
+  member TeamMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+}
+
+// ==================== SKILLS & TECH STACK ====================
+
+model SkillCategory {
+  id    String   @id @default(cuid())
+  name  String
+  icon  String
+  color String
+  items String[]
+  order Int      @default(0)
+}
+
+model TechStackItem {
+  id       String  @id @default(cuid())
+  name     String
+  icon     String
+  color    String
+  category String
+  featured Boolean @default(false)
+  order    Int     @default(0)
+}
+
+// ==================== WORK PROCESS ====================
+
+model WorkProcessStep {
+  id          String @id @default(cuid())
+  number      String // "01", "02", etc.
+  title       String
+  description String @db.Text
+  icon        String
+  color       String
+  order       Int    @default(0)
+}
+
+// ==================== PRICING ====================
+
+model PricingPackage {
+  id          String   @id @default(cuid())
+  name        String
+  price       String
+  description String
+  icon        String
+  color       String
+  popular     Boolean  @default(false)
+  features    String[]
+  notIncluded String[]
+  order       Int      @default(0)
+}
+
+model AdditionalService {
+  id          String @id @default(cuid())
+  name        String
+  price       String
+  description String
+  order       Int    @default(0)
+}
+
+// ==================== FAQ ====================
+
+model FaqItem {
+  id           String   @id @default(cuid())
+  question     String
+  answer       String   @db.Text
+  category     String?
+  helpfulCount Int      @default(0)
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// ==================== CONTACT ====================
+
+model ContactInfo {
+  id           String   @id @default("default")
+  email        String
+  telegram     String
+  github       String
+  youdoUrl     String?
+  responseTime String   @default("24 часа")
+  updatedAt    DateTime @updatedAt
+}
+
+model ContactSubmission {
+  id        String           @id @default(cuid())
+  name      String
+  email     String
+  subject   String?
+  message   String           @db.Text
+  status    SubmissionStatus @default(NEW)
+  response  String?          @db.Text
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum SubmissionStatus {
+  NEW
+  READ
+  RESPONDED
+}
+
+// ==================== SITE SETTINGS ====================
+
+model SiteSettings {
+  id              String   @id @default("default")
+  companyName     String   @default("METABYTE")
+  subtitle        String   @default("Full-Stack Development Studio")
+  badgeText       String   @default("Открыт для предложений")
+  heroServices    String[] // Typewriter services
+  heroTechStack   String[] // Featured tech
+  projectsCount   Int      @default(17)
+  rating          Float    @default(4.9)
+  countriesCount  Int      @default(5)
+  founderName     String   @default("Владимир")
+  founderTitle    String
+  founderBioShort String   @db.Text
+  founderBioLong  String?  @db.Text
+  founderPhoto    String
+  updatedAt       DateTime @updatedAt
+}
+
+// ==================== PROJECT CATEGORIES (Lookup) ====================
+
+model ProjectCategory {
+  id    String @id @default(cuid())
+  value String @unique
+  label String
+  order Int    @default(0)
+}
