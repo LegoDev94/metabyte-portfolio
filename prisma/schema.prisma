@@ -1,5 +1,5 @@
 // Portfolio Database Schema
-// Prisma ORM for PostgreSQL
+// Prisma ORM for PostgreSQL (Supabase)
 
 generator client {
   provider = "prisma-client-js"
@@ -7,7 +7,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // ==================== PROJECTS ====================
