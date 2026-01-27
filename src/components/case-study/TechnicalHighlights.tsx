@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Code2 } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import type { TechnicalHighlight } from "@/data/projects";
+import { useLocaleContext } from "@/components/providers/LocaleProvider";
 
 interface TechnicalHighlightsProps {
   highlights: TechnicalHighlight[];
@@ -65,6 +66,8 @@ function HighlightCard({ highlight, index }: HighlightCardProps) {
 }
 
 export function TechnicalHighlights({ highlights }: TechnicalHighlightsProps) {
+  const { locale } = useLocaleContext();
+
   return (
     <section className="py-16 border-t border-border bg-card/30">
       <div className="container mx-auto px-4 lg:px-8">
@@ -77,14 +80,22 @@ export function TechnicalHighlights({ highlights }: TechnicalHighlightsProps) {
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
             <Code2 className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-primary">Почему это работает</span>
+            <span className="text-sm font-medium text-primary">
+              {locale === "ro" ? "De ce functioneaza" : "Почему это работает"}
+            </span>
           </div>
           <h2 className="text-3xl font-display tracking-wide mb-4">
-            <span className="text-foreground">Что даёт </span>
-            <span className="text-primary">бизнесу</span>
+            <span className="text-foreground">
+              {locale === "ro" ? "Ce ofera " : "Что даёт "}
+            </span>
+            <span className="text-primary">
+              {locale === "ro" ? "afacerii" : "бизнесу"}
+            </span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Каждое решение = конкретная выгода для бизнеса: экономия, скорость, конверсия
+            {locale === "ro"
+              ? "Fiecare solutie = beneficiu concret pentru afacere: economie, viteza, conversie"
+              : "Каждое решение = конкретная выгода для бизнеса: экономия, скорость, конверсия"}
           </p>
         </motion.div>
 

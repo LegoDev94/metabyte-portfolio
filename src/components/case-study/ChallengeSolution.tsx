@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { AlertTriangle, Lightbulb, Trophy, Check, TrendingUp } from "lucide-react";
+import { useLocaleContext } from "@/components/providers/LocaleProvider";
 
 interface ChallengeSolutionProps {
   challenge: string;
@@ -157,6 +158,8 @@ function MobileArrow({ color = "primary" }: { color?: "orange" | "primary" | "gr
 }
 
 export function ChallengeSolution({ challenge, solution, results }: ChallengeSolutionProps) {
+  const { locale } = useLocaleContext();
+
   return (
     <section className="py-16 border-t border-border bg-gradient-to-br from-card/50 to-background">
       <div className="container mx-auto px-4 lg:px-8">
@@ -169,14 +172,22 @@ export function ChallengeSolution({ challenge, solution, results }: ChallengeSol
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
             <TrendingUp className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-primary">Бизнес-результат</span>
+            <span className="text-sm font-medium text-primary">
+              {locale === "ro" ? "Rezultat de business" : "Бизнес-результат"}
+            </span>
           </div>
           <h2 className="text-3xl font-display tracking-wide">
-            <span className="text-foreground">Задача клиента → </span>
-            <span className="text-primary">Результат</span>
+            <span className="text-foreground">
+              {locale === "ro" ? "Sarcina clientului → " : "Задача клиента → "}
+            </span>
+            <span className="text-primary">
+              {locale === "ro" ? "Rezultat" : "Результат"}
+            </span>
           </h2>
           <p className="text-muted-foreground mt-3 max-w-2xl mx-auto">
-            Как я решил бизнес-задачу и какую ценность это принесло
+            {locale === "ro"
+              ? "Cum am rezolvat sarcina de business si ce valoare a adus"
+              : "Как я решил бизнес-задачу и какую ценность это принесло"}
           </p>
         </motion.div>
 
@@ -195,7 +206,9 @@ export function ChallengeSolution({ challenge, solution, results }: ChallengeSol
                   <div className="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center">
                     <AlertTriangle className="w-5 h-5 text-orange-400" />
                   </div>
-                  <h3 className="text-lg font-semibold text-orange-400">Задача клиента</h3>
+                  <h3 className="text-lg font-semibold text-orange-400">
+                    {locale === "ro" ? "Sarcina clientului" : "Задача клиента"}
+                  </h3>
                 </div>
                 <p className="text-muted-foreground leading-relaxed">{challenge}</p>
               </div>
@@ -220,7 +233,9 @@ export function ChallengeSolution({ challenge, solution, results }: ChallengeSol
                   <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
                     <Lightbulb className="w-5 h-5 text-primary" />
                   </div>
-                  <h3 className="text-lg font-semibold text-primary">Что я сделал</h3>
+                  <h3 className="text-lg font-semibold text-primary">
+                    {locale === "ro" ? "Ce am facut" : "Что я сделал"}
+                  </h3>
                 </div>
                 <p className="text-muted-foreground leading-relaxed">{solution}</p>
               </div>
@@ -248,7 +263,9 @@ export function ChallengeSolution({ challenge, solution, results }: ChallengeSol
                     <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
                       <Trophy className="w-5 h-5 text-green-400" />
                     </div>
-                    <h3 className="text-lg font-semibold text-green-400">Бизнес-результат</h3>
+                    <h3 className="text-lg font-semibold text-green-400">
+                      {locale === "ro" ? "Rezultat de business" : "Бизнес-результат"}
+                    </h3>
                   </div>
                   <ul className="space-y-3">
                     {results.map((result, index) => (

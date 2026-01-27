@@ -103,7 +103,7 @@ const fallbackPlans: PricingPlan[] = [
   },
 ];
 
-const fallbackServices: AdditionalService[] = [
+const fallbackServicesRu: AdditionalService[] = [
   { id: "1", name: "Telegram Bot", price: "от 30 000 ₽", description: "Бот с любым функционалом" },
   { id: "2", name: "Telegram Mini App", price: "от 80 000 ₽", description: "Приложение внутри Telegram" },
   { id: "3", name: "Интеграция с 1С", price: "от 50 000 ₽", description: "Синхронизация данных с 1С" },
@@ -112,13 +112,84 @@ const fallbackServices: AdditionalService[] = [
   { id: "6", name: "UI/UX дизайн", price: "от 30 000 ₽", description: "Дизайн с Figma файлами" },
 ];
 
+const fallbackPlansRo: PricingPlan[] = [
+  {
+    id: "1",
+    name: "Landing Page",
+    price: "от 50 000 ₽",
+    description: "Site cu o singura pagina pentru produs sau serviciu",
+    icon: "Zap",
+    color: "#00ffff",
+    popular: false,
+    features: [
+      "Design adaptiv",
+      "Pana la 5 sectiuni",
+      "Formular de contact",
+      "Optimizare SEO",
+      "Animatii si efecte",
+      "Conectare analytics",
+      "Termen: 1-2 saptamani",
+    ],
+    notIncluded: ["Panou admin", "Baza de date", "Cont personal"],
+  },
+  {
+    id: "2",
+    name: "Web Application",
+    price: "от 200 000 ₽",
+    description: "Aplicatie web completa cu backend",
+    icon: "Rocket",
+    color: "#ff00ff",
+    popular: true,
+    features: [
+      "Totul din Landing Page",
+      "Autentificare utilizatori",
+      "Baza de date",
+      "Panou admin",
+      "Integrari API",
+      "Plati (Stripe, etc.)",
+      "Termen: 1-2 luni",
+    ],
+    notIncluded: ["Aplicatie mobila"],
+  },
+  {
+    id: "3",
+    name: "Mobile App",
+    price: "от 300 000 ₽",
+    description: "Aplicatie cross-platform pe Flutter",
+    icon: "Crown",
+    color: "#ffaa00",
+    popular: false,
+    features: [
+      "iOS + Android dintr-un cod",
+      "Performanta nativa",
+      "Notificari push",
+      "Mod offline",
+      "Integrare cu API",
+      "Publicare in magazine",
+      "Termen: 2-3 luni",
+    ],
+    notIncluded: [],
+  },
+];
+
+const fallbackServicesRo: AdditionalService[] = [
+  { id: "1", name: "Telegram Bot", price: "от 30 000 ₽", description: "Bot cu orice functionalitate" },
+  { id: "2", name: "Telegram Mini App", price: "от 80 000 ₽", description: "Aplicatie in interiorul Telegram" },
+  { id: "3", name: "Integrare 1C", price: "от 50 000 ₽", description: "Sincronizare date cu 1C" },
+  { id: "4", name: "Integrare AI", price: "от 40 000 ₽", description: "ChatGPT, Claude, generare continut" },
+  { id: "5", name: "Suport/luna", price: "от 10 000 ₽", description: "Hosting, monitorizare, bugfix-uri" },
+  { id: "6", name: "Design UI/UX", price: "от 30 000 ₽", description: "Design cu fisiere Figma" },
+];
+
 export function PricingContent({ plans, services }: PricingContentProps) {
   const t = useTranslations("pricing");
   const { locale, formatPrice } = useLocaleContext();
 
-  // Use fallback data if database is empty
-  const packages = plans.length > 0 ? plans : fallbackPlans;
-  const additionalServices = services.length > 0 ? services : fallbackServices;
+  // Use fallback data if database is empty (with locale-specific fallbacks)
+  const fallbackPlansData = locale === "ro" ? fallbackPlansRo : fallbackPlans;
+  const fallbackServicesData = locale === "ro" ? fallbackServicesRo : fallbackServicesRu;
+  const packages = plans.length > 0 ? plans : fallbackPlansData;
+  const additionalServices = services.length > 0 ? services : fallbackServicesData;
 
   // Format price with currency conversion
   const displayPrice = (priceStr: string) => {

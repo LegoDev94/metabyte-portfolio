@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Gauge, Eye, ShieldCheck, Search, Zap, Timer, Clock, Move } from "lucide-react";
 import type { PerformanceMetrics } from "@/data/projects";
+import { useLocaleContext } from "@/components/providers/LocaleProvider";
 
 interface LighthouseMetricsProps {
   metrics: PerformanceMetrics;
@@ -114,6 +115,8 @@ function MetricBadge({ label, value, icon, delay = 0 }: MetricBadgeProps) {
 }
 
 export function LighthouseMetrics({ metrics }: LighthouseMetricsProps) {
+  const { locale } = useLocaleContext();
+
   return (
     <section className="py-12">
       <div className="container mx-auto px-4 lg:px-8">
@@ -126,14 +129,24 @@ export function LighthouseMetrics({ metrics }: LighthouseMetricsProps) {
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/20 mb-4">
             <Gauge className="w-4 h-4 text-green-400" />
-            <span className="text-sm font-medium text-green-400">Google Lighthouse — официальный тест скорости</span>
+            <span className="text-sm font-medium text-green-400">
+              {locale === "ro"
+                ? "Google Lighthouse — test oficial de viteza"
+                : "Google Lighthouse — официальный тест скорости"}
+            </span>
           </div>
           <h2 className="text-3xl font-display tracking-wide">
-            <span className="text-foreground">Быстрее </span>
-            <span className="text-primary">95% сайтов в интернете</span>
+            <span className="text-foreground">
+              {locale === "ro" ? "Mai rapid decat " : "Быстрее "}
+            </span>
+            <span className="text-primary">
+              {locale === "ro" ? "95% din site-uri" : "95% сайтов в интернете"}
+            </span>
           </h2>
           <p className="text-muted-foreground mt-3 max-w-2xl mx-auto">
-            Каждая секунда задержки = -7% конверсии. Этот сайт загружается мгновенно — пользователи не уходят.
+            {locale === "ro"
+              ? "Fiecare secunda de intarziere = -7% conversie. Acest site se incarca instantaneu — utilizatorii nu pleaca."
+              : "Каждая секунда задержки = -7% конверсии. Этот сайт загружается мгновенно — пользователи не уходят."}
           </p>
         </motion.div>
 
@@ -141,21 +154,21 @@ export function LighthouseMetrics({ metrics }: LighthouseMetricsProps) {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
           <CircularProgress
             value={metrics.score}
-            label="Производительность"
+            label={locale === "ro" ? "Performanta" : "Производительность"}
             icon={<Zap className="w-4 h-4" />}
             color="auto"
             delay={0}
           />
           <CircularProgress
             value={metrics.accessibility}
-            label="Доступность"
+            label={locale === "ro" ? "Accesibilitate" : "Доступность"}
             icon={<Eye className="w-4 h-4" />}
             color="auto"
             delay={0.1}
           />
           <CircularProgress
             value={metrics.bestPractices}
-            label="Лучшие практики"
+            label={locale === "ro" ? "Bune practici" : "Лучшие практики"}
             icon={<ShieldCheck className="w-4 h-4" />}
             color="auto"
             delay={0.2}
@@ -172,31 +185,31 @@ export function LighthouseMetrics({ metrics }: LighthouseMetricsProps) {
         {/* Detailed metrics */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <MetricBadge
-            label="Первая отрисовка"
+            label={locale === "ro" ? "Prima randare" : "Первая отрисовка"}
             value={metrics.fcp}
             icon={<Zap className="w-5 h-5" />}
             delay={0.4}
           />
           <MetricBadge
-            label="Загрузка контента"
+            label={locale === "ro" ? "Incarcare continut" : "Загрузка контента"}
             value={metrics.lcp}
             icon={<Timer className="w-5 h-5" />}
             delay={0.5}
           />
           <MetricBadge
-            label="Время блокировки"
+            label={locale === "ro" ? "Timp de blocare" : "Время блокировки"}
             value={metrics.tbt}
             icon={<Clock className="w-5 h-5" />}
             delay={0.6}
           />
           <MetricBadge
-            label="Сдвиг макета"
+            label={locale === "ro" ? "Deplasare layout" : "Сдвиг макета"}
             value={metrics.cls}
             icon={<Move className="w-5 h-5" />}
             delay={0.7}
           />
           <MetricBadge
-            label="Индекс скорости"
+            label={locale === "ro" ? "Index de viteza" : "Индекс скорости"}
             value={metrics.speedIndex}
             icon={<Gauge className="w-5 h-5" />}
             delay={0.8}

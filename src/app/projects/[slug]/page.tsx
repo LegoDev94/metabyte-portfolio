@@ -3,7 +3,8 @@ import { Metadata } from "next";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ProjectDetail } from "@/components/project/ProjectDetail";
-import { getProjectBySlug, getProjects } from "@/lib/db";
+import { getProjectBySlug } from "@/lib/db";
+import { projects } from "@/data/projects";
 
 export const dynamic = "force-dynamic";
 
@@ -11,8 +12,8 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
+// Use local data for static params to avoid DB connection pool issues during build
 export async function generateStaticParams() {
-  const projects = await getProjects();
   return projects.map((project) => ({
     slug: project.slug,
   }));

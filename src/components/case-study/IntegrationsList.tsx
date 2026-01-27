@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Plug, ExternalLink } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import type { Integration } from "@/data/projects";
+import { useLocaleContext } from "@/components/providers/LocaleProvider";
 
 interface IntegrationsListProps {
   integrations: Integration[];
@@ -21,6 +22,8 @@ function DynamicIcon({ name, className, style }: { name: string; className?: str
 }
 
 export function IntegrationsList({ integrations }: IntegrationsListProps) {
+  const { locale } = useLocaleContext();
+
   return (
     <section className="py-16 border-t border-border">
       <div className="container mx-auto px-4 lg:px-8">
@@ -33,14 +36,22 @@ export function IntegrationsList({ integrations }: IntegrationsListProps) {
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 mb-4">
             <Plug className="w-4 h-4 text-accent" />
-            <span className="text-sm font-medium text-accent">Проверенные сервисы</span>
+            <span className="text-sm font-medium text-accent">
+              {locale === "ro" ? "Servicii verificate" : "Проверенные сервисы"}
+            </span>
           </div>
           <h2 className="text-3xl font-display tracking-wide mb-4">
-            <span className="text-foreground">Работает на </span>
-            <span className="text-primary">лучших решениях</span>
+            <span className="text-foreground">
+              {locale === "ro" ? "Functioneaza pe " : "Работает на "}
+            </span>
+            <span className="text-primary">
+              {locale === "ro" ? "cele mai bune solutii" : "лучших решениях"}
+            </span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Интегрированы мировые лидеры: Stripe для платежей, OpenAI для AI, SendGrid для писем — надёжность и масштаб
+            {locale === "ro"
+              ? "Lideri mondiali integrati: Stripe pentru plati, OpenAI pentru AI, SendGrid pentru email-uri — fiabilitate si scalare"
+              : "Интегрированы мировые лидеры: Stripe для платежей, OpenAI для AI, SendGrid для писем — надёжность и масштаб"}
           </p>
         </motion.div>
 

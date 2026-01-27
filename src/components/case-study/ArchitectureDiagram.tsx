@@ -3,12 +3,15 @@
 import { motion } from "framer-motion";
 import { Layers, ArrowDown } from "lucide-react";
 import type { ArchitectureInfo } from "@/data/projects";
+import { useLocaleContext } from "@/components/providers/LocaleProvider";
 
 interface ArchitectureDiagramProps {
   architecture: ArchitectureInfo;
 }
 
 export function ArchitectureDiagram({ architecture }: ArchitectureDiagramProps) {
+  const { locale } = useLocaleContext();
+
   return (
     <section className="py-16 border-t border-border">
       <div className="container mx-auto px-4 lg:px-8">
@@ -21,14 +24,22 @@ export function ArchitectureDiagram({ architecture }: ArchitectureDiagramProps) 
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 mb-4">
             <Layers className="w-4 h-4 text-accent" />
-            <span className="text-sm font-medium text-accent">Под капотом</span>
+            <span className="text-sm font-medium text-accent">
+              {locale === "ro" ? "Sub capota" : "Под капотом"}
+            </span>
           </div>
           <h2 className="text-3xl font-display tracking-wide mb-4">
-            <span className="text-foreground">Как это </span>
-            <span className="text-primary">устроено</span>
+            <span className="text-foreground">
+              {locale === "ro" ? "Cum " : "Как это "}
+            </span>
+            <span className="text-primary">
+              {locale === "ro" ? "functioneaza" : "устроено"}
+            </span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Многоуровневая архитектура для надёжности: каждый слой отвечает за свою задачу
+            {locale === "ro"
+              ? "Arhitectura pe niveluri pentru fiabilitate: fiecare nivel este responsabil de propria sarcina"
+              : "Многоуровневая архитектура для надёжности: каждый слой отвечает за свою задачу"}
           </p>
         </motion.div>
 

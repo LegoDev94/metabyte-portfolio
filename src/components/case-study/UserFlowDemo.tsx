@@ -6,6 +6,7 @@ import { ChevronRight, Play, Check } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import type { UserFlow } from "@/data/projects";
 import { cn } from "@/lib/utils";
+import { useLocaleContext } from "@/components/providers/LocaleProvider";
 
 interface UserFlowDemoProps {
   flows: UserFlow[];
@@ -26,6 +27,7 @@ export function UserFlowDemo({ flows }: UserFlowDemoProps) {
   const [activeFlow, setActiveFlow] = useState(0);
   const [activeStep, setActiveStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const { locale } = useLocaleContext();
 
   const currentFlow = flows[activeFlow];
   const currentSteps = currentFlow?.steps || [];
@@ -62,14 +64,22 @@ export function UserFlowDemo({ flows }: UserFlowDemoProps) {
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 mb-4">
             <DynamicIcon name="play-circle" className="w-4 h-4 text-accent" />
-            <span className="text-sm font-medium text-accent">Интерактивная демонстрация</span>
+            <span className="text-sm font-medium text-accent">
+              {locale === "ro" ? "Demonstratie interactiva" : "Интерактивная демонстрация"}
+            </span>
           </div>
           <h2 className="text-3xl font-display tracking-wide mb-4">
-            <span className="text-foreground">Как это </span>
-            <span className="text-primary">работает</span>
+            <span className="text-foreground">
+              {locale === "ro" ? "Cum " : "Как это "}
+            </span>
+            <span className="text-primary">
+              {locale === "ro" ? "functioneaza" : "работает"}
+            </span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Нажмите «Запустить демо» чтобы увидеть путь пользователя по шагам
+            {locale === "ro"
+              ? "Apasati «Porniti demo» pentru a vedea calea utilizatorului pas cu pas"
+              : "Нажмите «Запустить демо» чтобы увидеть путь пользователя по шагам"}
           </p>
         </motion.div>
 
@@ -134,7 +144,9 @@ export function UserFlowDemo({ flows }: UserFlowDemoProps) {
               )}
             >
               <Play className="w-5 h-5" />
-              {isPlaying ? "Воспроизведение..." : "Запустить демо"}
+              {isPlaying
+                ? (locale === "ro" ? "Redare..." : "Воспроизведение...")
+                : (locale === "ro" ? "Porniti demo" : "Запустить демо")}
             </motion.button>
           </div>
 
