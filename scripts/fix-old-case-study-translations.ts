@@ -12,8 +12,11 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 
 // Import static data
-import { projects as projectsRu } from "../src/data/projects";
-import { projects as projectsRo } from "../src/data/projects-ro";
+import { projects as projectsRu } from "../src/data/projects.js";
+import { projects as projectsRo } from "../src/data/projects-ro.js";
+
+console.log("Loaded RU projects:", projectsRu?.length || 0);
+console.log("Loaded RO projects:", projectsRo?.length || 0);
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
