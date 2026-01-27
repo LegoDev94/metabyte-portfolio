@@ -28,6 +28,7 @@ import {
   FloatingReactionComponent,
 } from "./AIEffects";
 import { TicTacToe } from "./TicTacToe";
+import { useLocaleContext } from "@/components/providers/LocaleProvider";
 
 // ============================================
 // TYPES
@@ -83,6 +84,7 @@ const INTRO_DELAY = 2000; // Задержка перед появлением (�
 export function AIAssistant() {
   const router = useRouter();
   const pathname = usePathname();
+  const { locale } = useLocaleContext();
 
   // UI State
   const [isOpen, setIsOpen] = useState(false);
@@ -252,7 +254,9 @@ export function AIAssistant() {
       setMessages([
         {
           role: "assistant",
-          content: `Привет${userCity ? `, гость из ${userCity}` : ""}! 👋 Я AI-помощник Metabyte. Могу рассказать о проектах, помочь с навигацией или ответить на вопросы!`,
+          content: locale === "ro"
+            ? `Salut${userCity ? `, vizitator din ${userCity}` : ""}! 👋 Sunt asistentul AI Metabyte. Pot povesti despre proiecte, ajuta cu navigarea sau raspunde la intrebari!`
+            : `Привет${userCity ? `, гость из ${userCity}` : ""}! 👋 Я AI-помощник Metabyte. Могу рассказать о проектах, помочь с навигацией или ответить на вопросы!`,
         },
       ]);
     } finally {
@@ -481,7 +485,9 @@ export function AIAssistant() {
               ...prev,
               {
                 role: "assistant",
-                content: `Ваши контакты уже у нас! 📋 Разработчик свяжется с вами в ближайшее время. Если хотите ускорить — напишите напрямую в Telegram: @metabytemd`,
+                content: locale === "ro"
+                  ? `Avem deja datele dvs. de contact! 📋 Dezvoltatorul va contacta in curand. Daca doriti mai repede — scrieti direct pe Telegram: @metabytemd`
+                  : `Ваши контакты уже у нас! 📋 Разработчик свяжется с вами в ближайшее время. Если хотите ускорить — напишите напрямую в Telegram: @metabytemd`,
               },
             ]);
           } else {
@@ -513,7 +519,9 @@ export function AIAssistant() {
             ...prev,
             {
               role: "assistant",
-              content: `Спасибо, ${name}! 🎉 Я передал ваши контакты (${contact}) разработчику. Он свяжется с вами в ближайшее время! А пока можете посмотреть проекты или написать напрямую в Telegram: @metabytemd`,
+              content: locale === "ro"
+                ? `Multumesc, ${name}! 🎉 Am transmis contactele tale (${contact}) dezvoltatorului. Te va contacta in curand! Intre timp poti vedea proiectele sau scrie direct pe Telegram: @metabytemd`
+                : `Спасибо, ${name}! 🎉 Я передал ваши контакты (${contact}) разработчику. Он свяжется с вами в ближайшее время! А пока можете посмотреть проекты или написать напрямую в Telegram: @metabytemd`,
             },
           ]);
           // Показываем конфетти
@@ -594,8 +602,12 @@ export function AIAssistant() {
               {
                 role: "assistant",
                 content: wonDiscount
-                  ? "Ты уже выиграл свою скидку 10%! 🎉 Больше одного раза не получится, хитрец! 😄"
-                  : "Мы уже играли! К сожалению, повторно сыграть нельзя. Но ты всё равно можешь написать разработчику — может договоритесь! 😉",
+                  ? (locale === "ro"
+                    ? "Ai castigat deja reducerea de 10%! 🎉 Nu se poate de doua ori, smecher! 😄"
+                    : "Ты уже выиграл свою скидку 10%! 🎉 Больше одного раза не получится, хитрец! 😄")
+                  : (locale === "ro"
+                    ? "Am mai jucat! Din pacate, nu se poate repeta. Dar poti oricum sa scrii dezvoltatorului — poate va intelegeti! 😉"
+                    : "Мы уже играли! К сожалению, повторно сыграть нельзя. Но ты всё равно можешь написать разработчику — может договоритесь! 😉"),
               },
             ]);
           }
@@ -717,7 +729,9 @@ export function AIAssistant() {
       console.error("Send message error:", error);
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "Упс, что-то пошло не так. Попробуйте ещё раз! 😅" },
+        { role: "assistant", content: locale === "ro"
+          ? "Oops, ceva nu a mers bine. Incearca din nou! 😅"
+          : "Упс, что-то пошло не так. Попробуйте ещё раз! 😅" },
       ]);
     } finally {
       setIsLoading(false);
@@ -789,7 +803,7 @@ export function AIAssistant() {
           if (pathname === "/") {
             aiEffects.showSpotlight(
               "[data-section='projects'], .project-card, #projects",
-              "Посмотрите наши проекты! Там много интересного 👀"
+              locale === "ro" ? "Vedeti proiectele noastre! E mult interesant 👀" : "Посмотрите наши проекты! Там много интересного 👀"
             );
           } else if (pathname === "/projects") {
             const cards = document.querySelectorAll(".project-card");
@@ -797,7 +811,7 @@ export function AIAssistant() {
               const randomCard = cards[Math.floor(Math.random() * Math.min(cards.length, 4))];
               if (randomCard) {
                 aiEffects.addBubble(
-                  "Нажмите на карточку чтобы узнать подробности! 💡",
+                  locale === "ro" ? "Apasati pe cartonas pentru detalii! 💡" : "Нажмите на карточку чтобы узнать подробности! 💡",
                   window.innerWidth - 350,
                   200,
                   "tip"
@@ -806,7 +820,7 @@ export function AIAssistant() {
             }
           } else if (pathname.startsWith("/projects/") && !clientInfo) {
             aiEffects.addBubble(
-              "Нравится проект? Могу организовать созвон с разработчиком! 📞",
+              locale === "ro" ? "Iti place proiectul? Pot organiza un apel cu dezvoltatorul! 📞" : "Нравится проект? Могу организовать созвон с разработчиком! 📞",
               window.innerWidth - 350,
               300,
               "tip"
@@ -847,7 +861,7 @@ export function AIAssistant() {
           scrollTriggeredRef.current.add("home-50");
           setTimeout(() => {
             aiEffects.addBubble(
-              "Уже на полпути! Ниже есть контактная форма 📬",
+              locale === "ro" ? "Deja la jumatate! Mai jos e formularul de contact 📬" : "Уже на полпути! Ниже есть контактная форма 📬",
               window.innerWidth - 350,
               window.innerHeight - 200,
               "comment"
@@ -861,7 +875,7 @@ export function AIAssistant() {
           setTimeout(() => {
             if (!clientInfo) {
               aiEffects.addBubble(
-                "Дошли до конца! Напишите — обсудим ваш проект 🚀",
+                locale === "ro" ? "Ai ajuns la final! Scrie — discutam proiectul tau 🚀" : "Дошли до конца! Напишите — обсудим ваш проект 🚀",
                 window.innerWidth - 350,
                 window.innerHeight - 250,
                 "celebration"
@@ -939,7 +953,9 @@ export function AIAssistant() {
           ...prev,
           {
             role: "assistant",
-            content: `🎉 ${userName ? `${userName}, п` : "П"}оздравляю с победой! Ты заслужил скидку 10%! Я уже шепнул разработчику... Когда будешь обсуждать проект, скажи кодовое слово "КРЕСТИКИ" и скидка твоя! 😎`,
+            content: locale === "ro"
+              ? `🎉 ${userName ? `${userName}, f` : "F"}elicitari cu victoria! Ai meritat reducerea de 10%! I-am soptit deja dezvoltatorului... Cand vei discuta proiectul, spune cuvantul cod "XSIO" si reducerea e a ta! 😎`
+              : `🎉 ${userName ? `${userName}, п` : "П"}оздравляю с победой! Ты заслужил скидку 10%! Я уже шепнул разработчику... Когда будешь обсуждать проект, скажи кодовое слово "КРЕСТИКИ" и скидка твоя! 😎`,
           },
         ]);
       }, 2000);
@@ -950,7 +966,9 @@ export function AIAssistant() {
           ...prev,
           {
             role: "assistant",
-            content: `Я победил! 😄 Но не расстраивайся — напиши разработчику, может он всё равно даст скидку за смелость! @metabytemd`,
+            content: locale === "ro"
+              ? `Am castigat! 😄 Dar nu te supara — scrie dezvoltatorului, poate iti da oricum reducere pentru curaj! @metabytemd`
+              : `Я победил! 😄 Но не расстраивайся — напиши разработчику, может он всё равно даст скидку за смелость! @metabytemd`,
           },
         ]);
       }, 2000);
@@ -961,7 +979,9 @@ export function AIAssistant() {
           ...prev,
           {
             role: "assistant",
-            content: `Ничья! 🤝 Достойная игра! Скидку не выиграл, но уважение заслужил. Напиши разработчику — @metabytemd`,
+            content: locale === "ro"
+              ? `Egalitate! 🤝 Joc demn! Nu ai castigat reducerea, dar ai castigat respectul. Scrie dezvoltatorului — @metabytemd`
+              : `Ничья! 🤝 Достойная игра! Скидку не выиграл, но уважение заслужил. Напиши разработчику — @metabytemd`,
           },
         ]);
       }, 2000);
@@ -1065,7 +1085,7 @@ export function AIAssistant() {
                 <div className="p-4 border-b border-border/50 flex justify-between items-center bg-gradient-to-r from-primary/10 to-accent/10">
                   <div className="flex items-center gap-2">
                     <span className="text-xl">🎮</span>
-                    <span className="font-bold text-foreground">Крестики-нолики</span>
+                    <span className="font-bold text-foreground">{locale === "ro" ? "X si O" : "Крестики-нолики"}</span>
                   </div>
                   <button
                     onClick={() => setShowGame(false)}
@@ -1085,7 +1105,7 @@ export function AIAssistant() {
                 {/* Footer hint */}
                 <div className="p-3 border-t border-border/50 bg-muted/30 text-center">
                   <p className="text-xs text-muted-foreground">
-                    Выиграй и получи скидку 10%! 🏆
+                    {locale === "ro" ? "Castiga si obtine reducere 10%! 🏆" : "Выиграй и получи скидку 10%! 🏆"}
                   </p>
                 </div>
               </div>
@@ -1118,7 +1138,7 @@ export function AIAssistant() {
                 <div className="p-4 border-b border-border/50 flex justify-between items-center bg-gradient-to-r from-primary/10 to-accent/10">
                   <div className="flex items-center gap-2">
                     <span className="text-xl">📞</span>
-                    <span className="font-bold text-foreground">Оставьте контакты</span>
+                    <span className="font-bold text-foreground">{locale === "ro" ? "Lasati datele de contact" : "Оставьте контакты"}</span>
                   </div>
                   <button
                     onClick={() => setShowContactForm(false)}
@@ -1131,20 +1151,22 @@ export function AIAssistant() {
                 {/* Form */}
                 <div className="p-6 space-y-4">
                   <p className="text-sm text-muted-foreground text-center">
-                    Оставьте свои данные и разработчик свяжется с вами в ближайшее время!
+                    {locale === "ro"
+                      ? "Lasati datele si dezvoltatorul va contacta in curand!"
+                      : "Оставьте свои данные и разработчик свяжется с вами в ближайшее время!"}
                   </p>
                   <input
                     type="text"
                     value={contactName}
                     onChange={(e) => setContactName(e.target.value)}
-                    placeholder="Ваше имя"
+                    placeholder={locale === "ro" ? "Numele dvs." : "Ваше имя"}
                     className="w-full px-4 py-3 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                   />
                   <input
                     type="text"
                     value={contactValue}
                     onChange={(e) => setContactValue(e.target.value)}
-                    placeholder="Telegram (@username) или телефон"
+                    placeholder={locale === "ro" ? "Telegram (@username) sau telefon" : "Telegram (@username) или телефон"}
                     className="w-full px-4 py-3 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                   />
                   <div className="flex gap-3 pt-2">
@@ -1162,13 +1184,17 @@ export function AIAssistant() {
                           setShowContactForm(false);
                           sendContactToServer(info);
                           const gameOffer = !hasPlayedGame
-                            ? "\n\n🎮 Кстати, хочешь сыграть в крестики-нолики? Если выиграешь — выпрошу для тебя скидку 10%! Напиши 'играем' или 'давай сыграем'!"
+                            ? (locale === "ro"
+                              ? "\n\n🎮 Apropo, vrei sa jucam X si O? Daca castigi — iti fac reducere 10%! Scrie 'jucam' sau 'hai sa jucam'!"
+                              : "\n\n🎮 Кстати, хочешь сыграть в крестики-нолики? Если выиграешь — выпрошу для тебя скидку 10%! Напиши 'играем' или 'давай сыграем'!")
                             : "";
                           setMessages((prev) => [
                             ...prev,
                             {
                               role: "assistant",
-                              content: `Спасибо, ${contactName}! 🎉 Я передал ваши контакты разработчику. Он свяжется с вами в ближайшее время!${gameOffer}`,
+                              content: locale === "ro"
+                                ? `Multumesc, ${contactName}! 🎉 Am transmis contactele dezvoltatorului. Te va contacta in curand!${gameOffer}`
+                                : `Спасибо, ${contactName}! 🎉 Я передал ваши контакты разработчику. Он свяжется с вами в ближайшее время!${gameOffer}`,
                             },
                           ]);
                           confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
@@ -1179,13 +1205,13 @@ export function AIAssistant() {
                       disabled={!contactName || !contactValue}
                       className="flex-1 py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-primary/30"
                     >
-                      Отправить
+                      {locale === "ro" ? "Trimite" : "Отправить"}
                     </button>
                     <button
                       onClick={() => setShowContactForm(false)}
                       className="px-6 py-3 bg-muted text-muted-foreground rounded-xl font-medium hover:bg-muted/80 transition-colors"
                     >
-                      Отмена
+                      {locale === "ro" ? "Anuleaza" : "Отмена"}
                     </button>
                   </div>
                 </div>
@@ -1237,7 +1263,9 @@ export function AIAssistant() {
                   className="text-center"
                 >
                   <h2 className="text-2xl font-display text-foreground mb-2">
-                    {userCity ? `Привет, ${userCity}!` : "Привет!"} 👋
+                    {userCity
+                      ? (locale === "ro" ? `Salut, ${userCity}!` : `Привет, ${userCity}!`)
+                      : (locale === "ro" ? "Salut!" : "Привет!")} 👋
                   </h2>
 
                   <div className="bg-muted rounded-xl p-4 mb-4">
@@ -1262,7 +1290,9 @@ export function AIAssistant() {
                     ) : (
                       <p className="text-muted-foreground text-sm">
                         {messages[0]?.content ||
-                          "Я AI-помощник Metabyte. Покажу проекты, отвечу на вопросы, помогу связаться с разработчиком!"}
+                          (locale === "ro"
+                            ? "Sunt asistentul AI Metabyte. Iti arat proiectele, raspund la intrebari, ajut sa contactezi dezvoltatorul!"
+                            : "Я AI-помощник Metabyte. Покажу проекты, отвечу на вопросы, помогу связаться с разработчиком!")}
                       </p>
                     )}
                   </div>
@@ -1273,11 +1303,11 @@ export function AIAssistant() {
                     onClick={closeIntroAndOpenChat}
                     className="w-full py-3 px-6 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary/90 transition-colors shadow-lg shadow-primary/30"
                   >
-                    Начать общение
+                    {locale === "ro" ? "Incepe conversatia" : "Начать общение"}
                   </motion.button>
 
                   <p className="text-xs text-muted-foreground mt-3">
-                    Нажмите куда угодно чтобы закрыть
+                    {locale === "ro" ? "Apasati oriunde pentru a inchide" : "Нажмите куда угодно чтобы закрыть"}
                   </p>
                 </motion.div>
               </div>
@@ -1343,9 +1373,9 @@ export function AIAssistant() {
                   <Sparkles className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground">AI Ассистент</h3>
+                  <h3 className="font-semibold text-foreground">{locale === "ro" ? "Asistent AI" : "AI Ассистент"}</h3>
                   <p className="text-xs text-muted-foreground">
-                    {userName ? userName : userCity ? `Гость из ${userCity}` : "Онлайн"}
+                    {userName ? userName : userCity ? (locale === "ro" ? `Vizitator din ${userCity}` : `Гость из ${userCity}`) : "Online"}
                   </p>
                 </div>
               </div>
@@ -1379,7 +1409,9 @@ export function AIAssistant() {
                     <div className="text-center py-8">
                       <Bot className="w-12 h-12 text-primary/50 mx-auto mb-3" />
                       <p className="text-muted-foreground text-sm">
-                        Привет! Спроси меня о проектах или просто поболтаем! 😊
+                        {locale === "ro"
+                          ? "Salut! Intreaba-ma despre proiecte sau hai sa vorbim! 😊"
+                          : "Привет! Спроси меня о проектах или просто поболтаем! 😊"}
                       </p>
                     </div>
                   )}
@@ -1445,7 +1477,7 @@ export function AIAssistant() {
                       value={inputValue}
                       onChange={(e) => setInputValue(e.target.value)}
                       onKeyPress={handleKeyPress}
-                      placeholder="Напишите сообщение..."
+                      placeholder={locale === "ro" ? "Scrie un mesaj..." : "Напишите сообщение..."}
                       className="flex-1 px-4 py-2 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                     />
                     <button
@@ -1461,7 +1493,7 @@ export function AIAssistant() {
                       onClick={clearHistory}
                       className="text-xs text-muted-foreground hover:text-foreground mt-2 transition-colors"
                     >
-                      Очистить историю
+                      {locale === "ro" ? "Sterge istoricul" : "Очистить историю"}
                     </button>
                   )}
                 </div>
