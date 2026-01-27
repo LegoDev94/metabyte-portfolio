@@ -35,10 +35,9 @@ export function Hero({ settings }: HeroProps) {
   const { locale } = useLocaleContext();
   const data = settings || defaultSettings;
 
-  // Split company name for styling (assumes format like "METABYTE" -> "META" + "BYTE")
-  const nameParts = data.companyName.match(/^([A-Z]+)([A-Z]+)$/i);
-  const firstName = nameParts ? nameParts[1] : data.companyName.slice(0, 4);
-  const lastName = nameParts ? nameParts[2] : data.companyName.slice(4);
+  // Split company name for styling (METABYTE -> META + BYTE)
+  const firstName = data.companyName.slice(0, 4);
+  const lastName = data.companyName.slice(4);
 
   // Format services for typewriter - localized
   const servicesRo = ["SaaS", "FinTech", "E-commerce", "Jocuri", "Mobile Apps"];
