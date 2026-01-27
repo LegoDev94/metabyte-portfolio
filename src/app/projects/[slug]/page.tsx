@@ -1,10 +1,12 @@
 import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
 import { Metadata } from "next";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ProjectDetail } from "@/components/project/ProjectDetail";
 import { getProjectBySlug } from "@/lib/db";
 import { projects } from "@/data/projects";
+import { getLocalizedProject } from "@/lib/utils/get-locale-projects";
 
 export const dynamic = "force-dynamic";
 
@@ -21,11 +23,18 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const project = await getProjectBySlug(slug);
+  const cookieStore = await cookies();
+  const locale = cookieStore.get("locale")?.value || "ru";
+
+  // Try DB first, then localized static data
+  let project = await getProjectBySlug(slug);
+  if (!project) {
+    project = getLocalizedProject(slug, locale) || null;
+  }
 
   if (!project) {
     return {
-      title: "Проект не найден",
+      title: locale === "ro" ? "Proiect negasit" : "Проект не найден",
     };
   }
 
@@ -42,7 +51,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProjectPage({ params }: Props) {
   const { slug } = await params;
-  const project = await getProjectBySlug(slug);
+  const cookieStore = await cookies();
+  const locale = cookieStore.get("locale")?.value || "ru";
+
+  // Try DB first, then localized static data
+  let project = await getProjectBySlug(slug);
+  if (!project) {
+    project = getLocalizedProject(slug, locale) || null;
+  }
 
   if (!project) {
     notFound();

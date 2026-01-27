@@ -86,13 +86,13 @@ export async function getProjectsByCategory(category: string): Promise<Project[]
 }
 
 // Get project categories with counts
-export async function getProjectCategories() {
+export async function getProjectCategories(locale: string = "ru") {
   const categories = await prisma.project.groupBy({
     by: ["category"],
     _count: { category: true },
   });
 
-  const categoryMap: Record<string, string> = {
+  const categoryMapRu: Record<string, string> = {
     games: "Игры",
     fintech: "FinTech",
     mobile: "Мобильные",
@@ -100,8 +100,19 @@ export async function getProjectCategories() {
     automation: "Автоматизация",
   };
 
+  const categoryMapRo: Record<string, string> = {
+    games: "Jocuri",
+    fintech: "FinTech",
+    mobile: "Mobile",
+    enterprise: "Enterprise",
+    automation: "Automatizare",
+  };
+
+  const categoryMap = locale === "ro" ? categoryMapRo : categoryMapRu;
+  const allLabel = locale === "ro" ? "Toate proiectele" : "Все проекты";
+
   return [
-    { value: "all", label: "Все проекты" },
+    { value: "all", label: allLabel },
     ...categories.map((c) => ({
       value: c.category,
       label: categoryMap[c.category] || c.category,
