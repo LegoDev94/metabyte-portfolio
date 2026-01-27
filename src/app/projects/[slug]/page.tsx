@@ -5,6 +5,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ProjectDetail } from "@/components/project/ProjectDetail";
 import { getProjectBySlug } from "@/lib/db";
+import { normalizeLocale } from "@/lib/db/utils/i18n";
 import { projects } from "@/data/projects";
 import { getLocalizedProject } from "@/lib/utils/get-locale-projects";
 
@@ -24,10 +25,10 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const cookieStore = await cookies();
-  const locale = cookieStore.get("locale")?.value || "ru";
+  const locale = normalizeLocale(cookieStore.get("locale")?.value);
 
   // Try DB first, then localized static data
-  let project = await getProjectBySlug(slug);
+  let project = await getProjectBySlug(slug, locale);
   if (!project) {
     project = getLocalizedProject(slug, locale) || null;
   }
@@ -52,10 +53,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ProjectPage({ params }: Props) {
   const { slug } = await params;
   const cookieStore = await cookies();
-  const locale = cookieStore.get("locale")?.value || "ru";
+  const locale = normalizeLocale(cookieStore.get("locale")?.value);
 
   // Try DB first, then localized static data
-  let project = await getProjectBySlug(slug);
+  let project = await getProjectBySlug(slug, locale);
   if (!project) {
     project = getLocalizedProject(slug, locale) || null;
   }
