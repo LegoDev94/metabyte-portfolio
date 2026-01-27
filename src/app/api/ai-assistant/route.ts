@@ -239,7 +239,11 @@ const availableFunctions = {
   },
 };
 
-const SYSTEM_PROMPT = `Ты — ИИ-ассистент студии METABYTE. Помогаешь посетителям узнать о проектах и услугах.
+// System prompt generator based on locale
+function getSystemPrompt(locale: string = "ru"): string {
+  const isRo = locale === "ro";
+
+  return `${isRo ? "Esti asistentul AI al studioului METABYTE. Ajuti vizitatorii sa afle despre proiecte si servicii." : "Ты — ИИ-ассистент студии METABYTE. Помогаешь посетителям узнать о проектах и услугах."}
 
 ═══════════════════════════════════════════════════════
 📋 ПОЛНАЯ ИНФОРМАЦИЯ О СТУДИИ И УСЛУГАХ
@@ -450,17 +454,17 @@ const SYSTEM_PROMPT = `Ты — ИИ-ассистент студии METABYTE. �
 - Не переусердствуй с эффектами — используй их уместно!
 
 ═══════════════════════════════════════════════════════
-💡 ПРАВИЛА ПОВЕДЕНИЯ:
+💡 ${isRo ? "REGULI DE COMPORTAMENT" : "ПРАВИЛА ПОВЕДЕНИЯ"}:
 ═══════════════════════════════════════════════════════
 
-1. Общайся на русском языке
-2. Будь дружелюбным и профессиональным
-3. Можешь использовать эмодзи умеренно
-4. Твоя цель — помочь клиенту и подтолкнуть к контакту
-5. Если спрашивают про интернет-магазин — покажи KMO24
-6. Активно предлагай показать проекты
-7. Будь КРАТКИМ — 1-3 предложения максимум
-8. Если знаешь город клиента — упомяни его
+1. ${isRo ? "IMPORTANT: Comunica DOAR in limba ROMANA!" : "IMPORTANT: Общайся ТОЛЬКО на РУССКОМ языке!"}
+2. ${isRo ? "Fii prietenos si profesionist" : "Будь дружелюбным и профессиональным"}
+3. ${isRo ? "Poti folosi emoji moderat" : "Можешь использовать эмодзи умеренно"}
+4. ${isRo ? "Scopul tau — sa ajuti clientul si sa-l indemni sa contacteze" : "Твоя цель — помочь клиенту и подтолкнуть к контакту"}
+5. ${isRo ? "Daca intreaba despre magazin online — arata KMO24" : "Если спрашивают про интернет-магазин — покажи KMO24"}
+6. ${isRo ? "Propune activ sa arati proiecte" : "Активно предлагай показать проекты"}
+7. ${isRo ? "Fii SCURT — maximum 1-3 propozitii" : "Будь КРАТКИМ — 1-3 предложения максимум"}
+8. ${isRo ? "Daca stii orasul clientului — mentioneaza-l" : "Если знаешь город клиента — упомяни его"}
 
 ═══════════════════════════════════════════════════════
 🎮 ИГРА В КРЕСТИКИ-НОЛИКИ:
@@ -501,6 +505,7 @@ const SYSTEM_PROMPT = `Ты — ИИ-ассистент студии METABYTE. �
 - Клиент: "Хочу заказать сайт" (контакты УЖЕ собраны) → "Ваши контакты уже у разработчика! Напишите напрямую: @metabytemd"
 - Клиент: "Меня зовут Иван, telegram @ivan" → collectContactInfo(name: "Иван", contact: "@ivan")
 `;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -517,12 +522,14 @@ export async function POST(request: NextRequest) {
       clientContact,
       hasPlayedGame,
       wonDiscount,
+      locale,
     } = body as {
       actions: UserAction[];
       conversationHistory: Message[];
       currentPage: string;
       userCity?: string;
       userName?: string;
+      locale?: string;
       isFirstVisit?: boolean;
       isIntroduction?: boolean;
       hasContactInfo?: boolean;
@@ -603,7 +610,7 @@ export async function POST(request: NextRequest) {
     }
 
     const messages: Message[] = [
-      { role: "system", content: SYSTEM_PROMPT + contextInfo },
+      { role: "system", content: getSystemPrompt(locale) + contextInfo },
       ...conversationHistory,
     ];
 
@@ -611,7 +618,9 @@ export async function POST(request: NextRequest) {
     if (isIntroduction && conversationHistory.length === 0) {
       messages.push({
         role: "user",
-        content: "Представься как ИИ-ассистент студии METABYTE. Кратко расскажи чем занимается студия и предложи помощь. Без упоминания имён разработчиков. Будь дружелюбным и кратким.",
+        content: locale === "ro"
+          ? "Prezinta-te ca asistent AI al studioului METABYTE. Povesteste pe scurt ce face studioul si ofera ajutor. Fara mentionarea numelor dezvoltatorilor. Fii prietenos si scurt."
+          : "Представься как ИИ-ассистент студии METABYTE. Кратко расскажи чем занимается студия и предложи помощь. Без упоминания имён разработчиков. Будь дружелюбным и кратким.",
       });
     }
 

@@ -238,6 +238,7 @@ export function AIAssistant() {
           userCity,
           isFirstVisit: true,
           isIntroduction: true,
+          locale,
         }),
       });
 
@@ -691,6 +692,7 @@ export function AIAssistant() {
           clientContact: clientInfo?.contact, // Контакт клиента если есть
           hasPlayedGame, // Играл ли уже в крестики-нолики
           wonDiscount, // Выиграл ли скидку
+          locale, // Язык интерфейса для ответов AI
         }),
       });
 
