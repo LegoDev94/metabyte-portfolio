@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { useLocaleContext } from "@/components/providers/LocaleProvider";
 
 interface Model3DViewerProps {
   models: Array<{
@@ -25,6 +26,7 @@ export function Model3DViewer({ models }: Model3DViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const { locale } = useLocaleContext();
 
   // Three.js refs
   const sceneRef = useRef<THREE.Scene | null>(null);
@@ -247,10 +249,14 @@ export function Model3DViewer({ models }: Model3DViewerProps) {
         >
           <h2 className="text-3xl font-display tracking-wide mb-4">
             <span className="text-foreground">3D </span>
-            <span className="text-primary">Модели персонажей</span>
+            <span className="text-primary">
+              {locale === "ro" ? "Modele de personaje" : "Модели персонажей"}
+            </span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Интерактивный просмотр игровых моделей. Используйте мышь для вращения и масштабирования.
+            {locale === "ro"
+              ? "Vizualizare interactiva a modelelor de joc. Folositi mouse-ul pentru a roti si a mari."
+              : "Интерактивный просмотр игровых моделей. Используйте мышь для вращения и масштабирования."}
           </p>
         </motion.div>
 
@@ -298,14 +304,18 @@ export function Model3DViewer({ models }: Model3DViewerProps) {
             <div className="absolute inset-0 flex items-center justify-center z-10 bg-background/50">
               <div className="flex flex-col items-center gap-2">
                 <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                <span className="text-xs text-muted-foreground">Loading 3D...</span>
+                <span className="text-xs text-muted-foreground">
+                  {locale === "ro" ? "Se incarca 3D..." : "Загрузка 3D..."}
+                </span>
               </div>
             </div>
           )}
 
           {/* Controls hint */}
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-background/80 backdrop-blur-sm rounded-full text-xs text-muted-foreground z-10 pointer-events-none">
-            Drag to rotate | Scroll to zoom
+            {locale === "ro"
+              ? "Trage pentru a roti | Scroll pentru zoom"
+              : "Перетащите для вращения | Прокрутите для масштаба"}
           </div>
         </motion.div>
 
