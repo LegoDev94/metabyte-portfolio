@@ -581,6 +581,774 @@ export const projectsRo: Project[] = [
       { label: "Timp raspuns", value: "<3 min", icon: "clock" },
     ],
   },
+  // Project 6: 404-dispatch
+  {
+    slug: "404-dispatch",
+    title: "404 Dispatch",
+    subtitle: "Sistem CRM pentru Dispecerat",
+    description:
+      "Sistem CRM pentru companie de transport: gestionarea soferilor, incarcaturilor, contabilitate.",
+    fullDescription: `404 Dispatch — sistem CRM B2B pentru gestionarea companiei de transport. Suporta 3 roluri de utilizatori: Admin, Dispecer, Contabil.
+
+Functionalitatea include gestionarea soferilor (documente, fotografii prin Cloudinary), incarcaturi cu calendar, sistem contabil cu calculul procentelor si rapoarte saptamanale.
+
+Este integrat un asistent AI bazat pe OpenAI pentru traducere si generarea raspunsurilor, export rapoarte in PDF.`,
+    category: "enterprise",
+    categoryLabel: "Enterprise / CRM",
+    image: "/images/projects/404-dispatch.jpg",
+    technologies: [
+      { name: "Next.js 16", icon: "triangle", color: "#ffffff" },
+      { name: "MongoDB", icon: "database", color: "#00ed64" },
+      { name: "Cloudinary", icon: "cloud", color: "#3448c5" },
+      { name: "OpenAI", icon: "brain", color: "#00ff00" },
+      { name: "shadcn/ui", icon: "component", color: "#ffffff" },
+    ],
+    features: [
+      {
+        title: "3 roluri",
+        description: "Admin, Dispecer, Contabil",
+        icon: "users",
+      },
+      {
+        title: "Gestionare incarcaturi",
+        description: "Calendar si statusuri livrari",
+        icon: "truck",
+      },
+      {
+        title: "Contabilitate",
+        description: "Calcul salarii si rapoarte",
+        icon: "calculator",
+      },
+      {
+        title: "Asistent AI",
+        description: "Traducere si generare raspunsuri",
+        icon: "brain",
+      },
+    ],
+    links: {
+      github: "https://github.com/LegoDev94/404dispatch",
+    },
+    metrics: [
+      { label: "Roluri", value: "3", icon: "users" },
+      { label: "API endpoints", value: "20+", icon: "server" },
+    ],
+  },
+  // Project 7: exchanger-pmr
+  {
+    slug: "exchanger-pmr",
+    title: "Exchanger PMR",
+    subtitle: "Schimb valutar P2P",
+    description:
+      "Platforma P2P de schimb valutar ca Telegram Mini App. Tranzactii in timp real, ratinguri, recenzii.",
+    fullDescription: `Exchanger PMR — platforma P2P pentru schimb valutar in regiunea PMR, realizata ca Telegram Mini App cu versiune web.
+
+Utilizatorii pot crea oferte de schimb, cauta cu filtre dupa valute, sume si zone. Sistem de tranzactii cu ratinguri si recenzii.
+
+Actualizari in timp real prin Socket.IO, autentificare prin Telegram Web App API.`,
+    category: "fintech",
+    categoryLabel: "FinTech",
+    image: "/images/projects/exchanger-pmr.jpg",
+    technologies: [
+      { name: "Vue 3", icon: "vuejs", color: "#42b883" },
+      { name: "Express", icon: "hexagon", color: "#ffffff" },
+      { name: "PostgreSQL", icon: "database", color: "#336791" },
+      { name: "Socket.IO", icon: "wifi", color: "#ffffff" },
+      { name: "Telegraf", icon: "send", color: "#0088cc" },
+    ],
+    features: [
+      {
+        title: "Schimb P2P",
+        description: "Creare si cautare oferte",
+        icon: "repeat",
+      },
+      {
+        title: "Timp real",
+        description: "Socket.IO pentru actualizari instantanee",
+        icon: "wifi",
+      },
+      {
+        title: "Telegram Mini App",
+        description: "Integrare cu Telegram",
+        icon: "send",
+      },
+      {
+        title: "Ratinguri",
+        description: "Sistem de recenzii si reputatie",
+        icon: "star",
+      },
+    ],
+    links: {
+      github: "https://github.com/LegoDev94/exchanger_pmr",
+    },
+  },
+  // Project 8: fns-tg-scan
+  {
+    slug: "fns-tg-scan",
+    title: "FNS TG Scan",
+    subtitle: "Scanner de bonuri QR",
+    description:
+      "Telegram Mini App pentru scanarea bonurilor: coduri QR si recunoastere text OCR.",
+    fullDescription: `FNS TG Scan — Telegram Mini App pentru scanarea si recunoasterea bonurilor. Suporta scanarea codurilor QR prin camera si recunoasterea textului OCR din fotografii.
+
+Foloseste jsQR pentru decodarea QR si Tesseract.js pentru OCR. Datele din bonuri pot fi folosite pentru evidenta cheltuielilor.`,
+    category: "automation",
+    categoryLabel: "Automatizare",
+    image: "/images/projects/fns-tg-scan.jpg",
+    technologies: [
+      { name: "Vue 3", icon: "vuejs", color: "#42b883" },
+      { name: "TypeScript", icon: "file-code", color: "#3178c6" },
+      { name: "Tesseract.js", icon: "scan", color: "#ffffff" },
+      { name: "jsQR", icon: "qr-code", color: "#ffffff" },
+      { name: "Telegram SDK", icon: "send", color: "#0088cc" },
+    ],
+    features: [
+      {
+        title: "Scanner QR",
+        description: "Scanare prin camera",
+        icon: "qr-code",
+      },
+      {
+        title: "OCR",
+        description: "Recunoastere text din fotografii",
+        icon: "scan",
+      },
+      {
+        title: "Telegram Mini App",
+        description: "Integrare cu Telegram SDK",
+        icon: "send",
+      },
+    ],
+    links: {
+      github: "https://github.com/LegoDev94/fns-tg-scan",
+    },
+  },
+  // Project 9: kmo24
+  {
+    slug: "kmo24",
+    title: "KMO24",
+    subtitle: "Piata de echipamente pentru restaurante",
+    description:
+      "Magazin online de echipamente second-hand pentru cafenele si restaurante cu integrare 1C, calcul livrare si generare PDF.",
+    fullDescription: `KMO24 — magazin online modern de echipamente profesionale second-hand pentru cafenele si restaurante in Krasnoyarsk. Solutie full-stack cu SSR si panou admin bogat.
+
+Proiectul include Backend complet pe Express.js + MongoDB si Frontend pe Nuxt.js 3 cu SSR pentru optimizare SEO.
+
+🛒 **Functionalitati cheie:**
+- Integrare cu 1C:Service pentru sincronizare produse si stocuri
+- Calcul livrare prin API Delovye Linii si PEK
+- Generare automata PDF oferte comerciale
+- Integrare cu Telegram pentru publicarea stirilor
+- Sistem de recenzii cu moderare si ratinguri
+- Redis caching pentru performanta ridicata
+- Panou admin complet cu sistem ACL de permisiuni`,
+    category: "enterprise",
+    categoryLabel: "E-commerce / HoReCa",
+    image: "/images/projects/kmo24.jpg",
+    video: { type: "file", src: "/images/projects/kmo24.mp4" },
+    featured: true,
+    technologies: [
+      { name: "Nuxt.js 3", icon: "triangle", color: "#00dc82" },
+      { name: "Vue 3", icon: "vuejs", color: "#42b883" },
+      { name: "Express.js", icon: "hexagon", color: "#ffffff" },
+      { name: "MongoDB", icon: "database", color: "#00ed64" },
+      { name: "Redis", icon: "database", color: "#dc382d" },
+      { name: "TypeScript", icon: "file-code", color: "#3178c6" },
+    ],
+    features: [
+      {
+        title: "Integrare cu 1C",
+        description: "Sincronizare automata produse si comenzi",
+        icon: "refresh-cw",
+      },
+      {
+        title: "Calcul livrare",
+        description: "API Delovye Linii si PEK",
+        icon: "truck",
+      },
+      {
+        title: "Generare PDF",
+        description: "Oferte comerciale",
+        icon: "file-text",
+      },
+      {
+        title: "Panou admin",
+        description: "CMS complet cu ACL",
+        icon: "settings",
+      },
+    ],
+    links: {
+      demo: "https://kmo24-frontend.onrender.com",
+      github: "https://github.com/LegoDev94/kmo24",
+    },
+    metrics: [
+      { label: "Produse", value: "500+", icon: "package" },
+      { label: "Timp incarcare", value: "1.2 sec", icon: "zap" },
+      { label: "Integratii", value: "5+", icon: "plug" },
+      { label: "Termen dezvoltare", value: "2.5 luni", icon: "calendar" },
+    ],
+    caseStudy: {
+      performance: {
+        score: 92,
+        accessibility: 95,
+        bestPractices: 96,
+        seo: 100,
+        fcp: "1.0s",
+        lcp: "1.2s",
+        tbt: "120ms",
+        cls: "0.01",
+        speedIndex: "1.4s",
+      },
+      challenge: "Clientul avea nevoie de un magazin online modern de echipamente second-hand pentru HoReCa in Krasnoyarsk. Problema principala — gestionarea manuala a produselor in 1C si pe site separat, duplicare munca. De asemenea era necesar calculul livrarii echipamentelor voluminoase in toata Rusia.",
+      solution: "Am creat un magazin online pe Nuxt.js 3 cu integrare completa 1C: produsele, stocurile si preturile se sincronizeaza automat. Am conectat API-ul a doua companii de transport pentru calculul exact al livrarii. Am adaugat generare automata PDF oferte comerciale pentru clientii angro.",
+      results: [
+        "Produsele se sincronizeaza cu 1C automat — 0 munca manuala",
+        "Calcul livrare in toata Rusia in 2 secunde in loc de apel la manager",
+        "Ofertele comerciale PDF se genereaza in 3 secunde",
+        "Stirile se publica simultan pe site si in Telegram",
+        "Optimizare SEO: 100 puncte Google Lighthouse",
+        "Panoul admin permite gestionarea fara dezvoltator",
+      ],
+    },
+  },
+  // Project 10: betanalitics
+  {
+    slug: "betanalitics",
+    title: "BetAnalitics",
+    subtitle: "Platforma de analiza sportiva AI",
+    description:
+      "Platforma de analiza AI a evenimentelor sportive: Claude + Computer Use pentru cautare autonoma de date, 50+ ligi, sistem de calibrare a preciziei prognozelor.",
+    fullDescription: `**Ce a primit clientul:** O platforma analitica completa pentru prognoze sportive cu AI, care cauta singura informatii actuale pe internet si invata din greseli.
+
+**Problema:** Serviciile existente de prognoze folosesc date invechite si nu isi urmaresc precizia. Utilizatorii nu inteleg cat de mult pot avea incredere intr-un prognostic.
+
+**Solutia:** Am creat un sistem cu doua caracteristici unice: 1) Claude Computer Use — AI deschide singur browserul si cauta coeficienti actuali, accidentari, stiri inainte de analiza. 2) Sistem de calibrare — platforma urmareste precizia prognozelor pe ligi si corecteaza increderea pe baza datelor istorice.
+
+**Executie tehnica:**
+• 4 sporturi prin API-Sports: fotbal (50+ ligi), baschet, hochei, tenis
+• Claude Sonnet 4 cu fallback pe OpenAI GPT-4 pentru analiza
+• Computer Use prin Puppeteer — Claude controleaza autonom browserul
+• Progres analiza in timp real prin Socket.IO cu loguri detaliate
+• Sistem de abonamente cu program de referral (cod "1WIN")
+• Accuracy tracking: calibrare incredere pe date istorice`,
+    category: "fintech",
+    categoryLabel: "Sports Tech / AI",
+    image: "/images/projects/betanalitics.jpg",
+    video: { type: "file", src: "/images/projects/betanalitics.mp4" },
+    featured: true,
+    technologies: [
+      { name: "Vue.js 3", icon: "vuejs", color: "#42b883" },
+      { name: "Claude AI", icon: "brain", color: "#00ffff" },
+      { name: "Node.js", icon: "hexagon", color: "#339933" },
+      { name: "MongoDB", icon: "database", color: "#00ed64" },
+      { name: "Socket.IO", icon: "wifi", color: "#ffffff" },
+      { name: "Puppeteer", icon: "chrome", color: "#4285f4" },
+    ],
+    features: [
+      {
+        title: "Computer Use",
+        description: "Claude cauta singur date in browser",
+        icon: "monitor",
+      },
+      {
+        title: "4 sporturi",
+        description: "Fotbal 50+ ligi, baschet, hochei, tenis",
+        icon: "trophy",
+      },
+      {
+        title: "Calibrare precizie",
+        description: "Sistemul invata din prognozele sale",
+        icon: "target",
+      },
+      {
+        title: "Progres timp real",
+        description: "Loguri Socket.IO pentru fiecare pas al analizei",
+        icon: "activity",
+      },
+      {
+        title: "AI dublu",
+        description: "Claude Sonnet 4 + OpenAI GPT-4 fallback",
+        icon: "brain",
+      },
+      {
+        title: "Abonamente",
+        description: "4 tarife cu program referral",
+        icon: "credit-card",
+      },
+    ],
+    links: {
+      github: "https://github.com/LegoDev94/betanalitics",
+    },
+    metrics: [
+      { label: "Ligi", value: "50+", icon: "trophy" },
+      { label: "Servicii", value: "20+", icon: "server" },
+      { label: "API calls/zi", value: "75K", icon: "activity" },
+      { label: "Modele MongoDB", value: "6", icon: "database" },
+    ],
+    caseStudy: {
+      challenge: "Clientul avea nevoie de o platforma de analiza sportiva care foloseste cele mai actuale date si arata sincer precizia sa. Solutiile existente lucreaza pe statistici invechite si nu urmaresc calitatea prognozelor.",
+      solution: "Am dezvoltat un sistem cu Claude Computer Use — AI deschide autonom browserul, cauta coeficienti actuali, accidentari si stiri inainte de fiecare analiza. Plus sistem unic de calibrare: platforma urmareste precizia pentru fiecare liga si corecteaza nivelul de incredere pe baza datelor istorice.",
+      results: [
+        "Claude Computer Use cauta automat date actuale inainte de analiza",
+        "Sistemul de calibrare creste precizia prognozelor cu 15-20%",
+        "50+ ligi de fotbal + baschet, hochei, tenis prin API-Sports",
+        "Socket.IO timp real arata fiecare pas al analizei cu loguri",
+        "AI dublu: Claude Sonnet 4 cu fallback automat pe GPT-4",
+        "Sistem de abonamente pe 4 niveluri cu program referral",
+      ],
+    },
+  },
+  // Project 11: neoproxy
+  {
+    slug: "neoproxy",
+    title: "NeoProxy",
+    subtitle: "SaaS de gestionare proxy",
+    description:
+      "Panou SaaS de gestionare serviciu proxy: monitorizare modem-uri USB, rotatie IP, billing cu abonamente si analiza veniturilor.",
+    fullDescription: `NeoProxy — platforma SaaS completa pentru gestionarea serviciului proxy bazat pe modem-uri USB. Include cont personal utilizator, panou admin si landing public.
+
+Utilizatorii isi gestioneaza proxy-urile: vad statusul modem-urilor, controleaza traficul (download/upload), configureaza rotatia automata IP la intervale. Dashboard-ul arata statistici de utilizare bandwidth si activitate proxy.
+
+Sistem de billing cu 3 planuri tarifare (Basic, Professional, Enterprise), atasare carduri Visa/Mastercard/PayPal, istoric plati si descarcare facturi.
+
+Panoul admin include: gestionare utilizatori, configurare planuri tarifare, analiza veniturilor cu grafice dinamica venituri pe perioade, loguri API pentru debug integratii clienti.`,
+    category: "enterprise",
+    categoryLabel: "SaaS / Infrastructura",
+    image: "/images/projects/neoproxy.jpg",
+    video: { type: "file", src: "/images/projects/neoproxy/demo.mp4" },
+    technologies: [
+      { name: "Vue.js 3", icon: "vuejs", color: "#42b883" },
+      { name: "Pinia", icon: "layers", color: "#ffd859" },
+      { name: "Vue Router", icon: "navigation", color: "#42b883" },
+      { name: "Tailwind CSS", icon: "wind", color: "#06b6d4" },
+      { name: "Chart.js", icon: "bar-chart", color: "#ff6384" },
+      { name: "Vite", icon: "zap", color: "#646cff" },
+      { name: "Axios", icon: "wifi", color: "#5a29e4" },
+      { name: "HeadlessUI", icon: "component", color: "#66e3ff" },
+    ],
+    features: [
+      {
+        title: "Modem-uri USB",
+        description: "Monitorizare modem-uri LTE cu rotatie IP",
+        icon: "smartphone",
+      },
+      {
+        title: "Dashboard",
+        description: "Grafice bandwidth si activitate",
+        icon: "bar-chart",
+      },
+      {
+        title: "Billing",
+        description: "3 tarife, carduri, PayPal, facturi",
+        icon: "credit-card",
+      },
+      {
+        title: "Analiza venituri",
+        description: "Dinamica venituri, retention rate",
+        icon: "trending-up",
+      },
+      {
+        title: "Gestionare planuri",
+        description: "CRUD pentru planuri tarifare",
+        icon: "settings",
+      },
+      {
+        title: "Loguri API",
+        description: "Debug integratii clienti",
+        icon: "file-text",
+      },
+    ],
+    links: {
+      github: "https://github.com/LegoDev94/neoproxy",
+    },
+    metrics: [
+      { label: "Pagini", value: "27", icon: "layout-grid" },
+      { label: "Roluri", value: "3", icon: "users" },
+      { label: "Componente", value: "30+", icon: "component" },
+    ],
+    caseStudy: {
+      challenge: "Clientul avea nevoie de un panou de control pentru serviciul proxy bazat pe modem-uri USB LTE. Era necesar ciclul complet: de la monitorizarea modem-urilor si traficului pana la sistemul de billing cu abonamente si panoul admin cu analiza pentru urmarirea veniturilor business-ului.",
+      solution: "Am dezvoltat SPA pe Vue 3 cu arhitectura feature-based: 3 layout-uri (public, auth, dashboard), Pinia store pentru state management, Chart.js pentru vizualizarea datelor. Am implementat sistem de roluri (user, admin, superadmin), sistem complet de billing cu atasare carduri si PayPal, analiza detaliata venituri cu export in CSV.",
+      results: [
+        "27 pagini aplicatie cu 3 layout-uri diferite",
+        "Monitorizare timp real 8+ modem-uri USB cu afisare signal strength",
+        "Sistem billing: 3 tarife, Visa/Mastercard/PayPal, istoric plati",
+        "Analiza venituri cu grafice pe 7/30/90/365 zile",
+        "Export date in CSV pentru contabilitate",
+        "Adaptare mobila pentru toate paginile",
+      ],
+    },
+  },
+  // Project 12: fancy-app
+  {
+    slug: "fancy-app",
+    title: "Fancy Dating",
+    subtitle: "Aplicatie premium de dating",
+    description:
+      "Aplicatie cross-platform de dating pe Flutter cu chat timp real, sistem de matching, albume private si monetizare prin abonamente.",
+    fullDescription: `**Fancy** — aplicatie premium de dating cu focus pe calitatea profilelor, securitate si monetizare. Construita pe Flutter pentru functionare pe Android, iOS si Web dintr-o singura baza de cod.
+
+## Arhitectura proiectului
+
+Aplicatia este construita pe **Clean Architecture** cu **structura Feature-Based** — fiecare modul functional (auth, home, chats, albums, settings) este complet izolat cu propriile straturi domain si presentation.
+
+**State Management** este realizat prin **Riverpod** cu code generation — aceasta asigura stare type-safe fara BuildContext si actualizare automata UI la schimbarea datelor.
+
+## Solutii tehnice cheie
+
+**Subscriptii timp real** — Supabase Realtime channels asigura livrare instantanee mesaje, notificari despre like-uri si match-uri. RealtimeService gestioneaza subscriptiile si previne duplicarea notificarilor pentru chat-uri deschise.
+
+**Geolocatie privacy-preserving** — distanta pana la utilizatori se calculeaza cu formula Haversine, dar pentru protejarea confidentialitatii se aplica distance fuzzing (±1 km) cu hashing consistent pentru fiecare utilizator.
+
+**Sistem media private** — albumele suporta timed viewing (limitare timp vizualizare), one-time view (vizualizare unica) si sistem de cereri acces pentru continut privat.
+
+## Monetizare
+
+Sistem complet de monetizare implementat:
+- **Abonamente**: Trial (7 zile), Weekly ($5), Monthly ($10), Yearly ($25)
+- **Consumables**: Super Likes (1/10/50), Invisible Mode (7/30 zile)
+- **Program referral**: zile premium pentru utilizatori invitati
+
+Functii Premium: like-uri nelimitate, vezi cine ti-a dat like, filtre extinse, albume private, video in profil, mod incognito.
+
+## Securitate
+
+- Politici Row-Level Security (RLS) in PostgreSQL
+- Utilizatorii blocati sunt exclusi din afisare la nivel de BD
+- Soft deletes pentru chat-uri cu pastrarea istoricului
+- Sistem verificare profile cu panou admin`,
+    category: "mobile",
+    categoryLabel: "Social / Dating",
+    image: "/images/projects/fancy-app.png",
+    technologies: [
+      { name: "Flutter", icon: "smartphone", color: "#02569b" },
+      { name: "Dart", icon: "code", color: "#0175c2" },
+      { name: "Supabase", icon: "database", color: "#3ecf8e" },
+      { name: "Firebase", icon: "flame", color: "#ffca28" },
+      { name: "Riverpod", icon: "layers", color: "#00d1b2" },
+      { name: "PostgreSQL", icon: "database", color: "#336791" },
+      { name: "GoRouter", icon: "navigation", color: "#00b4d8" },
+      { name: "IAP", icon: "credit-card", color: "#ff6b6b" },
+    ],
+    features: [
+      {
+        title: "Chat timp real",
+        description: "Text, voce, media, GIF, stickere",
+        icon: "message-circle",
+      },
+      {
+        title: "Matching",
+        description: "Like-uri, Super Likes, filtre",
+        icon: "heart",
+      },
+      {
+        title: "Albume private",
+        description: "Timed viewing, one-time view",
+        icon: "lock",
+      },
+      {
+        title: "Abonamente",
+        description: "Trial, Weekly, Monthly, Yearly",
+        icon: "crown",
+      },
+      {
+        title: "Geolocatie",
+        description: "Cautare aproape cu privacy fuzzing",
+        icon: "map-pin",
+      },
+      {
+        title: "Notificari push",
+        description: "FCM + Local Notifications",
+        icon: "bell",
+      },
+    ],
+    links: {
+      github: "https://github.com/LegoDev94/fancy-app",
+    },
+    metrics: [
+      { label: "Platforme", value: "3", icon: "smartphone" },
+      { label: "Ecrane", value: "40+", icon: "layout" },
+      { label: "Module", value: "8", icon: "package" },
+      { label: "Limbi", value: "2", icon: "globe" },
+    ],
+    caseStudy: {
+      challenge: "Crearea unei aplicatii premium de dating cu functii timp real, sistem de monetizare si protejarea confidentialitatii utilizatorilor pe trei platforme dintr-o singura baza de cod.",
+      solution: "Am dezvoltat aplicatie Flutter cross-platform cu Clean Architecture, backend Supabase timp real, sistem de abonamente prin In-App Purchases si geolocatie privacy-preserving cu distance fuzzing.",
+      results: [
+        "3 platforme (Android, iOS, Web) din cod unic",
+        "Livrare mesaje timp real < 100ms",
+        "4 planuri abonament + consumables",
+        "40+ ecrane cu sistem de design unitar",
+      ],
+    },
+  },
+  // Project 13: akbarov
+  {
+    slug: "akbarov",
+    title: "Dr. Akbarov",
+    subtitle: "Landing page medical",
+    description:
+      "Landing pentru doctor de medicina sportiva cu galerie, video si formular de cerere.",
+    fullDescription: `Site-ul oficial al doctorului Rinat Fagimovich Akbarov — specialist in medicina sportiva, reabilitare si longevitate.
+
+Site modern single-page cu animatii fluide, design adaptiv si integrare formulare de contact.
+
+🏥 **Continut:**
+- Biografie profesionala si experienta de lucru
+- Directii de activitate si metode de sanatate
+- Galerie imagini si prezentari video
+- Informatii de contact si formular de cerere
+- Adaptivitate completa pentru dispozitive mobile
+- Optimizare pentru motoare de cautare`,
+    category: "enterprise",
+    categoryLabel: "Healthcare / Landing",
+    image: "/images/projects/akbarov.jpg",
+    technologies: [
+      { name: "HTML5", icon: "code", color: "#e34f26" },
+      { name: "CSS3", icon: "palette", color: "#1572b6" },
+      { name: "JavaScript", icon: "file-code", color: "#f7df1e" },
+      { name: "GitHub Pages", icon: "github", color: "#ffffff" },
+    ],
+    features: [
+      {
+        title: "Animatii",
+        description: "Efecte CSS moderne",
+        icon: "sparkles",
+      },
+      {
+        title: "Galerie",
+        description: "Materiale foto si video",
+        icon: "image",
+      },
+      {
+        title: "Formular cerere",
+        description: "Fereastra modala de programare",
+        icon: "mail",
+      },
+      {
+        title: "SEO",
+        description: "Optimizare pentru cautare",
+        icon: "search",
+      },
+    ],
+    links: {
+      demo: "https://mainlego.github.io/akbarov/",
+      github: "https://github.com/LegoDev94/akbarov",
+    },
+    metrics: [
+      { label: "Sectiuni", value: "6", icon: "layout-grid" },
+      { label: "Incarcare", value: "<2s", icon: "zap" },
+    ],
+  },
+  // Project 14: fitness-tracker
+  {
+    slug: "fitness-tracker",
+    title: "FitPulse",
+    subtitle: "Antrenor fitness AI",
+    description:
+      "Tracker fitness cu antrenor AI: programe personalizate, urmarire progres, integrare cu dispozitive purtabile.",
+    fullDescription: `FitPulse — asistent fitness inteligent cu recomandari AI-powered. Generare programe personalizate de antrenament pe baza obiectivelor si nivelului de pregatire.
+
+Integrare cu Apple Health, Google Fit, Garmin pentru colectarea automata a datelor de activitate. Urmarire nutritie cu recunoastere produse din fotografie.
+
+Functii sociale: provocari cu prietenii, clasamente, partajare realizari.`,
+    category: "mobile",
+    categoryLabel: "Health & Fitness",
+    image: "/images/projects/fitness-tracker.jpg",
+    technologies: [
+      { name: "React Native", icon: "smartphone", color: "#61dafb" },
+      { name: "OpenAI", icon: "brain", color: "#00ff00" },
+      { name: "HealthKit", icon: "heart", color: "#ff2d55" },
+      { name: "Firebase", icon: "flame", color: "#ffca28" },
+      { name: "TensorFlow", icon: "brain", color: "#ff6f00" },
+    ],
+    features: [
+      {
+        title: "Antrenor AI",
+        description: "Programe personalizate",
+        icon: "brain",
+      },
+      {
+        title: "Integratii",
+        description: "Apple Health, Garmin, Fitbit",
+        icon: "watch",
+      },
+      {
+        title: "Nutritie",
+        description: "Recunoastere mancare din foto",
+        icon: "utensils",
+      },
+      {
+        title: "Social",
+        description: "Provocari si clasamente",
+        icon: "users",
+      },
+    ],
+    links: {
+      github: "https://github.com/LegoDev94/fitpulse",
+    },
+    metrics: [
+      { label: "Exercitii", value: "500+", icon: "dumbbell" },
+      { label: "Integratii", value: "8", icon: "plug" },
+    ],
+  },
+  // Project 15: e-learning-platform
+  {
+    slug: "e-learning-platform",
+    title: "LearnHub",
+    subtitle: "Platforma de invatare online",
+    description:
+      "Platforma educationala cu videocursuri, sarcini interactive si certificate.",
+    fullDescription: `LearnHub — platforma LMS pentru educatie online. Creare si vanzare cursuri cu lectii video, materiale text si sarcini interactive.
+
+Sistem de progres cu gamificare: XP, niveluri, insigne. Generare automata certificate la finalizarea cursului.
+
+Player video incorporat cu notite si semne de carte, editor de cod pentru sarcini practice de programare.`,
+    category: "enterprise",
+    categoryLabel: "EdTech",
+    image: "/images/projects/e-learning-platform.jpg",
+    technologies: [
+      { name: "Next.js 15", icon: "triangle", color: "#ffffff" },
+      { name: "Prisma", icon: "database", color: "#5a67d8" },
+      { name: "Stripe", icon: "credit-card", color: "#635bff" },
+      { name: "Mux", icon: "video", color: "#ff2d55" },
+      { name: "Monaco Editor", icon: "code", color: "#007acc" },
+    ],
+    features: [
+      {
+        title: "Videocursuri",
+        description: "Streaming HLS prin Mux",
+        icon: "video",
+      },
+      {
+        title: "Editor cod",
+        description: "Monaco pentru practica",
+        icon: "code",
+      },
+      {
+        title: "Certificate",
+        description: "Generare automata PDF",
+        icon: "award",
+      },
+      {
+        title: "Gamificare",
+        description: "XP, niveluri, insigne",
+        icon: "trophy",
+      },
+    ],
+    links: {
+      demo: "https://learnhub.metabyte.dev",
+      github: "https://github.com/LegoDev94/learnhub",
+    },
+    metrics: [
+      { label: "Cursuri", value: "100+", icon: "book-open" },
+      { label: "Studenti", value: "5K+", icon: "users" },
+    ],
+  },
+  // Project 16: restaurant-pos
+  {
+    slug: "restaurant-pos",
+    title: "QuickServe POS",
+    subtitle: "Sistem de management restaurant",
+    description:
+      "Sistem POS pentru restaurante: comenzi, bucatarie, depozit, analiza intr-o solutie unica.",
+    fullDescription: `QuickServe POS — sistem complex de gestionare restaurant. Primire comenzi prin tableta ospatar, KDS (Kitchen Display System) pentru bucatarie.
+
+Gestionare depozit cu deducere automata ingrediente, notificari stocuri mici. Integrare cu case de marcat fiscale si acquiring.
+
+Analiza timp real: venituri, nota medie, feluri populare, incarcare pe ore.`,
+    category: "enterprise",
+    categoryLabel: "HoReCa",
+    image: "/images/projects/restaurant-pos.jpg",
+    technologies: [
+      { name: "React", icon: "atom", color: "#61dafb" },
+      { name: "Node.js", icon: "hexagon", color: "#339933" },
+      { name: "PostgreSQL", icon: "database", color: "#336791" },
+      { name: "Socket.IO", icon: "wifi", color: "#ffffff" },
+      { name: "Electron", icon: "monitor", color: "#47848f" },
+    ],
+    features: [
+      {
+        title: "Comenzi",
+        description: "Tableta ospatar",
+        icon: "clipboard-list",
+      },
+      {
+        title: "KDS",
+        description: "Ecran pentru bucatarie",
+        icon: "chef-hat",
+      },
+      {
+        title: "Depozit",
+        description: "Deducere automata si stocuri",
+        icon: "package",
+      },
+      {
+        title: "Analiza",
+        description: "Dashboard-uri in timp real",
+        icon: "bar-chart",
+      },
+    ],
+    links: {
+      github: "https://github.com/LegoDev94/quickserve-pos",
+    },
+    metrics: [
+      { label: "Localuri", value: "50+", icon: "store" },
+      { label: "Comenzi/zi", value: "10K+", icon: "receipt" },
+    ],
+  },
+  // Project 17: social-scheduler
+  {
+    slug: "social-scheduler",
+    title: "PostFlow",
+    subtitle: "Planificator social media",
+    description:
+      "Planificator postari pentru retele sociale cu generare continut AI si analiza.",
+    fullDescription: `PostFlow — instrument de gestionare retele sociale. Planificare si autopostare in Instagram, Twitter, LinkedIn, Telegram.
+
+Asistent AI pentru generare texte, hashtag-uri si timp optim de publicare. Calendar vizual continut cu drag-and-drop.
+
+Analiza detaliata: acoperire, engagement, crestere urmaritori. Lucru in echipa cu roluri si aprobare postari.`,
+    category: "automation",
+    categoryLabel: "Marketing",
+    image: "/images/projects/social-scheduler.jpg",
+    technologies: [
+      { name: "Next.js 15", icon: "triangle", color: "#ffffff" },
+      { name: "OpenAI", icon: "brain", color: "#00ff00" },
+      { name: "Bull", icon: "clock", color: "#ff6b6b" },
+      { name: "Redis", icon: "database", color: "#dc382d" },
+      { name: "PostgreSQL", icon: "database", color: "#336791" },
+    ],
+    features: [
+      {
+        title: "Autopostare",
+        description: "5 retele sociale dintr-un loc",
+        icon: "share-2",
+      },
+      {
+        title: "Continut AI",
+        description: "Generare texte si hashtag-uri",
+        icon: "brain",
+      },
+      {
+        title: "Calendar",
+        description: "Planificare vizuala",
+        icon: "calendar",
+      },
+      {
+        title: "Analiza",
+        description: "Statistici si rapoarte",
+        icon: "bar-chart-2",
+      },
+    ],
+    links: {
+      demo: "https://postflow.metabyte.dev",
+      github: "https://github.com/LegoDev94/postflow",
+    },
+    metrics: [
+      { label: "Retele sociale", value: "5", icon: "share-2" },
+      { label: "Postari/luna", value: "100K+", icon: "file-text" },
+    ],
+  },
 ];
 
 // Re-export all projects (use this for locale-based selection)
