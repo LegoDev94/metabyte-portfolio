@@ -17,6 +17,7 @@ interface TicTacToeProps {
   onGameEnd: (result: "won" | "lost" | "draw") => void;
   onAIMove: (board: BoardState, playerSymbol: "X" | "O") => Promise<number>;
   userName?: string;
+  locale?: string;
 }
 
 // ============================================
@@ -38,7 +39,7 @@ const WINNING_COMBINATIONS = [
 // COMPONENT
 // ============================================
 
-export function TicTacToe({ onGameEnd, onAIMove, userName }: TicTacToeProps) {
+export function TicTacToe({ onGameEnd, onAIMove, userName, locale = "ru" }: TicTacToeProps) {
   const [board, setBoard] = useState<BoardState>(Array(9).fill(null));
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
   const [gameStatus, setGameStatus] = useState<GameStatus>("playing");
@@ -104,7 +105,7 @@ export function TicTacToe({ onGameEnd, onAIMove, userName }: TicTacToeProps) {
     // AI turn
     setIsPlayerTurn(false);
     setIsAIThinking(true);
-    setAiComment("Хмм, дай подумаю...");
+    setAiComment(locale === "ro" ? "Hmm, lasă-mă să mă gândesc..." : "Хмм, дай подумаю...");
 
     try {
       // Get AI move from API
@@ -121,7 +122,7 @@ export function TicTacToe({ onGameEnd, onAIMove, userName }: TicTacToeProps) {
         if (aiResult) {
           setWinningCells(aiResult.cells);
           setGameStatus("lost");
-          setAiComment("Ха-ха! Я победил! 😎");
+          setAiComment(locale === "ro" ? "Ha-ha! Am câștigat! 😎" : "Ха-ха! Я победил! 😎");
           onGameEnd("lost");
           return;
         }
@@ -129,7 +130,7 @@ export function TicTacToe({ onGameEnd, onAIMove, userName }: TicTacToeProps) {
         // Check for draw
         if (checkDraw(boardAfterAI)) {
           setGameStatus("draw");
-          setAiComment("Ничья! Неплохо играешь!");
+          setAiComment(locale === "ro" ? "Remiză! Joci bine!" : "Ничья! Неплохо играешь!");
           onGameEnd("draw");
           return;
         }
@@ -201,29 +202,37 @@ export function TicTacToe({ onGameEnd, onAIMove, userName }: TicTacToeProps) {
       case "won":
         return {
           icon: <Trophy className="w-8 h-8 text-yellow-400" />,
-          title: `Поздравляю${userName ? `, ${userName}` : ""}! Ты победил! 🎉`,
-          subtitle: "Скидка 10% твоя! Я попрошу разработчика...",
+          title: locale === "ro"
+            ? `Felicitări${userName ? `, ${userName}` : ""}! Ai câștigat! 🎉`
+            : `Поздравляю${userName ? `, ${userName}` : ""}! Ты победил! 🎉`,
+          subtitle: locale === "ro"
+            ? "Reducerea de 10% e a ta! O să-l rog pe dezvoltator..."
+            : "Скидка 10% твоя! Я попрошу разработчика...",
           color: "text-green-400",
         };
       case "lost":
         return {
           icon: <Frown className="w-8 h-8 text-red-400" />,
-          title: "Я победил! 😎",
-          subtitle: "В следующий раз повезёт больше!",
+          title: locale === "ro" ? "Am câștigat! 😎" : "Я победил! 😎",
+          subtitle: locale === "ro"
+            ? "Data viitoare vei avea mai mult noroc!"
+            : "В следующий раз повезёт больше!",
           color: "text-red-400",
         };
       case "draw":
         return {
           icon: <Handshake className="w-8 h-8 text-yellow-400" />,
-          title: "Ничья!",
-          subtitle: "Достойная игра! 🤝",
+          title: locale === "ro" ? "Remiză!" : "Ничья!",
+          subtitle: locale === "ro" ? "Joc demn! 🤝" : "Достойная игра! 🤝",
           color: "text-yellow-400",
         };
       default:
         return {
           icon: <Sparkles className="w-6 h-6 text-primary" />,
-          title: isPlayerTurn ? "Твой ход!" : "Думаю...",
-          subtitle: `Ты играешь за X`,
+          title: isPlayerTurn
+            ? (locale === "ro" ? "Rândul tău!" : "Твой ход!")
+            : (locale === "ro" ? "Mă gândesc..." : "Думаю..."),
+          subtitle: locale === "ro" ? "Joci cu X" : "Ты играешь за X",
           color: "text-foreground",
         };
     }
@@ -271,7 +280,7 @@ export function TicTacToe({ onGameEnd, onAIMove, userName }: TicTacToeProps) {
       <div className="flex items-center gap-6 text-sm text-muted-foreground mt-2">
         <div className="flex items-center gap-2">
           <X className="w-4 h-4 text-primary" />
-          <span>Ты</span>
+          <span>{locale === "ro" ? "Tu" : "Ты"}</span>
         </div>
         <div className="flex items-center gap-2">
           <Circle className="w-4 h-4 text-accent" />
@@ -291,7 +300,7 @@ export function TicTacToe({ onGameEnd, onAIMove, userName }: TicTacToeProps) {
             transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
             className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full"
           />
-          <span className="text-sm text-muted-foreground">AI думает...</span>
+          <span className="text-sm text-muted-foreground">{locale === "ro" ? "AI se gândește..." : "AI думает..."}</span>
         </motion.div>
       )}
     </div>

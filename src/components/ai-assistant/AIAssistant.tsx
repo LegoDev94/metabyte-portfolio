@@ -1003,7 +1003,7 @@ export function AIAssistant() {
           <GlitchOverlay onComplete={() => {}} />
         )}
         {aiEffects.activeEffect === "hack" && (
-          <HackTerminal onComplete={() => {}} />
+          <HackTerminal onComplete={() => {}} locale={locale} />
         )}
         {aiEffects.activeEffect === "emoji" && (
           <EmojiRain emojis={emojiRainEmojis} onComplete={() => {}} />
@@ -1035,6 +1035,7 @@ export function AIAssistant() {
             target={aiEffects.spotlightTarget.element}
             message={aiEffects.spotlightTarget.message}
             onClose={() => aiEffects.setSpotlightTarget(null)}
+            locale={locale}
           />
         )}
       </AnimatePresence>
@@ -1046,6 +1047,7 @@ export function AIAssistant() {
             userName={userName}
             onClose={() => aiEffects.setShowExitIntent(false)}
             onContact={handleExitIntentContact}
+            locale={locale}
           />
         )}
       </AnimatePresence>
@@ -1057,6 +1059,7 @@ export function AIAssistant() {
             projectsViewed={aiEffects.progressCelebration}
             onClose={() => aiEffects.setProgressCelebration(null)}
             onAskFavorite={handleProgressAskFavorite}
+            locale={locale}
           />
         )}
       </AnimatePresence>
@@ -1100,6 +1103,7 @@ export function AIAssistant() {
                   onGameEnd={handleGameEnd}
                   onAIMove={handleAIMove}
                   userName={userName}
+                  locale={locale}
                 />
 
                 {/* Footer hint */}

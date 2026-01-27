@@ -236,11 +236,13 @@ export function FloatingReactionComponent({ reaction }: { reaction: FloatingReac
 export function SpotlightEffect({
   target,
   message,
-  onClose
+  onClose,
+  locale = "ru"
 }: {
   target: Element;
   message: string;
   onClose: () => void;
+  locale?: string;
 }) {
   const rect = target.getBoundingClientRect();
   const padding = 10;
@@ -312,7 +314,7 @@ export function SpotlightEffect({
                 onClick={onClose}
                 className="text-xs text-primary hover:underline flex items-center gap-1"
               >
-                Понятно <ArrowRight className="w-3 h-3" />
+                {locale === "ro" ? "Am înțeles" : "Понятно"} <ArrowRight className="w-3 h-3" />
               </button>
             </div>
           </div>
@@ -330,10 +332,12 @@ export function ExitIntentPopup({
   onClose,
   onContact,
   userName,
+  locale = "ru",
 }: {
   onClose: () => void;
   onContact: () => void;
   userName?: string;
+  locale?: string;
 }) {
   return (
     <motion.div
@@ -374,11 +378,15 @@ export function ExitIntentPopup({
           </div>
 
           <h2 className="text-xl font-display text-center text-foreground mb-2">
-            {userName ? `${userName}, подождите!` : "Подождите!"}
+            {locale === "ro"
+              ? (userName ? `${userName}, așteptați!` : "Așteptați!")
+              : (userName ? `${userName}, подождите!` : "Подождите!")}
           </h2>
 
           <p className="text-center text-muted-foreground mb-4">
-            Уже уходите? Оставьте контакт — я отправлю вам подборку лучших проектов и смогу ответить на вопросы!
+            {locale === "ro"
+              ? "Plecați deja? Lăsați contactul — vă voi trimite o selecție cu cele mai bune proiecte și voi putea răspunde la întrebări!"
+              : "Уже уходите? Оставьте контакт — я отправлю вам подборку лучших проектов и смогу ответить на вопросы!"}
           </p>
 
           <div className="flex gap-3">
@@ -386,13 +394,13 @@ export function ExitIntentPopup({
               onClick={onContact}
               className="flex-1 py-3 px-4 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary/90 transition-colors shadow-lg shadow-primary/30"
             >
-              Оставить контакт
+              {locale === "ro" ? "Lăsați contactul" : "Оставить контакт"}
             </button>
             <button
               onClick={onClose}
               className="py-3 px-4 bg-muted text-muted-foreground rounded-xl hover:bg-muted/80 transition-colors"
             >
-              Не сейчас
+              {locale === "ro" ? "Nu acum" : "Не сейчас"}
             </button>
           </div>
         </div>
@@ -409,10 +417,12 @@ export function ProgressCelebration({
   projectsViewed,
   onClose,
   onAskFavorite,
+  locale = "ru",
 }: {
   projectsViewed: number;
   onClose: () => void;
   onAskFavorite: () => void;
+  locale?: string;
 }) {
   useEffect(() => {
     // Trigger confetti
@@ -453,21 +463,27 @@ export function ProgressCelebration({
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mb-3 shadow-lg shadow-primary/30">
               <span className="text-3xl">🎉</span>
             </div>
-            <h3 className="text-xl font-bold text-foreground">Отлично!</h3>
+            <h3 className="text-xl font-bold text-foreground">
+              {locale === "ro" ? "Excelent!" : "Отлично!"}
+            </h3>
             <p className="text-muted-foreground">
-              Вы изучили уже {projectsViewed} проект{projectsViewed === 1 ? "" : projectsViewed < 5 ? "а" : "ов"}!
+              {locale === "ro"
+                ? `Ați explorat deja ${projectsViewed} proiect${projectsViewed === 1 ? "" : "e"}!`
+                : `Вы изучили уже ${projectsViewed} проект${projectsViewed === 1 ? "" : projectsViewed < 5 ? "а" : "ов"}!`}
             </p>
           </div>
 
           <p className="text-center text-muted-foreground mb-4">
-            Какой понравился больше всего? Расскажите в чате!
+            {locale === "ro"
+              ? "Care v-a plăcut cel mai mult? Spuneți-ne în chat!"
+              : "Какой понравился больше всего? Расскажите в чате!"}
           </p>
 
           <button
             onClick={onAskFavorite}
             className="w-full py-3 px-4 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary/90 transition-colors shadow-lg shadow-primary/30"
           >
-            Рассказать
+            {locale === "ro" ? "Povestiți" : "Рассказать"}
           </button>
         </div>
       </motion.div>
@@ -524,13 +540,23 @@ export function TypingText({
 
 export function HackTerminal({
   duration = 3000,
-  onComplete
+  onComplete,
+  locale = "ru"
 }: {
   duration?: number;
   onComplete?: () => void;
+  locale?: string;
 }) {
   const [lines, setLines] = useState<string[]>([]);
-  const hackLines = [
+  const hackLines = locale === "ro" ? [
+    "Inițializare hack...",
+    "Conectare la server...",
+    "Ocolire firewall... [OK]",
+    "Obținere acces...",
+    "Descărcare date...",
+    "root@metabyte:~# ACCESS GRANTED",
+    "Glumesc! 😄 E doar un efect",
+  ] : [
     "Инициализация взлома...",
     "Подключение к серверу...",
     "Обход файрволла... [OK]",
