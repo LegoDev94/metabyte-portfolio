@@ -13,7 +13,7 @@ import { Pool } from "pg";
 
 // Import static data
 import { projects as projectsRu } from "../src/data/projects.js";
-import { projects as projectsRo } from "../src/data/projects-ro.js";
+import { projectsRo } from "../src/data/projects-ro.js";
 
 console.log("Loaded RU projects:", projectsRu?.length || 0);
 console.log("Loaded RO projects:", projectsRo?.length || 0);
