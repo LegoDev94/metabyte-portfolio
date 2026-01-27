@@ -4,6 +4,9 @@ import { createContext, useContext, useEffect, useState, useCallback } from "rea
 import { useLocale } from "next-intl";
 import { localeCurrency, type Locale } from "@/i18n/config";
 
+// Type for UI strings dictionary
+export type UIStringsDict = Record<string, string>;
+
 interface CurrencyInfo {
   code: string;
   symbol: string;
@@ -16,21 +19,56 @@ interface LocaleContextType {
   setLocale: (locale: Locale) => Promise<void>;
   formatPrice: (priceInRub: number) => string;
   isLoading: boolean;
+  // UI Strings from database
+  uiStrings: UIStringsDict;
+  uiStringsLoaded: boolean;
 }
 
 const LocaleContext = createContext<LocaleContextType | null>(null);
 
-export function LocaleProvider({ children }: { children: React.ReactNode }) {
+interface LocaleProviderProps {
+  children: React.ReactNode;
+  // Pre-loaded UI strings from server component
+  initialUIStrings?: UIStringsDict;
+}
+
+export function LocaleProvider({ children, initialUIStrings = {} }: LocaleProviderProps) {
   const currentLocale = useLocale() as Locale;
   const [locale, setLocaleState] = useState<Locale>(currentLocale);
   const [currency, setCurrency] = useState<CurrencyInfo>(localeCurrency[currentLocale]);
   const [isLoading, setIsLoading] = useState(false);
+
+  // UI Strings state
+  const [uiStrings, setUIStrings] = useState<UIStringsDict>(initialUIStrings);
+  const [uiStringsLoaded, setUIStringsLoaded] = useState(Object.keys(initialUIStrings).length > 0);
 
   // Sync with server locale on mount
   useEffect(() => {
     setLocaleState(currentLocale);
     setCurrency(localeCurrency[currentLocale]);
   }, [currentLocale]);
+
+  // Load UI strings if not pre-loaded
+  useEffect(() => {
+    if (!uiStringsLoaded && Object.keys(uiStrings).length === 0) {
+      loadUIStrings(currentLocale);
+    }
+  }, [currentLocale, uiStringsLoaded, uiStrings]);
+
+  // Function to load UI strings from API
+  const loadUIStrings = async (targetLocale: Locale) => {
+    try {
+      const response = await fetch(`/api/ui-strings?locale=${targetLocale}`);
+      if (response.ok) {
+        const data = await response.json();
+        setUIStrings(data.strings || {});
+        setUIStringsLoaded(true);
+      }
+    } catch (error) {
+      console.error("Failed to load UI strings:", error);
+      // Keep using initial strings or empty object
+    }
+  };
 
   // Function to change locale
   const setLocale = useCallback(async (newLocale: Locale) => {
@@ -46,6 +84,8 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
         const data = await response.json();
         setLocaleState(newLocale);
         setCurrency(data.currency);
+        // Load new UI strings before reload
+        await loadUIStrings(newLocale);
         // Reload to apply new locale
         window.location.reload();
       }
@@ -78,6 +118,8 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
         setLocale,
         formatPrice,
         isLoading,
+        uiStrings,
+        uiStringsLoaded,
       }}
     >
       {children}

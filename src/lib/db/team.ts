@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { DEFAULT_LOCALE, type SupportedLocale } from "./utils/i18n";
 
 export interface TeamMember {
   id: string;
@@ -16,51 +17,67 @@ export interface TeamMember {
   };
 }
 
+// Get translation from array
+function getTranslation<T extends { locale: string }>(
+  translations: T[] | undefined,
+  locale: string
+): T | undefined {
+  if (!translations || translations.length === 0) return undefined;
+  return translations.find((t) => t.locale === locale)
+    || translations.find((t) => t.locale === DEFAULT_LOCALE);
+}
+
 // Fetch all team members
-export async function getTeamMembers(): Promise<TeamMember[]> {
+export async function getTeamMembers(locale: SupportedLocale = DEFAULT_LOCALE): Promise<TeamMember[]> {
   const dbMembers = await prisma.teamMember.findMany({
     include: {
+      translations: true,
       socialLinks: true,
     },
     orderBy: { order: "asc" },
   });
 
-  return dbMembers.map((m) => ({
-    id: m.id,
-    name: m.name,
-    role: m.role,
-    description: m.description,
-    photo: m.photo,
-    skills: m.skills,
-    bio: m.bio,
-    isFounder: m.isFounder,
-    socials: {
-      github: m.socialLinks?.github || undefined,
-      telegram: m.socialLinks?.telegram || undefined,
-      linkedin: m.socialLinks?.linkedin || undefined,
-    },
-  }));
+  return dbMembers.map((m) => {
+    const trans = getTranslation(m.translations, locale);
+    return {
+      id: m.id,
+      name: trans?.name || "",
+      role: trans?.role || "",
+      description: trans?.description || "",
+      photo: m.photo,
+      skills: m.skills,
+      bio: trans?.bio || null,
+      isFounder: m.isFounder,
+      socials: {
+        github: m.socialLinks?.github || undefined,
+        telegram: m.socialLinks?.telegram || undefined,
+        linkedin: m.socialLinks?.linkedin || undefined,
+      },
+    };
+  });
 }
 
 // Get founder/primary team member
-export async function getFounder(): Promise<TeamMember | null> {
+export async function getFounder(locale: SupportedLocale = DEFAULT_LOCALE): Promise<TeamMember | null> {
   const dbMember = await prisma.teamMember.findFirst({
     where: { isFounder: true },
     include: {
+      translations: true,
       socialLinks: true,
     },
   });
 
   if (!dbMember) return null;
 
+  const trans = getTranslation(dbMember.translations, locale);
   return {
     id: dbMember.id,
-    name: dbMember.name,
-    role: dbMember.role,
-    description: dbMember.description,
+    name: trans?.name || "",
+    role: trans?.role || "",
+    description: trans?.description || "",
     photo: dbMember.photo,
     skills: dbMember.skills,
-    bio: dbMember.bio,
+    bio: trans?.bio || null,
     isFounder: dbMember.isFounder,
     socials: {
       github: dbMember.socialLinks?.github || undefined,

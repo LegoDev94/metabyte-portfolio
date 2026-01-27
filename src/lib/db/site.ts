@@ -1,4 +1,15 @@
 import { prisma } from "@/lib/prisma";
+import { DEFAULT_LOCALE, type SupportedLocale } from "./utils/i18n";
+
+// Get translation from array
+function getTranslation<T extends { locale: string }>(
+  translations: T[] | undefined,
+  locale: string
+): T | undefined {
+  if (!translations || translations.length === 0) return undefined;
+  return translations.find((t) => t.locale === locale)
+    || translations.find((t) => t.locale === DEFAULT_LOCALE);
+}
 
 // ==================== Site Settings ====================
 
@@ -18,24 +29,28 @@ export interface SiteSettings {
   founderPhoto: string;
 }
 
-export async function getSiteSettings(): Promise<SiteSettings | null> {
-  const settings = await prisma.siteSettings.findFirst();
+export async function getSiteSettings(locale: SupportedLocale = DEFAULT_LOCALE): Promise<SiteSettings | null> {
+  const settings = await prisma.siteSettings.findFirst({
+    include: { translations: true },
+  });
 
   if (!settings) return null;
 
+  const trans = getTranslation(settings.translations, locale);
+
   return {
-    companyName: settings.companyName,
-    subtitle: settings.subtitle,
-    badgeText: settings.badgeText,
-    heroServices: settings.heroServices,
+    companyName: trans?.companyName || "METABYTE",
+    subtitle: trans?.subtitle || "Full-Stack Development Studio",
+    badgeText: trans?.badgeText || "",
+    heroServices: trans?.heroServices || [],
     heroTechStack: settings.heroTechStack,
     projectsCount: settings.projectsCount,
     rating: settings.rating,
     countriesCount: settings.countriesCount,
-    founderName: settings.founderName,
-    founderTitle: settings.founderTitle,
-    founderBioShort: settings.founderBioShort,
-    founderBioLong: settings.founderBioLong,
+    founderName: trans?.founderName || "",
+    founderTitle: trans?.founderTitle || "",
+    founderBioShort: trans?.founderBioShort || "",
+    founderBioLong: trans?.founderBioLong || null,
     founderPhoto: settings.founderPhoto,
   };
 }
@@ -93,19 +108,23 @@ export interface WorkProcessStep {
   color: string;
 }
 
-export async function getWorkProcessSteps(): Promise<WorkProcessStep[]> {
+export async function getWorkProcessSteps(locale: SupportedLocale = DEFAULT_LOCALE): Promise<WorkProcessStep[]> {
   const steps = await prisma.workProcessStep.findMany({
+    include: { translations: true },
     orderBy: { order: "asc" },
   });
 
-  return steps.map((step) => ({
-    id: step.id,
-    number: step.number,
-    title: step.title,
-    description: step.description,
-    icon: step.icon,
-    color: step.color,
-  }));
+  return steps.map((step) => {
+    const trans = getTranslation(step.translations, locale);
+    return {
+      id: step.id,
+      number: step.number,
+      title: trans?.title || "",
+      description: trans?.description || "",
+      icon: step.icon,
+      color: step.color,
+    };
+  });
 }
 
 // ==================== Skill Categories ====================
@@ -118,18 +137,22 @@ export interface SkillCategory {
   items: string[];
 }
 
-export async function getSkillCategories(): Promise<SkillCategory[]> {
+export async function getSkillCategories(locale: SupportedLocale = DEFAULT_LOCALE): Promise<SkillCategory[]> {
   const categories = await prisma.skillCategory.findMany({
+    include: { translations: true },
     orderBy: { order: "asc" },
   });
 
-  return categories.map((cat) => ({
-    id: cat.id,
-    name: cat.name,
-    icon: cat.icon,
-    color: cat.color,
-    items: cat.items,
-  }));
+  return categories.map((cat) => {
+    const trans = getTranslation(cat.translations, locale);
+    return {
+      id: cat.id,
+      name: trans?.name || "",
+      icon: cat.icon,
+      color: cat.color,
+      items: cat.items,
+    };
+  });
 }
 
 // ==================== Contact Info ====================
@@ -142,16 +165,20 @@ export interface ContactInfo {
   responseTime: string;
 }
 
-export async function getContactInfo(): Promise<ContactInfo | null> {
-  const info = await prisma.contactInfo.findFirst();
+export async function getContactInfo(locale: SupportedLocale = DEFAULT_LOCALE): Promise<ContactInfo | null> {
+  const info = await prisma.contactInfo.findFirst({
+    include: { translations: true },
+  });
 
   if (!info) return null;
+
+  const trans = getTranslation(info.translations, locale);
 
   return {
     email: info.email,
     telegram: info.telegram,
     github: info.github,
     youdoUrl: info.youdoUrl,
-    responseTime: info.responseTime,
+    responseTime: trans?.responseTime || "24 часа",
   };
 }

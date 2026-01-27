@@ -1,36 +1,64 @@
 import { prisma } from "@/lib/prisma";
+import { flattenNestedTranslations, DEFAULT_LOCALE, type SupportedLocale } from "./utils/i18n";
 import type { Project, Technology, Feature, Metric, CaseStudy } from "@/data/projects";
 
-// Project include config for all queries - includes full case study data
+// Project include config for all queries - includes full case study data with translations
 const projectInclude = {
-  technologies: true,
-  features: true,
-  metrics: true,
+  translations: true,
+  technologies: { orderBy: { order: "asc" as const } },
+  features: {
+    include: { translations: true },
+    orderBy: { order: "asc" as const },
+  },
+  metrics: {
+    include: { translations: true },
+    orderBy: { order: "asc" as const },
+  },
   links: true,
   caseStudy: {
     include: {
-      gallery: { orderBy: { order: "asc" as const } },
+      translations: true,
+      gallery: {
+        include: { translations: true },
+        orderBy: { order: "asc" as const },
+      },
       performance: true,
       architecture: {
         include: {
-          layers: { orderBy: { order: "asc" as const } },
+          translations: true,
+          layers: {
+            include: { translations: true },
+            orderBy: { order: "asc" as const },
+          },
         },
       },
       userFlows: {
         include: {
-          steps: { orderBy: { order: "asc" as const } },
+          translations: true,
+          steps: {
+            include: { translations: true },
+            orderBy: { order: "asc" as const },
+          },
         },
         orderBy: { order: "asc" as const },
       },
-      technicalHighlights: { orderBy: { order: "asc" as const } },
-      integrations: { orderBy: { order: "asc" as const } },
-      testimonial: true,
+      technicalHighlights: {
+        include: { translations: true },
+        orderBy: { order: "asc" as const },
+      },
+      integrations: {
+        include: { translations: true },
+        orderBy: { order: "asc" as const },
+      },
+      testimonial: {
+        include: { translations: true },
+      },
     },
   },
 };
 
 // Fetch all projects from database
-export async function getProjects(): Promise<Project[]> {
+export async function getProjects(locale: SupportedLocale = DEFAULT_LOCALE): Promise<Project[]> {
   const dbProjects = await prisma.project.findMany({
     include: projectInclude,
     orderBy: [
@@ -39,11 +67,11 @@ export async function getProjects(): Promise<Project[]> {
     ],
   });
 
-  return dbProjects.map(mapDbProjectToProject);
+  return dbProjects.map((p) => mapDbProjectToProject(p, locale));
 }
 
 // Fetch featured projects
-export async function getFeaturedProjects(): Promise<Project[]> {
+export async function getFeaturedProjects(locale: SupportedLocale = DEFAULT_LOCALE): Promise<Project[]> {
   const dbProjects = await prisma.project.findMany({
     where: { featured: true },
     include: projectInclude,
@@ -51,24 +79,30 @@ export async function getFeaturedProjects(): Promise<Project[]> {
     take: 3,
   });
 
-  return dbProjects.map(mapDbProjectToProject);
+  return dbProjects.map((p) => mapDbProjectToProject(p, locale));
 }
 
 // Fetch single project by slug
-export async function getProjectBySlug(slug: string): Promise<Project | null> {
+export async function getProjectBySlug(
+  slug: string,
+  locale: SupportedLocale = DEFAULT_LOCALE
+): Promise<Project | null> {
   const dbProject = await prisma.project.findUnique({
     where: { slug },
     include: projectInclude,
   });
 
   if (!dbProject) return null;
-  return mapDbProjectToProject(dbProject);
+  return mapDbProjectToProject(dbProject, locale);
 }
 
 // Fetch projects by category
-export async function getProjectsByCategory(category: string): Promise<Project[]> {
+export async function getProjectsByCategory(
+  category: string,
+  locale: SupportedLocale = DEFAULT_LOCALE
+): Promise<Project[]> {
   if (category === "all") {
-    return getProjects();
+    return getProjects(locale);
   }
 
   const dbProjects = await prisma.project.findMany({
@@ -82,16 +116,46 @@ export async function getProjectsByCategory(category: string): Promise<Project[]
     ],
   });
 
-  return dbProjects.map(mapDbProjectToProject);
+  return dbProjects.map((p) => mapDbProjectToProject(p, locale));
 }
 
-// Get project categories with counts
-export async function getProjectCategories(locale: string = "ru") {
-  const categories = await prisma.project.groupBy({
+// Get project categories with counts - from database translations
+export async function getProjectCategories(locale: SupportedLocale = DEFAULT_LOCALE) {
+  // First try to get from database
+  const dbCategories = await prisma.projectCategory.findMany({
+    include: { translations: true },
+    orderBy: { order: "asc" },
+  });
+
+  const categoryCounts = await prisma.project.groupBy({
     by: ["category"],
     _count: { category: true },
   });
 
+  const countMap = Object.fromEntries(
+    categoryCounts.map((c) => [c.category, c._count.category])
+  );
+
+  // If we have database categories with translations, use them
+  if (dbCategories.length > 0) {
+    const allLabel = locale === "ro" ? "Toate proiectele" : "Все проекты";
+    const totalCount = categoryCounts.reduce((sum, c) => sum + c._count.category, 0);
+
+    return [
+      { value: "all", label: allLabel, count: totalCount },
+      ...dbCategories.map((cat) => {
+        const translation = cat.translations.find((t) => t.locale === locale)
+          || cat.translations.find((t) => t.locale === DEFAULT_LOCALE);
+        return {
+          value: cat.value,
+          label: translation?.label || cat.value,
+          count: countMap[cat.value] || 0,
+        };
+      }),
+    ];
+  }
+
+  // Fallback to hardcoded labels if no database categories
   const categoryMapRu: Record<string, string> = {
     games: "Игры",
     fintech: "FinTech",
@@ -113,7 +177,7 @@ export async function getProjectCategories(locale: string = "ru") {
 
   return [
     { value: "all", label: allLabel },
-    ...categories.map((c) => ({
+    ...categoryCounts.map((c) => ({
       value: c.category,
       label: categoryMap[c.category] || c.category,
       count: c._count.category,
@@ -121,26 +185,52 @@ export async function getProjectCategories(locale: string = "ru") {
   ];
 }
 
+// Get translation from array
+function getTranslation<T extends { locale: string }>(
+  translations: T[] | undefined,
+  locale: string
+): T | undefined {
+  if (!translations || translations.length === 0) return undefined;
+  return translations.find((t) => t.locale === locale)
+    || translations.find((t) => t.locale === DEFAULT_LOCALE);
+}
+
+// Helper to find translation in array with any type (avoids narrow type inference)
+function findTrans(translations: any[] | undefined, locale: string): any {
+  if (!translations || translations.length === 0) return undefined;
+  return translations.find((t: any) => t.locale === locale)
+    || translations.find((t: any) => t.locale === DEFAULT_LOCALE);
+}
+
 // Map database project to frontend Project interface
-function mapDbProjectToProject(dbProject: any): Project {
+function mapDbProjectToProject(dbProject: any, locale: SupportedLocale): Project {
+  // Get project translation using findTrans (returns any)
+  const projectTrans = findTrans(dbProject.translations, locale);
+
   const technologies: Technology[] = dbProject.technologies.map((t: any) => ({
     name: t.name,
     icon: t.icon,
     color: t.color,
   }));
 
-  const features: Feature[] = dbProject.features.map((f: any) => ({
-    title: f.title,
-    description: f.description,
-    icon: f.icon,
-  }));
+  const features: Feature[] = dbProject.features.map((f: any) => {
+    const trans = findTrans(f.translations, locale);
+    return {
+      title: trans?.title || "",
+      description: trans?.description || "",
+      icon: f.icon,
+    };
+  });
 
   const metrics: Metric[] | undefined = dbProject.metrics.length > 0
-    ? dbProject.metrics.map((m: any) => ({
-        label: m.label,
-        value: m.value,
-        icon: m.icon,
-      }))
+    ? dbProject.metrics.map((m: any) => {
+        const trans = findTrans(m.translations, locale);
+        return {
+          label: trans?.label || "",
+          value: m.value,
+          icon: m.icon,
+        };
+      })
     : undefined;
 
   // Parse video from JSON field
@@ -160,16 +250,16 @@ function mapDbProjectToProject(dbProject: any): Project {
   };
 
   // Map full case study from relation
-  const caseStudy = mapCaseStudy(dbProject.caseStudy);
+  const caseStudy = mapCaseStudy(dbProject.caseStudy, locale);
 
   return {
     slug: dbProject.slug,
-    title: dbProject.title,
-    subtitle: dbProject.subtitle,
-    description: dbProject.description,
-    fullDescription: dbProject.fullDescription,
+    title: projectTrans?.title || "",
+    subtitle: projectTrans?.subtitle || "",
+    description: projectTrans?.description || "",
+    fullDescription: projectTrans?.fullDescription || "",
     category: dbProject.category as any,
-    categoryLabel: dbProject.categoryLabel,
+    categoryLabel: projectTrans?.categoryLabel || "",
     image: dbProject.image,
     video,
     technologies,
@@ -181,25 +271,30 @@ function mapDbProjectToProject(dbProject: any): Project {
   };
 }
 
-// Map case study with all nested relations
-function mapCaseStudy(dbCaseStudy: any): CaseStudy | undefined {
+// Map case study with all nested relations and translations
+function mapCaseStudy(dbCaseStudy: any, locale: SupportedLocale): CaseStudy | undefined {
   if (!dbCaseStudy) return undefined;
 
+  const csTrans = findTrans(dbCaseStudy.translations, locale);
+
   return {
-    challenge: dbCaseStudy.challenge || undefined,
-    solution: dbCaseStudy.solution || undefined,
-    results: dbCaseStudy.results?.length > 0 ? dbCaseStudy.results : undefined,
+    challenge: csTrans?.challenge || undefined,
+    solution: csTrans?.solution || undefined,
+    results: csTrans?.results?.length > 0 ? csTrans.results : undefined,
 
     // Gallery
     gallery: dbCaseStudy.gallery?.length > 0
-      ? dbCaseStudy.gallery.map((g: any) => ({
-          src: g.src,
-          alt: g.alt,
-          caption: g.caption || undefined,
-        }))
+      ? dbCaseStudy.gallery.map((g: any) => {
+          const trans = findTrans(g.translations, locale);
+          return {
+            src: g.src,
+            alt: trans?.alt || "",
+            caption: trans?.caption || undefined,
+          };
+        })
       : undefined,
 
-    // Performance metrics
+    // Performance metrics (no translations needed)
     performance: dbCaseStudy.performance
       ? {
           score: dbCaseStudy.performance.score,
@@ -216,60 +311,81 @@ function mapCaseStudy(dbCaseStudy: any): CaseStudy | undefined {
 
     // Architecture diagram
     architecture: dbCaseStudy.architecture
-      ? {
-          description: dbCaseStudy.architecture.description,
-          layers: dbCaseStudy.architecture.layers?.map((l: any) => ({
-            name: l.name,
-            components: l.components,
-            color: l.color,
-          })) || [],
-        }
+      ? (() => {
+          const archTrans = findTrans(dbCaseStudy.architecture.translations, locale);
+          return {
+            description: archTrans?.description || "",
+            layers: dbCaseStudy.architecture.layers?.map((l: any) => {
+              const layerTrans = findTrans(l.translations, locale);
+              return {
+                name: layerTrans?.name || "",
+                components: l.components,
+                color: l.color,
+              };
+            }) || [],
+          };
+        })()
       : undefined,
 
     // User flows
     userFlows: dbCaseStudy.userFlows?.length > 0
-      ? dbCaseStudy.userFlows.map((f: any) => ({
-          id: f.id,
-          title: f.title,
-          description: f.description,
-          icon: f.icon,
-          steps: f.steps?.map((s: any) => ({
-            title: s.title,
-            description: s.description,
-            icon: s.icon || undefined,
-          })) || [],
-        }))
+      ? dbCaseStudy.userFlows.map((f: any) => {
+          const flowTrans = findTrans(f.translations, locale);
+          return {
+            id: f.id,
+            title: flowTrans?.title || "",
+            description: flowTrans?.description || "",
+            icon: f.icon,
+            steps: f.steps?.map((s: any) => {
+              const stepTrans = findTrans(s.translations, locale);
+              return {
+                title: stepTrans?.title || "",
+                description: stepTrans?.description || "",
+                icon: s.icon || undefined,
+              };
+            }) || [],
+          };
+        })
       : undefined,
 
     // Technical highlights
     technicalHighlights: dbCaseStudy.technicalHighlights?.length > 0
-      ? dbCaseStudy.technicalHighlights.map((h: any) => ({
-          title: h.title,
-          description: h.description,
-          icon: h.icon,
-          codePreview: h.codePreview || undefined,
-          tags: h.tags?.length > 0 ? h.tags : undefined,
-        }))
+      ? dbCaseStudy.technicalHighlights.map((h: any) => {
+          const hlTrans = findTrans(h.translations, locale);
+          return {
+            title: hlTrans?.title || "",
+            description: hlTrans?.description || "",
+            icon: h.icon,
+            codePreview: h.codePreview || undefined,
+            tags: hlTrans?.tags?.length > 0 ? hlTrans.tags : undefined,
+          };
+        })
       : undefined,
 
     // Integrations
     integrations: dbCaseStudy.integrations?.length > 0
-      ? dbCaseStudy.integrations.map((i: any) => ({
-          name: i.name,
-          logo: i.logo,
-          description: i.description,
-          color: i.color,
-        }))
+      ? dbCaseStudy.integrations.map((i: any) => {
+          const intTrans = findTrans(i.translations, locale);
+          return {
+            name: i.name,
+            logo: i.logo,
+            description: intTrans?.description || "",
+            color: i.color,
+          };
+        })
       : undefined,
 
     // Testimonial
     testimonial: dbCaseStudy.testimonial
-      ? {
-          quote: dbCaseStudy.testimonial.quote,
-          author: dbCaseStudy.testimonial.author,
-          role: dbCaseStudy.testimonial.role,
-          avatar: dbCaseStudy.testimonial.avatar || undefined,
-        }
+      ? (() => {
+          const testTrans = findTrans(dbCaseStudy.testimonial.translations, locale);
+          return {
+            quote: testTrans?.quote || "",
+            author: testTrans?.author || "",
+            role: testTrans?.role || "",
+            avatar: dbCaseStudy.testimonial.avatar || undefined,
+          };
+        })()
       : undefined,
   };
 }

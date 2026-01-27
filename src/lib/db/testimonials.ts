@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { DEFAULT_LOCALE, type SupportedLocale } from "./utils/i18n";
 
 export interface Testimonial {
   id: string;
@@ -17,37 +18,58 @@ export interface TestimonialStats {
   platformUrl: string | null;
 }
 
+// Get translation from array
+function getTranslation<T extends { locale: string }>(
+  translations: T[] | undefined,
+  locale: string
+): T | undefined {
+  if (!translations || translations.length === 0) return undefined;
+  return translations.find((t) => t.locale === locale)
+    || translations.find((t) => t.locale === DEFAULT_LOCALE);
+}
+
 // Fetch all testimonials
-export async function getTestimonials(): Promise<Testimonial[]> {
+export async function getTestimonials(locale: SupportedLocale = DEFAULT_LOCALE): Promise<Testimonial[]> {
   const dbTestimonials = await prisma.testimonial.findMany({
+    include: { translations: true },
     orderBy: { order: "asc" },
   });
 
-  return dbTestimonials.map((t) => ({
-    id: t.id,
-    author: t.author,
-    task: t.task,
-    text: t.text,
-    rating: t.rating,
-    source: t.source,
-  }));
+  return dbTestimonials.map((t) => {
+    const trans = getTranslation(t.translations, locale);
+    return {
+      id: t.id,
+      author: trans?.author || "",
+      task: trans?.task || "",
+      text: trans?.text || "",
+      rating: t.rating,
+      source: t.source,
+    };
+  });
 }
 
 // Fetch limited testimonials for display
-export async function getFeaturedTestimonials(limit: number = 6): Promise<Testimonial[]> {
+export async function getFeaturedTestimonials(
+  limit: number = 6,
+  locale: SupportedLocale = DEFAULT_LOCALE
+): Promise<Testimonial[]> {
   const dbTestimonials = await prisma.testimonial.findMany({
+    include: { translations: true },
     orderBy: { order: "asc" },
     take: limit,
   });
 
-  return dbTestimonials.map((t) => ({
-    id: t.id,
-    author: t.author,
-    task: t.task,
-    text: t.text,
-    rating: t.rating,
-    source: t.source,
-  }));
+  return dbTestimonials.map((t) => {
+    const trans = getTranslation(t.translations, locale);
+    return {
+      id: t.id,
+      author: trans?.author || "",
+      task: trans?.task || "",
+      text: trans?.text || "",
+      rating: t.rating,
+      source: t.source,
+    };
+  });
 }
 
 // Get testimonials stats

@@ -1,5 +1,6 @@
 // Portfolio Database Schema
 // Prisma ORM for PostgreSQL (Supabase)
+// With i18n support via separate translation tables
 
 generator client {
   provider = "prisma-client-js"
@@ -9,25 +10,46 @@ datasource db {
   provider = "postgresql"
 }
 
+// ==================== LOCALIZATION ====================
+
+model Locale {
+  code       String  @id // "ru", "ro"
+  name       String // "Russian", "Romanian"
+  nativeName String // "Русский", "Română"
+  isDefault  Boolean @default(false)
+  isActive   Boolean @default(true)
+
+  @@map("locales")
+}
+
+model UIString {
+  id        String   @id @default(cuid())
+  key       String // "hero.badge", "nav.home"
+  locale    String // "ru", "ro"
+  value     String   @db.Text
+  namespace String? // "common", "hero", "projects"
+  updatedAt DateTime @updatedAt
+
+  @@unique([key, locale])
+  @@index([namespace, locale])
+  @@map("ui_strings")
+}
+
 // ==================== PROJECTS ====================
 
 model Project {
-  id              String   @id @default(cuid())
-  slug            String   @unique
-  title           String
-  subtitle        String
-  description     String
-  fullDescription String   @db.Text
-  category        Category
-  categoryLabel   String
-  image           String
-  video           Json?    // { type: "file" | "vimeo", id?: string, src?: string }
-  featured        Boolean  @default(false)
-  order           Int      @default(0)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id       String   @id @default(cuid())
+  slug     String   @unique
+  category Category
+  image    String
+  video    Json? // { type: "file" | "vimeo", id?: string, src?: string }
+  featured Boolean  @default(false)
+  order    Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
+  translations ProjectTranslation[]
   technologies Technology[]
   features     Feature[]
   metrics      Metric[]
@@ -36,6 +58,22 @@ model Project {
 
   @@index([category])
   @@index([featured])
+}
+
+model ProjectTranslation {
+  id              String @id @default(cuid())
+  projectId       String
+  locale          String
+  title           String
+  subtitle        String
+  description     String
+  fullDescription String @db.Text
+  categoryLabel   String
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, locale])
+  @@index([locale])
 }
 
 enum Category {
@@ -47,12 +85,12 @@ enum Category {
 }
 
 model Technology {
-  id        String  @id @default(cuid())
+  id        String @id @default(cuid())
   projectId String
   name      String
   icon      String
   color     String
-  order     Int     @default(0)
+  order     Int    @default(0)
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
@@ -60,29 +98,53 @@ model Technology {
 }
 
 model Feature {
-  id          String @id @default(cuid())
-  projectId   String
-  title       String
-  description String
-  icon        String
-  order       Int    @default(0)
+  id        String @id @default(cuid())
+  projectId String
+  icon      String
+  order     Int    @default(0)
 
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project      Project              @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  translations FeatureTranslation[]
 
   @@index([projectId])
+}
+
+model FeatureTranslation {
+  id          String @id @default(cuid())
+  featureId   String
+  locale      String
+  title       String
+  description String
+
+  feature Feature @relation(fields: [featureId], references: [id], onDelete: Cascade)
+
+  @@unique([featureId, locale])
+  @@index([locale])
 }
 
 model Metric {
   id        String @id @default(cuid())
   projectId String
-  label     String
-  value     String
+  value     String // "98/100", "0.8 sec" - locale-independent
   icon      String
   order     Int    @default(0)
 
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project      Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  translations MetricTranslation[]
 
   @@index([projectId])
+}
+
+model MetricTranslation {
+  id       String @id @default(cuid())
+  metricId String
+  locale   String
+  label    String
+
+  metric Metric @relation(fields: [metricId], references: [id], onDelete: Cascade)
+
+  @@unique([metricId, locale])
+  @@index([locale])
 }
 
 model ProjectLink {
@@ -98,13 +160,11 @@ model ProjectLink {
 // ==================== CASE STUDIES ====================
 
 model CaseStudy {
-  id        String   @id @default(cuid())
-  projectId String   @unique
-  challenge String   @db.Text
-  solution  String   @db.Text
-  results   String[] // Array of result strings
+  id        String @id @default(cuid())
+  projectId String @unique
 
-  project             Project              @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project             Project                    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  translations        CaseStudyTranslation[]
   performance         Performance?
   architecture        Architecture?
   userFlows           UserFlow[]
@@ -112,6 +172,20 @@ model CaseStudy {
   integrations        Integration[]
   gallery             GalleryItem[]
   testimonial         CaseStudyTestimonial?
+}
+
+model CaseStudyTranslation {
+  id          String   @id @default(cuid())
+  caseStudyId String
+  locale      String
+  challenge   String   @db.Text
+  solution    String   @db.Text
+  results     String[]
+
+  caseStudy CaseStudy @relation(fields: [caseStudyId], references: [id], onDelete: Cascade)
+
+  @@unique([caseStudyId, locale])
+  @@index([locale])
 }
 
 model Performance {
@@ -131,67 +205,127 @@ model Performance {
 }
 
 model Architecture {
-  id          String  @id @default(cuid())
-  caseStudyId String  @unique
-  description String  @db.Text
+  id          String @id @default(cuid())
+  caseStudyId String @unique
 
-  caseStudy CaseStudy           @relation(fields: [caseStudyId], references: [id], onDelete: Cascade)
-  layers    ArchitectureLayer[]
+  caseStudy    CaseStudy                 @relation(fields: [caseStudyId], references: [id], onDelete: Cascade)
+  translations ArchitectureTranslation[]
+  layers       ArchitectureLayer[]
+}
+
+model ArchitectureTranslation {
+  id             String @id @default(cuid())
+  architectureId String
+  locale         String
+  description    String @db.Text
+
+  architecture Architecture @relation(fields: [architectureId], references: [id], onDelete: Cascade)
+
+  @@unique([architectureId, locale])
+  @@index([locale])
 }
 
 model ArchitectureLayer {
   id             String   @id @default(cuid())
   architectureId String
-  name           String
-  components     String[] // Array of component names
+  components     String[]
   color          String
   order          Int      @default(0)
 
-  architecture Architecture @relation(fields: [architectureId], references: [id], onDelete: Cascade)
+  architecture Architecture                   @relation(fields: [architectureId], references: [id], onDelete: Cascade)
+  translations  ArchitectureLayerTranslation[]
 
   @@index([architectureId])
+}
+
+model ArchitectureLayerTranslation {
+  id      String @id @default(cuid())
+  layerId String
+  locale  String
+  name    String
+
+  layer ArchitectureLayer @relation(fields: [layerId], references: [id], onDelete: Cascade)
+
+  @@unique([layerId, locale])
+  @@index([locale])
 }
 
 model UserFlow {
   id          String @id @default(cuid())
   caseStudyId String
-  title       String
-  description String
   icon        String
   order       Int    @default(0)
 
-  caseStudy CaseStudy      @relation(fields: [caseStudyId], references: [id], onDelete: Cascade)
-  steps     UserFlowStep[]
+  caseStudy    CaseStudy             @relation(fields: [caseStudyId], references: [id], onDelete: Cascade)
+  translations UserFlowTranslation[]
+  steps        UserFlowStep[]
 
   @@index([caseStudyId])
 }
 
-model UserFlowStep {
-  id          String  @id @default(cuid())
+model UserFlowTranslation {
+  id          String @id @default(cuid())
   flowId      String
+  locale      String
   title       String
   description String
-  icon        String?
-  order       Int     @default(0)
 
   flow UserFlow @relation(fields: [flowId], references: [id], onDelete: Cascade)
 
+  @@unique([flowId, locale])
+  @@index([locale])
+}
+
+model UserFlowStep {
+  id     String  @id @default(cuid())
+  flowId String
+  icon   String?
+  order  Int     @default(0)
+
+  flow         UserFlow                   @relation(fields: [flowId], references: [id], onDelete: Cascade)
+  translations UserFlowStepTranslation[]
+
   @@index([flowId])
+}
+
+model UserFlowStepTranslation {
+  id          String @id @default(cuid())
+  stepId      String
+  locale      String
+  title       String
+  description String
+
+  step UserFlowStep @relation(fields: [stepId], references: [id], onDelete: Cascade)
+
+  @@unique([stepId, locale])
+  @@index([locale])
 }
 
 model TechnicalHighlight {
   id          String   @id @default(cuid())
   caseStudyId String
-  title       String
-  description String   @db.Text
   icon        String
   codePreview String?  @db.Text
-  tags        String[]
   order       Int      @default(0)
 
-  caseStudy CaseStudy @relation(fields: [caseStudyId], references: [id], onDelete: Cascade)
+  caseStudy    CaseStudy                        @relation(fields: [caseStudyId], references: [id], onDelete: Cascade)
+  translations TechnicalHighlightTranslation[]
 
   @@index([caseStudyId])
+}
+
+model TechnicalHighlightTranslation {
+  id          String   @id @default(cuid())
+  highlightId String
+  locale      String
+  title       String
+  description String   @db.Text
+  tags        String[]
+
+  highlight TechnicalHighlight @relation(fields: [highlightId], references: [id], onDelete: Cascade)
+
+  @@unique([highlightId, locale])
+  @@index([locale])
 }
 
 model Integration {
@@ -199,52 +333,101 @@ model Integration {
   caseStudyId String
   name        String
   logo        String
-  description String
   color       String
   order       Int    @default(0)
 
-  caseStudy CaseStudy @relation(fields: [caseStudyId], references: [id], onDelete: Cascade)
+  caseStudy    CaseStudy                @relation(fields: [caseStudyId], references: [id], onDelete: Cascade)
+  translations IntegrationTranslation[]
 
   @@index([caseStudyId])
 }
 
+model IntegrationTranslation {
+  id            String @id @default(cuid())
+  integrationId String
+  locale        String
+  description   String
+
+  integration Integration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+
+  @@unique([integrationId, locale])
+  @@index([locale])
+}
+
 model GalleryItem {
-  id          String  @id @default(cuid())
+  id          String @id @default(cuid())
   caseStudyId String
   src         String
-  alt         String
-  caption     String?
-  order       Int     @default(0)
+  order       Int    @default(0)
 
-  caseStudy CaseStudy @relation(fields: [caseStudyId], references: [id], onDelete: Cascade)
+  caseStudy    CaseStudy                @relation(fields: [caseStudyId], references: [id], onDelete: Cascade)
+  translations GalleryItemTranslation[]
 
   @@index([caseStudyId])
+}
+
+model GalleryItemTranslation {
+  id        String  @id @default(cuid())
+  galleryId String
+  locale    String
+  alt       String
+  caption   String?
+
+  gallery GalleryItem @relation(fields: [galleryId], references: [id], onDelete: Cascade)
+
+  @@unique([galleryId, locale])
+  @@index([locale])
 }
 
 model CaseStudyTestimonial {
   id          String  @id @default(cuid())
   caseStudyId String  @unique
-  quote       String  @db.Text
-  author      String
-  role        String
   avatar      String?
 
-  caseStudy CaseStudy @relation(fields: [caseStudyId], references: [id], onDelete: Cascade)
+  caseStudy    CaseStudy                         @relation(fields: [caseStudyId], references: [id], onDelete: Cascade)
+  translations CaseStudyTestimonialTranslation[]
+}
+
+model CaseStudyTestimonialTranslation {
+  id            String @id @default(cuid())
+  testimonialId String
+  locale        String
+  quote         String @db.Text
+  author        String
+  role          String
+
+  testimonial CaseStudyTestimonial @relation(fields: [testimonialId], references: [id], onDelete: Cascade)
+
+  @@unique([testimonialId, locale])
+  @@index([locale])
 }
 
 // ==================== TESTIMONIALS ====================
 
 model Testimonial {
   id        String   @id @default(cuid())
-  author    String
-  task      String
-  text      String   @db.Text
   rating    Int      @default(5)
   source    String?  @default("YouDo")
   createdAt DateTime @default(now())
   order     Int      @default(0)
 
+  translations TestimonialTranslation[]
+
   @@index([rating])
+}
+
+model TestimonialTranslation {
+  id            String @id @default(cuid())
+  testimonialId String
+  locale        String
+  author        String
+  task          String
+  text          String @db.Text
+
+  testimonial Testimonial @relation(fields: [testimonialId], references: [id], onDelete: Cascade)
+
+  @@unique([testimonialId, locale])
+  @@index([locale])
 }
 
 model TestimonialStats {
@@ -260,19 +443,31 @@ model TestimonialStats {
 // ==================== TEAM ====================
 
 model TeamMember {
-  id          String   @id @default(cuid())
+  id        String   @id @default(cuid())
+  photo     String
+  skills    String[]
+  isFounder Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations TeamMemberTranslation[]
+  socialLinks  TeamMemberSocial?
+}
+
+model TeamMemberTranslation {
+  id          String  @id @default(cuid())
+  memberId    String
+  locale      String
   name        String
   role        String
-  description String   @db.Text
-  photo       String
-  skills      String[]
-  bio         String?  @db.Text
-  isFounder   Boolean  @default(false)
-  order       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  description String  @db.Text
+  bio         String? @db.Text
 
-  socialLinks TeamMemberSocial?
+  member TeamMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@unique([memberId, locale])
+  @@index([locale])
 }
 
 model TeamMemberSocial {
@@ -289,11 +484,24 @@ model TeamMemberSocial {
 
 model SkillCategory {
   id    String   @id @default(cuid())
-  name  String
   icon  String
   color String
   items String[]
   order Int      @default(0)
+
+  translations SkillCategoryTranslation[]
+}
+
+model SkillCategoryTranslation {
+  id         String @id @default(cuid())
+  categoryId String
+  locale     String
+  name       String
+
+  category SkillCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([categoryId, locale])
+  @@index([locale])
 }
 
 model TechStackItem {
@@ -309,61 +517,126 @@ model TechStackItem {
 // ==================== WORK PROCESS ====================
 
 model WorkProcessStep {
+  id     String @id @default(cuid())
+  number String // "01", "02", etc.
+  icon   String
+  color  String
+  order  Int    @default(0)
+
+  translations WorkProcessStepTranslation[]
+}
+
+model WorkProcessStepTranslation {
   id          String @id @default(cuid())
-  number      String // "01", "02", etc.
+  stepId      String
+  locale      String
   title       String
   description String @db.Text
-  icon        String
-  color       String
-  order       Int    @default(0)
+
+  step WorkProcessStep @relation(fields: [stepId], references: [id], onDelete: Cascade)
+
+  @@unique([stepId, locale])
+  @@index([locale])
 }
 
 // ==================== PRICING ====================
 
 model PricingPackage {
+  id      String  @id @default(cuid())
+  price   String
+  icon    String
+  color   String
+  popular Boolean @default(false)
+  order   Int     @default(0)
+
+  translations PricingPackageTranslation[]
+}
+
+model PricingPackageTranslation {
   id          String   @id @default(cuid())
+  packageId   String
+  locale      String
   name        String
-  price       String
   description String
-  icon        String
-  color       String
-  popular     Boolean  @default(false)
   features    String[]
   notIncluded String[]
-  order       Int      @default(0)
+
+  package PricingPackage @relation(fields: [packageId], references: [id], onDelete: Cascade)
+
+  @@unique([packageId, locale])
+  @@index([locale])
 }
 
 model AdditionalService {
+  id    String @id @default(cuid())
+  price String
+  order Int    @default(0)
+
+  translations AdditionalServiceTranslation[]
+}
+
+model AdditionalServiceTranslation {
   id          String @id @default(cuid())
+  serviceId   String
+  locale      String
   name        String
-  price       String
   description String
-  order       Int    @default(0)
+
+  service AdditionalService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@unique([serviceId, locale])
+  @@index([locale])
 }
 
 // ==================== FAQ ====================
 
 model FaqItem {
   id           String   @id @default(cuid())
-  question     String
-  answer       String   @db.Text
   category     String?
   helpfulCount Int      @default(0)
   order        Int      @default(0)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  translations FaqItemTranslation[]
+}
+
+model FaqItemTranslation {
+  id        String @id @default(cuid())
+  faqItemId String
+  locale    String
+  question  String
+  answer    String @db.Text
+
+  faqItem FaqItem @relation(fields: [faqItemId], references: [id], onDelete: Cascade)
+
+  @@unique([faqItemId, locale])
+  @@index([locale])
 }
 
 // ==================== CONTACT ====================
 
 model ContactInfo {
-  id           String   @id @default("default")
-  email        String
-  telegram     String
-  github       String
-  youdoUrl     String?
-  responseTime String   @default("24 часа")
-  updatedAt    DateTime @updatedAt
+  id        String   @id @default("default")
+  email     String
+  telegram  String
+  github    String
+  youdoUrl  String?
+  updatedAt DateTime @updatedAt
+
+  translations ContactInfoTranslation[]
+}
+
+model ContactInfoTranslation {
+  id           String @id @default(cuid())
+  contactId    String
+  locale       String
+  responseTime String @default("24 часа")
+
+  contact ContactInfo @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([contactId, locale])
+  @@index([locale])
 }
 
 model ContactSubmission {
@@ -390,21 +663,34 @@ enum SubmissionStatus {
 // ==================== SITE SETTINGS ====================
 
 model SiteSettings {
-  id              String   @id @default("default")
+  id            String   @id @default("default")
+  heroTechStack String[]
+  projectsCount Int      @default(17)
+  rating        Float    @default(4.9)
+  countriesCount Int     @default(5)
+  founderPhoto  String
+  updatedAt     DateTime @updatedAt
+
+  translations SiteSettingsTranslation[]
+}
+
+model SiteSettingsTranslation {
+  id              String   @id @default(cuid())
+  settingsId      String
+  locale          String
   companyName     String   @default("METABYTE")
   subtitle        String   @default("Full-Stack Development Studio")
-  badgeText       String   @default("Открыт для предложений")
-  heroServices    String[] // Typewriter services
-  heroTechStack   String[] // Featured tech
-  projectsCount   Int      @default(17)
-  rating          Float    @default(4.9)
-  countriesCount  Int      @default(5)
-  founderName     String   @default("Владимир")
+  badgeText       String
+  heroServices    String[]
+  founderName     String
   founderTitle    String
   founderBioShort String   @db.Text
   founderBioLong  String?  @db.Text
-  founderPhoto    String
-  updatedAt       DateTime @updatedAt
+
+  settings SiteSettings @relation(fields: [settingsId], references: [id], onDelete: Cascade)
+
+  @@unique([settingsId, locale])
+  @@index([locale])
 }
 
 // ==================== PROJECT CATEGORIES (Lookup) ====================
@@ -412,6 +698,19 @@ model SiteSettings {
 model ProjectCategory {
   id    String @id @default(cuid())
   value String @unique
-  label String
   order Int    @default(0)
+
+  translations ProjectCategoryTranslation[]
+}
+
+model ProjectCategoryTranslation {
+  id         String @id @default(cuid())
+  categoryId String
+  locale     String
+  label      String
+
+  category ProjectCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([categoryId, locale])
+  @@index([locale])
 }

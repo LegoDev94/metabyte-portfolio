@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { AboutContent } from "@/components/about/AboutContent";
@@ -8,16 +9,20 @@ import {
   getTestimonialStats,
   getSkillCategories,
 } from "@/lib/db";
+import { normalizeLocale } from "@/lib/db/utils/i18n";
 
 export const dynamic = "force-dynamic";
 
 export default async function AboutPage() {
+  const cookieStore = await cookies();
+  const locale = normalizeLocale(cookieStore.get("locale")?.value);
+
   const [founder, team, testimonials, testimonialStats, skillCategories] = await Promise.all([
-    getFounder(),
-    getTeamMembers(),
-    getTestimonials(),
+    getFounder(locale),
+    getTeamMembers(locale),
+    getTestimonials(locale),
     getTestimonialStats(),
-    getSkillCategories(),
+    getSkillCategories(locale),
   ]);
 
   return (
