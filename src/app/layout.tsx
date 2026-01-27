@@ -6,6 +6,8 @@ import "./globals.css";
 import { AIAssistant } from "@/components/ai-assistant";
 import { KeepAlive } from "@/components/KeepAlive";
 import { LocaleProvider } from "@/components/providers/LocaleProvider";
+import { getUIStrings } from "@/lib/db/ui-strings";
+import { normalizeLocale } from "@/lib/db/utils/i18n";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -53,13 +55,17 @@ export default async function RootLayout({
   const locale = await getLocale();
   const messages = await getMessages();
 
+  // Load UI strings from database
+  const normalizedLocale = normalizeLocale(locale);
+  const uiStrings = await getUIStrings(normalizedLocale);
+
   return (
     <html lang={locale} className="dark">
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} ${orbitron.variable} antialiased min-h-screen`}
       >
         <NextIntlClientProvider messages={messages}>
-          <LocaleProvider>
+          <LocaleProvider initialUIStrings={uiStrings}>
             {children}
             <AIAssistant />
             <KeepAlive />

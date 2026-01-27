@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Github, Send, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocaleContext } from "@/components/providers/LocaleProvider";
+import { useDBTranslations } from "@/hooks/useDBTranslations";
 import type { Locale } from "@/i18n/config";
 
 const navLinkKeys = [
@@ -23,7 +23,7 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const pathname = usePathname();
-  const t = useTranslations("nav");
+  const t = useDBTranslations("nav");
   const { locale, setLocale, isLoading } = useLocaleContext();
 
   useEffect(() => {

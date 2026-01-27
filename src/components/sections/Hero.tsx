@@ -2,12 +2,12 @@
 
 import { motion } from "framer-motion";
 import { ArrowDown, Sparkles, Star, Briefcase, Globe } from "lucide-react";
-import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Typewriter } from "@/components/animations/motion";
 import type { SiteSettings } from "@/lib/db/site";
 import { useLocaleContext } from "@/components/providers/LocaleProvider";
+import { useDBTranslations } from "@/hooks/useDBTranslations";
 
 interface HeroProps {
   settings?: SiteSettings | null;
@@ -31,7 +31,7 @@ const defaultSettings: SiteSettings = {
 };
 
 export function Hero({ settings }: HeroProps) {
-  const t = useTranslations("hero");
+  const t = useDBTranslations("hero");
   const { locale } = useLocaleContext();
   const data = settings || defaultSettings;
 
