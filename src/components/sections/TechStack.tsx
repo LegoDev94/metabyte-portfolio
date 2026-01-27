@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import * as LucideIcons from "lucide-react";
 import type { TechStackItem } from "@/lib/db/site";
+import { useLocaleContext } from "@/components/providers/LocaleProvider";
 
 interface TechStackProps {
   items?: TechStackItem[];
@@ -30,6 +31,7 @@ function DynamicIcon({ name, className, style }: { name: string; className?: str
 }
 
 export function TechStack({ items }: TechStackProps) {
+  const { locale } = useLocaleContext();
   const technologies = items && items.length > 0 ? items : defaultTechStack;
 
   return (
@@ -47,15 +49,18 @@ export function TechStack({ items }: TechStackProps) {
           className="text-center mb-16"
         >
           <span className="inline-block px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-medium mb-4">
-            Технологии
+            {locale === "ro" ? "Tehnologii" : "Технологии"}
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-display tracking-wide mb-4">
-            <span className="text-foreground">Наш </span>
-            <span className="text-accent text-glow-magenta">стек</span>
+            <span className="text-foreground">{locale === "ro" ? "Stack-ul " : "Наш "}</span>
+            <span className="text-accent text-glow-magenta">
+              {locale === "ro" ? "nostru" : "стек"}
+            </span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Ключевые технологии, которые мы используем для создания
-            надёжных решений
+            {locale === "ro"
+              ? "Tehnologiile cheie pe care le folosim pentru a crea solutii fiabile"
+              : "Ключевые технологии, которые мы используем для создания надёжных решений"}
           </p>
         </motion.div>
 

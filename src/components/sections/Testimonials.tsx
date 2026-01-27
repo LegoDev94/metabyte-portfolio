@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Star, ExternalLink, Quote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Testimonial, TestimonialStats } from "@/lib/db/testimonials";
+import { useLocaleContext } from "@/components/providers/LocaleProvider";
 
 interface TestimonialsProps {
   testimonials?: Testimonial[];
@@ -71,6 +72,7 @@ const defaultStats: TestimonialStats = {
 };
 
 export function Testimonials({ testimonials, stats }: TestimonialsProps) {
+  const { locale } = useLocaleContext();
   const items = testimonials && testimonials.length > 0 ? testimonials : defaultTestimonials;
   const displayStats = stats || defaultStats;
 
@@ -86,11 +88,17 @@ export function Testimonials({ testimonials, stats }: TestimonialsProps) {
           className="text-center mb-12"
         >
           <h2 className="text-3xl md:text-4xl font-display tracking-wide mb-4">
-            <span className="text-foreground">Отзывы </span>
-            <span className="text-primary text-glow-cyan">клиентов</span>
+            <span className="text-foreground">
+              {locale === "ro" ? "Recenzii " : "Отзывы "}
+            </span>
+            <span className="text-primary text-glow-cyan">
+              {locale === "ro" ? "clienti" : "клиентов"}
+            </span>
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            Реальные отзывы заказчиков с платформы {displayStats.platform}
+            {locale === "ro"
+              ? `Recenzii reale de la clienti de pe platforma ${displayStats.platform}`
+              : `Реальные отзывы заказчиков с платформы ${displayStats.platform}`}
           </p>
 
           {/* Stats */}
@@ -100,17 +108,23 @@ export function Testimonials({ testimonials, stats }: TestimonialsProps) {
                 <span className="text-2xl sm:text-3xl font-display text-primary">{displayStats.avgRating}</span>
                 <Star className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500 fill-yellow-500" />
               </div>
-              <div className="text-xs sm:text-sm text-muted-foreground">Средняя<br className="sm:hidden" /> оценка</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">
+                {locale === "ro" ? "Nota medie" : "Средняя оценка"}
+              </div>
             </div>
             <div className="w-px h-10 sm:h-12 bg-border hidden sm:block" />
             <div className="text-center min-w-[80px]">
               <div className="text-2xl sm:text-3xl font-display text-green-500">{displayStats.totalPositive}</div>
-              <div className="text-xs sm:text-sm text-muted-foreground">Положительных</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">
+                {locale === "ro" ? "Pozitive" : "Положительных"}
+              </div>
             </div>
             <div className="w-px h-10 sm:h-12 bg-border hidden sm:block" />
             <div className="text-center min-w-[80px]">
               <div className="text-2xl sm:text-3xl font-display text-muted-foreground">{displayStats.totalNegative}</div>
-              <div className="text-xs sm:text-sm text-muted-foreground">Отрицательных</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">
+                {locale === "ro" ? "Negative" : "Отрицательных"}
+              </div>
             </div>
           </div>
         </motion.div>
@@ -173,7 +187,9 @@ export function Testimonials({ testimonials, stats }: TestimonialsProps) {
               rel="noopener noreferrer"
             >
               <ExternalLink className="w-4 h-4 mr-2" />
-              Все отзывы на {displayStats.platform}
+              {locale === "ro"
+                ? `Toate recenziile pe ${displayStats.platform}`
+                : `Все отзывы на ${displayStats.platform}`}
             </a>
           </Button>
         </motion.div>

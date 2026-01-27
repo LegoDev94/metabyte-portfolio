@@ -4,8 +4,11 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { Send, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLocaleContext } from "@/components/providers/LocaleProvider";
 
 export function ContactCTA() {
+  const { locale } = useLocaleContext();
+
   return (
     <section className="py-24 relative overflow-hidden">
       {/* Background */}
@@ -30,14 +33,19 @@ export function ContactCTA() {
 
           {/* Heading */}
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-display tracking-wide mb-6">
-            <span className="text-foreground">Есть проект? </span>
-            <span className="gradient-text">Давайте обсудим!</span>
+            <span className="text-foreground">
+              {locale === "ro" ? "Aveti un proiect? " : "Есть проект? "}
+            </span>
+            <span className="gradient-text">
+              {locale === "ro" ? "Hai sa discutam!" : "Давайте обсудим!"}
+            </span>
           </h2>
 
           {/* Description */}
           <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto">
-            Открыт для новых возможностей и интересных проектов. Напишите мне, и
-            мы обсудим, как я могу помочь.
+            {locale === "ro"
+              ? "Sunt deschis pentru oportunitati noi si proiecte interesante. Scrieti-mi si vom discuta cum pot ajuta."
+              : "Открыт для новых возможностей и интересных проектов. Напишите мне, и мы обсудим, как я могу помочь."}
           </p>
 
           {/* CTAs */}
@@ -53,7 +61,7 @@ export function ContactCTA() {
                 rel="noopener noreferrer"
               >
                 <Send className="w-4 h-4 mr-2" />
-                Написать в Telegram
+                {locale === "ro" ? "Scrie pe Telegram" : "Написать в Telegram"}
               </a>
             </Button>
             <Button
@@ -63,7 +71,7 @@ export function ContactCTA() {
               className="border-border hover:border-primary hover:text-primary group px-8"
             >
               <Link href="/contact">
-                Форма связи
+                {locale === "ro" ? "Formular de contact" : "Форма связи"}
                 <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
             </Button>

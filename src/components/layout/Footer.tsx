@@ -2,12 +2,20 @@
 
 import Link from "next/link";
 import { Github, Send, Mail, Heart } from "lucide-react";
+import { useLocaleContext } from "@/components/providers/LocaleProvider";
 
-const footerLinks = [
+const footerLinksRu = [
   { href: "/", label: "Главная" },
   { href: "/projects", label: "Проекты" },
   { href: "/about", label: "Команда" },
   { href: "/contact", label: "Контакты" },
+];
+
+const footerLinksRo = [
+  { href: "/", label: "Acasa" },
+  { href: "/projects", label: "Proiecte" },
+  { href: "/about", label: "Echipa" },
+  { href: "/contact", label: "Contacte" },
 ];
 
 const socialLinks = [
@@ -30,6 +38,8 @@ const socialLinks = [
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
+  const { locale } = useLocaleContext();
+  const footerLinks = locale === "ro" ? footerLinksRo : footerLinksRu;
 
   return (
     <footer className="border-t border-border bg-card/50">
@@ -44,14 +54,17 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-muted-foreground text-sm max-w-xs">
-              Full-Stack разработчик. Создаю современные веб-приложения, игры и
-              Telegram Mini Apps.
+              {locale === "ro"
+                ? "Dezvoltator Full-Stack. Creez aplicatii web moderne, jocuri si Telegram Mini Apps."
+                : "Full-Stack разработчик. Создаю современные веб-приложения, игры и Telegram Mini Apps."}
             </p>
           </div>
 
           {/* Navigation */}
           <div>
-            <h3 className="font-semibold text-foreground mb-4">Навигация</h3>
+            <h3 className="font-semibold text-foreground mb-4">
+              {locale === "ro" ? "Navigare" : "Навигация"}
+            </h3>
             <ul className="space-y-2">
               {footerLinks.map((link) => (
                 <li key={link.href}>
@@ -68,7 +81,9 @@ export function Footer() {
 
           {/* Social */}
           <div>
-            <h3 className="font-semibold text-foreground mb-4">Контакты</h3>
+            <h3 className="font-semibold text-foreground mb-4">
+              {locale === "ro" ? "Contacte" : "Контакты"}
+            </h3>
             <ul className="space-y-3">
               {socialLinks.map((link) => (
                 <li key={link.href}>
@@ -90,10 +105,10 @@ export function Footer() {
         {/* Bottom */}
         <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-muted-foreground text-sm">
-            &copy; {currentYear} Metabyte. Все права защищены.
+            &copy; {currentYear} Metabyte. {locale === "ro" ? "Toate drepturile rezervate." : "Все права защищены."}
           </p>
           <p className="text-muted-foreground text-sm flex items-center gap-1">
-            Сделано с <Heart className="w-4 h-4 text-red-500 fill-red-500" /> и{" "}
+            {locale === "ro" ? "Creat cu" : "Сделано с"} <Heart className="w-4 h-4 text-red-500 fill-red-500" /> {locale === "ro" ? "si" : "и"}{" "}
             <span className="text-primary">React</span>
           </p>
         </div>

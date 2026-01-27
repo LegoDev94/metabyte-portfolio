@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, HelpCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useLocaleContext } from "@/components/providers/LocaleProvider";
 
 export interface FAQItem {
   id?: string;
@@ -15,7 +17,7 @@ interface FAQProps {
   items?: FAQItem[];
 }
 
-const defaultFAQs: FAQItem[] = [
+const defaultFAQsRu: FAQItem[] = [
   {
     id: "1",
     question: "Сколько стоит разработка?",
@@ -41,25 +43,42 @@ const defaultFAQs: FAQItem[] = [
     question: "Делаете ли поддержку после запуска?",
     answer: "Да, предлагаем пакеты поддержки: исправление багов, мелкие доработки, хостинг и мониторинг. Первые 30 дней поддержки включены в стоимость проекта."
   },
+];
+
+const defaultFAQsRo: FAQItem[] = [
   {
-    id: "6",
-    question: "Работаете ли с иностранными клиентами?",
-    answer: "Да, работаем с клиентами из любых стран. Общаемся на русском и английском. Оплата в USD, EUR или криптовалюте."
+    id: "1",
+    question: "Cat costa dezvoltarea?",
+    answer: "Costul depinde de complexitatea proiectului. Landing page — de la $500, Aplicatie web — de la $2000, Aplicatie mobila — de la $3000. Vom oferi o estimare exacta dupa discutarea cerintelor. Prima consultatie este gratuita."
   },
   {
-    id: "7",
-    question: "Какие технологии используете?",
-    answer: "Frontend: React, Next.js, Vue, Flutter. Backend: Node.js, Python. Базы данных: PostgreSQL, MongoDB, Supabase. Выбираем стек под задачу клиента."
+    id: "2",
+    question: "Care sunt termenele de dezvoltare?",
+    answer: "Landing page — 1-2 saptamani. Aplicatie web de complexitate medie — 1-2 luni. Proiecte complexe — 2-4 luni. Termenele sunt fixate in contract."
   },
   {
-    id: "8",
-    question: "Можно ли посмотреть код после завершения?",
-    answer: "Да, передаём полный исходный код и все доступы. Код остаётся вашей собственностью. Используем Git для версионирования."
+    id: "3",
+    question: "Cum se face plata?",
+    answer: "Lucram cu avans de 50%. Restul de 50% — dupa livrarea proiectului. Pentru proiecte mari este posibila plata lunara. Acceptam transferuri bancare, criptomonede, PayPal."
+  },
+  {
+    id: "4",
+    question: "Ce se intampla daca rezultatul nu place?",
+    answer: "La fiecare etapa coordonam rezultatul cu dvs. Design-ul este aprobat inainte de inceperea dezvoltarii. Daca ceva nu corespunde — facem modificari. Garantie pentru corectarea bug-urilor — 30 de zile dupa lansare."
+  },
+  {
+    id: "5",
+    question: "Oferiti suport dupa lansare?",
+    answer: "Da, oferim pachete de suport: corectarea bug-urilor, mici imbunatatiri, hosting si monitorizare. Primele 30 de zile de suport sunt incluse in costul proiectului."
   },
 ];
 
 export function FAQ({ items }: FAQProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const t = useTranslations("faq");
+  const { locale } = useLocaleContext();
+
+  const defaultFAQs = locale === "ro" ? defaultFAQsRo : defaultFAQsRu;
   const faqs = items && items.length > 0 ? items : defaultFAQs;
 
   return (
@@ -79,14 +98,16 @@ export function FAQ({ items }: FAQProps) {
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 mb-6">
             <HelpCircle className="w-4 h-4 text-accent" />
-            <span className="text-sm text-accent font-medium">FAQ</span>
+            <span className="text-sm text-accent font-medium">{t("subtitle")}</span>
           </div>
           <h2 className="text-3xl md:text-4xl font-display mb-4">
-            Частые{" "}
-            <span className="text-accent text-glow-magenta">вопросы</span>
+            {locale === "ro" ? "Intrebari " : "Частые "}
+            <span className="text-accent text-glow-magenta">
+              {locale === "ro" ? "frecvente" : "вопросы"}
+            </span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Ответы на популярные вопросы о работе с нами
+            {t("description")}
           </p>
         </motion.div>
 
@@ -141,14 +162,14 @@ export function FAQ({ items }: FAQProps) {
           className="text-center mt-12"
         >
           <p className="text-muted-foreground">
-            Не нашли ответ?{" "}
+            {locale === "ro" ? "Nu ati gasit raspunsul? " : "Не нашли ответ? "}
             <a
               href="https://t.me/metabytemd"
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary hover:underline"
             >
-              Напишите нам в Telegram
+              {locale === "ro" ? "Scrieti-ne pe Telegram" : "Напишите нам в Telegram"}
             </a>
           </p>
         </motion.div>

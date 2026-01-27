@@ -2,10 +2,12 @@
 
 import { motion } from "framer-motion";
 import { ArrowDown, Sparkles, Star, Briefcase, Globe } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Typewriter } from "@/components/animations/motion";
 import type { SiteSettings } from "@/lib/db/site";
+import { useLocaleContext } from "@/components/providers/LocaleProvider";
 
 interface HeroProps {
   settings?: SiteSettings | null;
@@ -29,6 +31,8 @@ const defaultSettings: SiteSettings = {
 };
 
 export function Hero({ settings }: HeroProps) {
+  const t = useTranslations("hero");
+  const { locale } = useLocaleContext();
   const data = settings || defaultSettings;
 
   // Split company name for styling (assumes format like "METABYTE" -> "META" + "BYTE")
@@ -36,8 +40,13 @@ export function Hero({ settings }: HeroProps) {
   const firstName = nameParts ? nameParts[1] : data.companyName.slice(0, 4);
   const lastName = nameParts ? nameParts[2] : data.companyName.slice(4);
 
-  // Format services for typewriter
-  const servicesText = data.heroServices.join(" • ");
+  // Format services for typewriter - localized
+  const servicesRo = ["SaaS", "FinTech", "E-commerce", "Jocuri", "Mobile Apps"];
+  const services = locale === "ro" ? servicesRo : data.heroServices;
+  const servicesText = services.join(" • ");
+
+  // Badge text localized
+  const badgeText = locale === "ro" ? "Disponibil pentru colaborare" : data.badgeText;
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -59,7 +68,7 @@ export function Hero({ settings }: HeroProps) {
         >
           <Sparkles className="w-4 h-4 text-primary" />
           <span className="text-sm text-primary font-medium">
-            {data.badgeText}
+            {badgeText}
           </span>
         </motion.div>
 
@@ -125,7 +134,7 @@ export function Hero({ settings }: HeroProps) {
             size="lg"
             className="bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-[0_0_30px_rgba(0,255,255,0.4)] transition-all duration-300 px-8"
           >
-            <Link href="/projects">Смотреть проекты</Link>
+            <Link href="/projects">{t("cta.projects")}</Link>
           </Button>
           <Button
             asChild
@@ -133,7 +142,7 @@ export function Hero({ settings }: HeroProps) {
             size="lg"
             className="border-border hover:border-primary hover:text-primary transition-all duration-300 px-8"
           >
-            <Link href="/contact">Связаться</Link>
+            <Link href="/contact">{t("cta.contact")}</Link>
           </Button>
         </motion.div>
 
@@ -147,17 +156,17 @@ export function Hero({ settings }: HeroProps) {
           <div className="flex items-center gap-2 text-muted-foreground">
             <Briefcase className="w-5 h-5 text-primary" />
             <span className="text-2xl font-bold text-foreground">{data.projectsCount}+</span>
-            <span className="text-sm">проектов</span>
+            <span className="text-sm">{t("stats.projects")}</span>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
             <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
             <span className="text-2xl font-bold text-foreground">{data.rating}</span>
-            <span className="text-sm">рейтинг</span>
+            <span className="text-sm">{t("stats.rating")}</span>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
             <Globe className="w-5 h-5 text-primary" />
             <span className="text-2xl font-bold text-foreground">{data.countriesCount}+</span>
-            <span className="text-sm">стран</span>
+            <span className="text-sm">{t("stats.countries")}</span>
           </div>
         </motion.div>
       </div>
@@ -174,7 +183,9 @@ export function Hero({ settings }: HeroProps) {
           transition={{ duration: 1.5, repeat: Infinity }}
           className="flex flex-col items-center gap-2 text-muted-foreground"
         >
-          <span className="text-xs uppercase tracking-wider">Скролл</span>
+          <span className="text-xs uppercase tracking-wider">
+            {locale === "ro" ? "Scroll" : "Скролл"}
+          </span>
           <ArrowDown className="w-4 h-4" />
         </motion.div>
       </motion.div>

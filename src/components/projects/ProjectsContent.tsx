@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { ProjectCard } from "@/components/project/ProjectCard";
 import { cn } from "@/lib/utils";
 import type { Project } from "@/data/projects";
+import { useLocaleContext } from "@/components/providers/LocaleProvider";
 
 interface Category {
   value: string;
@@ -19,12 +20,13 @@ interface ProjectsContentProps {
 
 export function ProjectsContent({ projects, categories }: ProjectsContentProps) {
   const [activeCategory, setActiveCategory] = useState("all");
+  const { locale } = useLocaleContext();
 
   const filteredProjects = activeCategory === "all"
     ? projects
     : projects.filter((p) => p.category === activeCategory);
 
-  const stats = [
+  const statsRu = [
     { label: "Всего проектов", value: projects.length },
     { label: "Игры", value: projects.filter((p) => p.category === "games").length },
     { label: "FinTech", value: projects.filter((p) => p.category === "fintech").length },
@@ -32,6 +34,17 @@ export function ProjectsContent({ projects, categories }: ProjectsContentProps) 
     { label: "Enterprise", value: projects.filter((p) => p.category === "enterprise").length },
     { label: "Автоматизация", value: projects.filter((p) => p.category === "automation").length },
   ].filter((s) => s.value > 0);
+
+  const statsRo = [
+    { label: "Total proiecte", value: projects.length },
+    { label: "Jocuri", value: projects.filter((p) => p.category === "games").length },
+    { label: "FinTech", value: projects.filter((p) => p.category === "fintech").length },
+    { label: "Mobile", value: projects.filter((p) => p.category === "mobile").length },
+    { label: "Enterprise", value: projects.filter((p) => p.category === "enterprise").length },
+    { label: "Automatizare", value: projects.filter((p) => p.category === "automation").length },
+  ].filter((s) => s.value > 0);
+
+  const stats = locale === "ro" ? statsRo : statsRu;
 
   return (
     <>
@@ -46,15 +59,20 @@ export function ProjectsContent({ projects, categories }: ProjectsContentProps) 
             className="text-center max-w-3xl mx-auto"
           >
             <span className="inline-block px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
-              Портфолио
+              {locale === "ro" ? "Portofoliu" : "Портфолио"}
             </span>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-display tracking-wide mb-6">
-              <span className="text-foreground">Мои </span>
-              <span className="text-primary text-glow-cyan">проекты</span>
+              <span className="text-foreground">
+                {locale === "ro" ? "Proiectele " : "Мои "}
+              </span>
+              <span className="text-primary text-glow-cyan">
+                {locale === "ro" ? "mele" : "проекты"}
+              </span>
             </h1>
             <p className="text-lg text-muted-foreground">
-              Коллекция работ, демонстрирующих мой опыт в разработке
-              веб-приложений, игр и Telegram Mini Apps
+              {locale === "ro"
+                ? "Colectie de lucrari care demonstreaza experienta mea in dezvoltarea aplicatiilor web, jocurilor si Telegram Mini Apps"
+                : "Коллекция работ, демонстрирующих мой опыт в разработке веб-приложений, игр и Telegram Mini Apps"}
             </p>
           </motion.div>
         </div>
@@ -104,7 +122,9 @@ export function ProjectsContent({ projects, categories }: ProjectsContentProps) 
           {filteredProjects.length === 0 && (
             <div className="text-center py-16">
               <p className="text-muted-foreground">
-                Проекты в этой категории не найдены
+                {locale === "ro"
+                  ? "Nu au fost gasite proiecte in aceasta categorie"
+                  : "Проекты в этой категории не найдены"}
               </p>
             </div>
           )}

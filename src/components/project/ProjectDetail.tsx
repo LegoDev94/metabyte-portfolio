@@ -25,6 +25,7 @@ import {
   ChallengeSolution,
   Model3DViewer,
 } from "@/components/case-study";
+import { useLocaleContext } from "@/components/providers/LocaleProvider";
 
 interface ProjectDetailProps {
   project: Project;
@@ -63,6 +64,8 @@ function renderInlineMarkdown(text: string): React.ReactNode {
 }
 
 export function ProjectDetail({ project }: ProjectDetailProps) {
+  const { locale } = useLocaleContext();
+
   return (
     <div className="relative">
       {/* Background */}
@@ -75,7 +78,7 @@ export function ProjectDetail({ project }: ProjectDetailProps) {
           className="inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          Все проекты
+          {locale === "ro" ? "Toate proiectele" : "Все проекты"}
         </Link>
       </div>
 
@@ -246,7 +249,9 @@ export function ProjectDetail({ project }: ProjectDetailProps) {
               >
                 <h2 className="text-2xl font-display tracking-wide mb-6 flex items-center gap-3">
                   <Layers className="w-6 h-6 text-primary" />
-                  <span className="text-foreground">О проекте</span>
+                  <span className="text-foreground">
+                    {locale === "ro" ? "Despre proiect" : "О проекте"}
+                  </span>
                 </h2>
                 <div className="space-y-6">
                   {project.fullDescription.split("\n\n").map((paragraph, index) => {
@@ -329,7 +334,9 @@ export function ProjectDetail({ project }: ProjectDetailProps) {
               >
                 <h2 className="text-2xl font-display tracking-wide mb-6 flex items-center gap-3">
                   <Code className="w-6 h-6 text-accent" />
-                  <span className="text-foreground">Технологии</span>
+                  <span className="text-foreground">
+                    {locale === "ro" ? "Tehnologii" : "Технологии"}
+                  </span>
                 </h2>
                 <div className="space-y-3">
                   {project.technologies.map((tech, index) => (
@@ -374,8 +381,12 @@ export function ProjectDetail({ project }: ProjectDetailProps) {
             className="text-center mb-12"
           >
             <h2 className="text-3xl font-display tracking-wide">
-              <span className="text-foreground">Ключевые </span>
-              <span className="text-primary">функции</span>
+              <span className="text-foreground">
+                {locale === "ro" ? "Functii " : "Ключевые "}
+              </span>
+              <span className="text-primary">
+                {locale === "ro" ? "cheie" : "функции"}
+              </span>
             </h2>
           </motion.div>
 
@@ -468,17 +479,23 @@ export function ProjectDetail({ project }: ProjectDetailProps) {
             className="text-center"
           >
             <p className="text-muted-foreground mb-6">
-              Заинтересовал проект? Свяжитесь со мной для обсуждения деталей.
+              {locale === "ro"
+                ? "V-a interesat proiectul? Contactati-ma pentru a discuta detaliile."
+                : "Заинтересовал проект? Свяжитесь со мной для обсуждения деталей."}
             </p>
             <div className="flex flex-wrap justify-center gap-4 relative z-20">
               <Button
                 asChild
                 className="bg-primary text-primary-foreground hover:bg-primary/90 relative z-20"
               >
-                <Link href="/contact">Связаться</Link>
+                <Link href="/contact">
+                  {locale === "ro" ? "Contacteaza" : "Связаться"}
+                </Link>
               </Button>
               <Button asChild variant="outline" className="relative z-20">
-                <Link href="/projects">Другие проекты</Link>
+                <Link href="/projects">
+                  {locale === "ro" ? "Alte proiecte" : "Другие проекты"}
+                </Link>
               </Button>
             </div>
           </motion.div>

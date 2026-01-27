@@ -14,6 +14,7 @@ import type { TeamMember } from "@/lib/db/team";
 import type { Testimonial, TestimonialStats } from "@/lib/db/testimonials";
 import type { SkillCategory } from "@/lib/db/site";
 import { Testimonials } from "@/components/sections/Testimonials";
+import { useLocaleContext } from "@/components/providers/LocaleProvider";
 
 interface AboutContentProps {
   founder: TeamMember | null;
@@ -42,8 +43,8 @@ const defaultSkills: SkillCategory[] = [
   { id: "4", name: "Mobile", icon: "Smartphone", color: "#ffff00", items: ["Flutter", "Telegram Mini Apps", "Telegram Bot API", "Firebase"] },
 ];
 
-// Fallback founder data
-const fallbackFounder: TeamMember = {
+// Fallback founder data - Russian
+const fallbackFounderRu: TeamMember = {
   id: "founder",
   name: "Владимир",
   role: "Full-Stack разработчик",
@@ -55,8 +56,21 @@ const fallbackFounder: TeamMember = {
   socials: {},
 };
 
-// Fallback team data
-const fallbackTeam: TeamMember[] = [
+// Fallback founder data - Romanian
+const fallbackFounderRo: TeamMember = {
+  id: "founder",
+  name: "Vladimir",
+  role: "Dezvoltator Full-Stack",
+  description: "Dezvoltator Full-Stack si fondator al studioului IT METABYTE. Creez aplicatii web, aplicatii mobile pe Flutter, jocuri multiplayer in browser si sisteme cu integrare AI.",
+  photo: "/images/team/vladimir.png",
+  skills: ["React", "Next.js", "Flutter", "Node.js"],
+  bio: "Am in spate 17+ proiecte comerciale: de la platforme FinTech si aplicatii EdTech pana la jocuri 3D in browser cu multiplayer in timp real. Lucrez cu React, Next.js, Vue, Flutter, Node.js si API-uri AI moderne.",
+  isFounder: true,
+  socials: {},
+};
+
+// Fallback team data - Russian
+const fallbackTeamRu: TeamMember[] = [
   {
     id: "1",
     name: "Сергей",
@@ -81,8 +95,38 @@ const fallbackTeam: TeamMember[] = [
   },
 ];
 
+// Fallback team data - Romanian
+const fallbackTeamRo: TeamMember[] = [
+  {
+    id: "1",
+    name: "Sergiu",
+    role: "Dezvoltator Full-Stack",
+    description: "Arhitect de sisteme de jocuri si aplicatii web. Se specializeaza in crearea proiectelor multiplayer complexe de la zero. Transforma ideile in cod functional.",
+    photo: "/images/team/zergo.png",
+    skills: ["Game Dev", "Babylon.js", "Colyseus", "WebSocket"],
+    bio: null,
+    isFounder: false,
+    socials: {},
+  },
+  {
+    id: "2",
+    name: "Iurie",
+    role: "Specialist DevOps & SEO",
+    description: "Maestru in promovare si infrastructura. Asigura functionarea stabila a proiectelor si vizibilitatea lor in motoarele de cautare.",
+    photo: "/images/team/yuri.png",
+    skills: ["SEO", "DevOps", "CI/CD", "Analytics"],
+    bio: null,
+    isFounder: false,
+    socials: {},
+  },
+];
+
 export function AboutContent({ founder, team, testimonials, testimonialStats, skillCategories }: AboutContentProps) {
+  const { locale } = useLocaleContext();
+
   // Use fallback data if database is empty
+  const fallbackFounder = locale === "ro" ? fallbackFounderRo : fallbackFounderRu;
+  const fallbackTeam = locale === "ro" ? fallbackTeamRo : fallbackTeamRu;
   const founderData = founder || fallbackFounder;
   const teamMembers = team.length > 0 ? team.filter(m => !m.isFounder) : fallbackTeam;
   const skills = skillCategories && skillCategories.length > 0 ? skillCategories : defaultSkills;
@@ -100,10 +144,12 @@ export function AboutContent({ founder, team, testimonials, testimonialStats, sk
               transition={{ duration: 0.5 }}
             >
               <span className="inline-block px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
-                Основатель
+                {locale === "ro" ? "Fondator" : "Основатель"}
               </span>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-display tracking-wide mb-6">
-                <span className="text-foreground">Привет. Я </span>
+                <span className="text-foreground">
+                  {locale === "ro" ? "Salut. Eu sunt " : "Привет. Я "}
+                </span>
                 <span className="text-primary text-glow-cyan">{founderData.name}</span>
               </h1>
               <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
@@ -120,12 +166,14 @@ export function AboutContent({ founder, team, testimonials, testimonialStats, sk
                   className="bg-primary text-primary-foreground hover:bg-primary/90"
                 >
                   <Link href="/projects">
-                    Смотреть проекты
+                    {locale === "ro" ? "Vezi proiectele" : "Смотреть проекты"}
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Link>
                 </Button>
                 <Button asChild variant="outline">
-                  <Link href="/contact">Связаться</Link>
+                  <Link href="/contact">
+                    {locale === "ro" ? "Contacteaza" : "Связаться"}
+                  </Link>
                 </Button>
               </div>
             </motion.div>
@@ -168,8 +216,12 @@ export function AboutContent({ founder, team, testimonials, testimonialStats, sk
             className="text-center mb-12"
           >
             <h2 className="text-3xl md:text-4xl font-display tracking-wide">
-              <span className="text-foreground">Наши </span>
-              <span className="text-accent text-glow-magenta">компетенции</span>
+              <span className="text-foreground">
+                {locale === "ro" ? "Competentele " : "Наши "}
+              </span>
+              <span className="text-accent text-glow-magenta">
+                {locale === "ro" ? "noastre" : "компетенции"}
+              </span>
             </h2>
           </motion.div>
 
@@ -224,14 +276,22 @@ export function AboutContent({ founder, team, testimonials, testimonialStats, sk
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 mb-4">
               <Users className="w-4 h-4 text-accent" />
-              <span className="text-sm font-medium text-accent">Команда</span>
+              <span className="text-sm font-medium text-accent">
+                {locale === "ro" ? "Echipa" : "Команда"}
+              </span>
             </div>
             <h2 className="text-3xl md:text-4xl font-display tracking-wide">
-              <span className="text-foreground">Наша </span>
-              <span className="text-accent text-glow-magenta">команда</span>
+              <span className="text-foreground">
+                {locale === "ro" ? "Echipa " : "Наша "}
+              </span>
+              <span className="text-accent text-glow-magenta">
+                {locale === "ro" ? "noastra" : "команда"}
+              </span>
             </h2>
             <p className="text-muted-foreground mt-3 max-w-2xl mx-auto">
-              Профессионалы, которые создают качественные продукты
+              {locale === "ro"
+                ? "Profesionisti care creeaza produse de calitate"
+                : "Профессионалы, которые создают качественные продукты"}
             </p>
           </motion.div>
 
@@ -308,12 +368,17 @@ export function AboutContent({ founder, team, testimonials, testimonialStats, sk
             className="text-center max-w-2xl mx-auto"
           >
             <h2 className="text-3xl font-display tracking-wide mb-4">
-              <span className="text-foreground">Готовы </span>
-              <span className="gradient-text">начать проект?</span>
+              <span className="text-foreground">
+                {locale === "ro" ? "Sunteti gata sa " : "Готовы "}
+              </span>
+              <span className="gradient-text">
+                {locale === "ro" ? "incepeti proiectul?" : "начать проект?"}
+              </span>
             </h2>
             <p className="text-muted-foreground mb-8">
-              Обсудим вашу задачу и предложим оптимальное решение.
-              Первая консультация бесплатно.
+              {locale === "ro"
+                ? "Vom discuta sarcina dvs. si vom propune solutia optima. Prima consultatie este gratuita."
+                : "Обсудим вашу задачу и предложим оптимальное решение. Первая консультация бесплатно."}
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Button
@@ -326,11 +391,13 @@ export function AboutContent({ founder, team, testimonials, testimonialStats, sk
                   rel="noopener noreferrer"
                 >
                   <Send className="w-4 h-4 mr-2" />
-                  Написать в Telegram
+                  {locale === "ro" ? "Scrie pe Telegram" : "Написать в Telegram"}
                 </a>
               </Button>
               <Button asChild variant="outline">
-                <Link href="/contact">Форма связи</Link>
+                <Link href="/contact">
+                  {locale === "ro" ? "Formular de contact" : "Форма связи"}
+                </Link>
               </Button>
             </div>
           </motion.div>

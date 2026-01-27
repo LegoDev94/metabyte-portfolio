@@ -4,19 +4,30 @@ import { motion } from "framer-motion";
 import * as LucideIcons from "lucide-react";
 import { ArrowRight } from "lucide-react";
 import type { WorkProcessStep } from "@/lib/db/site";
+import { useLocaleContext } from "@/components/providers/LocaleProvider";
 
 interface WorkProcessProps {
   steps?: WorkProcessStep[];
 }
 
-// Default fallback data
-const defaultSteps: WorkProcessStep[] = [
+// Default fallback data - Russian
+const defaultStepsRu: WorkProcessStep[] = [
   { id: "1", number: "01", title: "Бриф", description: "Обсуждаем задачу, требования и сроки. Бесплатная консультация.", icon: "MessageSquare", color: "#00ffff" },
   { id: "2", number: "02", title: "Анализ", description: "Изучаем нишу, конкурентов. Готовим ТЗ и смету.", icon: "Search", color: "#ff00ff" },
   { id: "3", number: "03", title: "Дизайн", description: "Создаём прототипы и UI/UX дизайн. Утверждаем с вами.", icon: "Palette", color: "#00ff88" },
   { id: "4", number: "04", title: "Разработка", description: "Пишем код, интегрируем API. Еженедельные демо.", icon: "Code2", color: "#ffaa00" },
   { id: "5", number: "05", title: "Тестирование", description: "QA тестирование, исправление багов, оптимизация.", icon: "TestTube2", color: "#ff5555" },
   { id: "6", number: "06", title: "Запуск", description: "Деплой на сервер, обучение, поддержка 30 дней.", icon: "Rocket", color: "#00ffff" },
+];
+
+// Default fallback data - Romanian
+const defaultStepsRo: WorkProcessStep[] = [
+  { id: "1", number: "01", title: "Brief", description: "Discutam sarcina, cerintele si termenele. Consultatie gratuita.", icon: "MessageSquare", color: "#00ffff" },
+  { id: "2", number: "02", title: "Analiza", description: "Studiem nisa, concurenta. Pregatim specificatiile si devizul.", icon: "Search", color: "#ff00ff" },
+  { id: "3", number: "03", title: "Design", description: "Cream prototipuri si design UI/UX. Aprobam cu dvs.", icon: "Palette", color: "#00ff88" },
+  { id: "4", number: "04", title: "Dezvoltare", description: "Scriem codul, integram API. Demo-uri saptamanale.", icon: "Code2", color: "#ffaa00" },
+  { id: "5", number: "05", title: "Testare", description: "Testare QA, corectarea bug-urilor, optimizare.", icon: "TestTube2", color: "#ff5555" },
+  { id: "6", number: "06", title: "Lansare", description: "Deploy pe server, instruire, suport 30 de zile.", icon: "Rocket", color: "#00ffff" },
 ];
 
 // Dynamic icon component
@@ -31,6 +42,8 @@ function DynamicIcon({ name, className, style }: { name: string; className?: str
 }
 
 export function WorkProcess({ steps }: WorkProcessProps) {
+  const { locale } = useLocaleContext();
+  const defaultSteps = locale === "ro" ? defaultStepsRo : defaultStepsRu;
   const processSteps = steps && steps.length > 0 ? steps : defaultSteps;
 
   return (
@@ -48,11 +61,15 @@ export function WorkProcess({ steps }: WorkProcessProps) {
           className="text-center mb-16"
         >
           <h2 className="text-3xl md:text-4xl font-display mb-4">
-            Как мы{" "}
-            <span className="text-primary text-glow-cyan">работаем</span>
+            {locale === "ro" ? "Cum " : "Как мы "}
+            <span className="text-primary text-glow-cyan">
+              {locale === "ro" ? "lucram" : "работаем"}
+            </span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Прозрачный процесс от идеи до запуска. Вы всегда в курсе статуса проекта.
+            {locale === "ro"
+              ? "Proces transparent de la idee la lansare. Sunteti mereu la curent cu statusul proiectului."
+              : "Прозрачный процесс от идеи до запуска. Вы всегда в курсе статуса проекта."}
           </p>
         </motion.div>
 
@@ -116,7 +133,9 @@ export function WorkProcess({ steps }: WorkProcessProps) {
           className="text-center mt-12"
         >
           <p className="text-muted-foreground mb-4">
-            Готовы начать проект? Первая консультация бесплатно.
+            {locale === "ro"
+              ? "Sunteti gata sa incepeti proiectul? Prima consultatie este gratuita."
+              : "Готовы начать проект? Первая консультация бесплатно."}
           </p>
         </motion.div>
       </div>

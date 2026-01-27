@@ -3,15 +3,20 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { ProjectCard } from "@/components/project/ProjectCard";
 import type { Project } from "@/data/projects";
+import { useLocaleContext } from "@/components/providers/LocaleProvider";
 
 interface FeaturedProjectsProps {
   projects?: Project[];
 }
 
 export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
+  const t = useTranslations("projects");
+  const { locale } = useLocaleContext();
+
   // If no projects passed, return null (data should come from parent)
   if (!projects || projects.length === 0) {
     return null;
@@ -32,15 +37,20 @@ export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
           className="text-center mb-16"
         >
           <span className="inline-block px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
-            Портфолио
+            {locale === "ro" ? "Portofoliu" : "Портфолио"}
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-display tracking-wide mb-4">
-            <span className="text-foreground">Избранные </span>
-            <span className="text-primary text-glow-cyan">проекты</span>
+            <span className="text-foreground">
+              {locale === "ro" ? "Proiecte " : "Избранные "}
+            </span>
+            <span className="text-primary text-glow-cyan">
+              {locale === "ro" ? "recomandate" : "проекты"}
+            </span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Лучшие работы из моего портфолио. Каждый проект — это уникальный опыт
-            и решение реальных задач.
+            {locale === "ro"
+              ? "Cele mai bune lucrari din portofoliul meu. Fiecare proiect este o experienta unica si o solutie la probleme reale."
+              : "Лучшие работы из моего портфолио. Каждый проект — это уникальный опыт и решение реальных задач."}
           </p>
         </motion.div>
 
@@ -66,7 +76,7 @@ export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
             className="border-border hover:border-primary hover:text-primary group"
           >
             <Link href="/projects">
-              Все проекты
+              {t("all")}
               <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </Button>
