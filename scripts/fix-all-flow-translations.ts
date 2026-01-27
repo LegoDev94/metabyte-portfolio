@@ -67,25 +67,27 @@ async function main() {
     const staticRu = projectsRu.find((p) => p.slug === slug);
     const staticRo = projectsRo.find((p) => p.slug === slug);
 
-    if (!staticRu?.caseStudy || !staticRo?.caseStudy) {
-      console.log(`  No static case study data`);
+    if (!staticRu?.caseStudy) {
+      console.log(`  No static case study data (RU)`);
       continue;
     }
 
     const cs = dbProject.caseStudy;
     const csRu = staticRu.caseStudy;
-    const csRo = staticRo.caseStudy;
+    const csRo = staticRo?.caseStudy || csRu; // Fallback to RU if RO missing
 
     // ===== FIX USER FLOWS =====
-    if (cs.userFlows && csRu.userFlows && csRo.userFlows) {
+    // Use RU data as source, RO falls back to RU if not available
+    if (cs.userFlows && csRu.userFlows) {
+      const csRoFlows = csRo.userFlows || csRu.userFlows;
       console.log(`\n  User Flows: ${cs.userFlows.length} in DB, ${csRu.userFlows.length} in static`);
 
       for (let i = 0; i < cs.userFlows.length; i++) {
         const dbFlow = cs.userFlows[i];
         const staticFlowRu = csRu.userFlows[i];
-        const staticFlowRo = csRo.userFlows[i];
+        const staticFlowRo = csRoFlows[i] || staticFlowRu;
 
-        if (!staticFlowRu || !staticFlowRo) {
+        if (!staticFlowRu) {
           console.log(`    Flow ${i}: No static data`);
           continue;
         }
@@ -105,13 +107,16 @@ async function main() {
         console.log(`    Flow ${i}: ${staticFlowRu.title}`);
 
         // Fix steps
-        if (dbFlow.steps && staticFlowRu.steps && staticFlowRo.steps) {
+        const staticStepsRu = staticFlowRu.steps || [];
+        const staticStepsRo = staticFlowRo.steps || staticStepsRu;
+
+        if (dbFlow.steps && staticStepsRu.length > 0) {
           for (let j = 0; j < dbFlow.steps.length; j++) {
             const dbStep = dbFlow.steps[j];
-            const staticStepRu = staticFlowRu.steps[j];
-            const staticStepRo = staticFlowRo.steps[j];
+            const staticStepRu = staticStepsRu[j];
+            const staticStepRo = staticStepsRo[j] || staticStepRu;
 
-            if (!staticStepRu || !staticStepRo) continue;
+            if (!staticStepRu) continue;
 
             // Delete existing translations
             await prisma.userFlowStepTranslation.deleteMany({
@@ -132,15 +137,16 @@ async function main() {
     }
 
     // ===== FIX TECHNICAL HIGHLIGHTS =====
-    if (cs.technicalHighlights && csRu.technicalHighlights && csRo.technicalHighlights) {
+    if (cs.technicalHighlights && csRu.technicalHighlights) {
+      const csRoHighlights = csRo.technicalHighlights || csRu.technicalHighlights;
       console.log(`\n  Technical Highlights: ${cs.technicalHighlights.length} in DB, ${csRu.technicalHighlights.length} in static`);
 
       for (let i = 0; i < cs.technicalHighlights.length; i++) {
         const dbHl = cs.technicalHighlights[i];
         const staticHlRu = csRu.technicalHighlights[i];
-        const staticHlRo = csRo.technicalHighlights[i];
+        const staticHlRo = csRoHighlights[i] || staticHlRu;
 
-        if (!staticHlRu || !staticHlRo) {
+        if (!staticHlRu) {
           console.log(`    Highlight ${i}: No static data`);
           continue;
         }
