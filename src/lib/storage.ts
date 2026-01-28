@@ -136,7 +136,8 @@ export async function uploadFile(
     originalName: file.name,
     mimeType: file.type,
     size: file.size,
-    url: `/${relativePath}`,
+    // Use API route for serving uploads to bypass standalone server static file caching
+    url: `/api/${relativePath}`,
     path: relativePath,
   };
 }
