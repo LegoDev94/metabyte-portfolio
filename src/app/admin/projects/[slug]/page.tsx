@@ -223,12 +223,25 @@ export default function ProjectEditPage() {
       const url = isNew ? "/api/admin/projects" : `/api/admin/projects/${slug}`;
       const method = isNew ? "POST" : "PUT";
 
-      // Filter out empty translations (keep only those with at least title filled)
-      const filteredTranslations = formData.translations.filter(t => t.title.trim());
+      // Filter out incomplete translations (keep only fully filled ones)
+      const filteredTranslations = formData.translations.filter(t =>
+        t.title.trim() &&
+        t.subtitle.trim() &&
+        t.description.trim() &&
+        t.fullDescription.trim() &&
+        t.categoryLabel.trim()
+      );
+
+      // For new projects, require at least one complete translation
+      if (isNew && filteredTranslations.length === 0) {
+        setError("Заполните хотя бы один перевод полностью (название, подзаголовок, описание, полное описание, метка категории)");
+        setIsSaving(false);
+        return;
+      }
 
       const dataToSend = {
         ...formData,
-        translations: filteredTranslations,
+        translations: filteredTranslations.length > 0 ? filteredTranslations : undefined,
       };
 
       const response = await fetch(url, {
@@ -249,7 +262,11 @@ export default function ProjectEditPage() {
         }
       } else {
         const data = await response.json();
-        setError(data.error || "Failed to save project");
+        console.error("Validation error details:", data);
+        const errorMsg = data.details
+          ? `${data.error}: ${JSON.stringify(data.details, null, 2)}`
+          : data.error || "Failed to save project";
+        setError(errorMsg);
       }
     } catch (error) {
       console.error("Save error:", error);

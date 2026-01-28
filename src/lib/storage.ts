@@ -4,7 +4,7 @@ import crypto from "crypto";
 
 // Local storage configuration
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
-const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB for videos
 const ALLOWED_TYPES = {
   image: ["image/jpeg", "image/png", "image/webp", "image/gif", "image/svg+xml"],
   video: ["video/mp4", "video/webm", "video/quicktime"],
