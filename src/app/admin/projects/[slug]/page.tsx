@@ -216,7 +216,7 @@ export default function ProjectEditPage() {
         description={isNew ? "Создание нового проекта" : "Редактирование данных проекта"}
       />
 
-      <form onSubmit={handleSubmit} className="p-6 space-y-6 max-w-4xl">
+      <form onSubmit={handleSubmit} className="p-6 space-y-6">
         {/* Back button and save */}
         <div className="flex items-center justify-between">
           <button
