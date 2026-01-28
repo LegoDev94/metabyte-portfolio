@@ -20,10 +20,13 @@ export default function AdminLoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("[Login] Form submitted");
+    console.log("[Login] Email:", email);
     setIsLoading(true);
     setErrorMessage("");
 
     try {
+      console.log("[Login] Calling signIn...");
       const result = await signIn("credentials", {
         email,
         password,
@@ -46,7 +49,8 @@ export default function AdminLoginPage() {
         setErrorMessage("Неожиданная ошибка. Попробуйте снова.");
         setIsLoading(false);
       }
-    } catch {
+    } catch (err) {
+      console.error("[Login] Exception caught:", err);
       setErrorMessage("Произошла ошибка. Попробуйте снова.");
       setIsLoading(false);
     }
