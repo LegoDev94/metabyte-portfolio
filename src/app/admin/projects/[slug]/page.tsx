@@ -18,6 +18,9 @@ import {
   Eye,
   FileText,
   CheckCircle,
+  Video,
+  Link,
+  Images,
 } from "lucide-react";
 import { MediaPicker } from "@/components/admin/MediaPicker";
 
@@ -52,6 +55,22 @@ interface CaseStudyTranslation {
 interface CaseStudyData {
   id?: string;
   translations: CaseStudyTranslation[];
+}
+
+interface GalleryItemTranslation {
+  locale: string;
+  alt: string;
+  caption?: string;
+}
+
+interface GalleryItem {
+  id?: string;
+  type: "IMAGE" | "VIDEO";
+  src: string;
+  videoUrl?: string;
+  videoProvider?: string;
+  order: number;
+  translations: GalleryItemTranslation[];
 }
 
 const initialCaseStudyTranslation = (locale: string): CaseStudyTranslation => ({
@@ -121,6 +140,17 @@ export default function ProjectEditPage() {
   const [isSavingCaseStudy, setIsSavingCaseStudy] = useState(false);
   const [resultInput, setResultInput] = useState("");
 
+  // Gallery state
+  const [gallery, setGallery] = useState<GalleryItem[]>([]);
+  const [isSavingGallery, setIsSavingGallery] = useState(false);
+  const [showAddGalleryItem, setShowAddGalleryItem] = useState(false);
+  const [newGalleryItem, setNewGalleryItem] = useState<{
+    type: "IMAGE" | "VIDEO";
+    src: string;
+    videoUrl: string;
+    videoProvider: string;
+  }>({ type: "IMAGE", src: "", videoUrl: "", videoProvider: "" });
+
   useEffect(() => {
     if (!isNew) {
       fetchProject();
@@ -159,6 +189,19 @@ export default function ProjectEditPage() {
                 }))
               : [initialCaseStudyTranslation("ru"), initialCaseStudyTranslation("ro")],
           });
+
+          // Load gallery if exists
+          if (data.project.caseStudy.gallery) {
+            setGallery(data.project.caseStudy.gallery.map((item: GalleryItem & { id: string }) => ({
+              id: item.id,
+              type: item.type || "IMAGE",
+              src: item.src,
+              videoUrl: item.videoUrl || "",
+              videoProvider: item.videoProvider || "",
+              order: item.order,
+              translations: item.translations || [],
+            })));
+          }
         }
       } else {
         setError("Project not found");
@@ -392,6 +435,84 @@ export default function ProjectEditPage() {
       alert("Ошибка сохранения кейс-стади");
     } finally {
       setIsSavingCaseStudy(false);
+    }
+  };
+
+  // Gallery functions
+  const addGalleryItem = () => {
+    if (!newGalleryItem.src && newGalleryItem.type === "IMAGE") {
+      alert("Выберите изображение");
+      return;
+    }
+    if (newGalleryItem.type === "VIDEO" && !newGalleryItem.videoUrl && !newGalleryItem.src) {
+      alert("Укажите ссылку на видео или загрузите файл");
+      return;
+    }
+
+    const item: GalleryItem = {
+      type: newGalleryItem.type,
+      src: newGalleryItem.src || "/images/video-placeholder.jpg",
+      videoUrl: newGalleryItem.videoUrl || undefined,
+      videoProvider: newGalleryItem.videoProvider || (newGalleryItem.videoUrl?.includes("vimeo") ? "vimeo" : newGalleryItem.videoUrl?.includes("youtube") ? "youtube" : "local"),
+      order: gallery.length,
+      translations: [
+        { locale: "ru", alt: "", caption: "" },
+        { locale: "ro", alt: "", caption: "" },
+        { locale: "en", alt: "", caption: "" },
+      ],
+    };
+
+    setGallery([...gallery, item]);
+    setNewGalleryItem({ type: "IMAGE", src: "", videoUrl: "", videoProvider: "" });
+    setShowAddGalleryItem(false);
+  };
+
+  const removeGalleryItem = (index: number) => {
+    setGallery(gallery.filter((_, i) => i !== index));
+  };
+
+  const updateGalleryItemTranslation = (index: number, locale: string, field: "alt" | "caption", value: string) => {
+    setGallery(gallery.map((item, i) => {
+      if (i !== index) return item;
+      return {
+        ...item,
+        translations: item.translations.map((t) =>
+          t.locale === locale ? { ...t, [field]: value } : t
+        ),
+      };
+    }));
+  };
+
+  const saveGallery = async () => {
+    setIsSavingGallery(true);
+    try {
+      const res = await fetch(`/api/admin/projects/${slug}/gallery`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: gallery }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to save gallery");
+      }
+
+      const data = await res.json();
+      setGallery(data.gallery.map((item: GalleryItem & { id: string }) => ({
+        id: item.id,
+        type: item.type || "IMAGE",
+        src: item.src,
+        videoUrl: item.videoUrl || "",
+        videoProvider: item.videoProvider || "",
+        order: item.order,
+        translations: item.translations || [],
+      })));
+      alert("Галерея сохранена!");
+    } catch (error) {
+      console.error("Save gallery error:", error);
+      alert(`Ошибка сохранения галереи: ${error instanceof Error ? error.message : "Unknown error"}`);
+    } finally {
+      setIsSavingGallery(false);
     }
   };
 
@@ -1027,6 +1148,200 @@ export default function ProjectEditPage() {
                 </div>
               );
             })()}
+          </div>
+        )}
+
+        {/* Gallery */}
+        {!isNew && (
+          <div className="bg-card border border-border rounded-xl p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold flex items-center gap-2">
+                <Images className="w-5 h-5" />
+                Галерея кейса
+              </h2>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddGalleryItem(true)}
+                  className="flex items-center gap-2 px-3 py-1.5 text-sm bg-muted hover:bg-muted/80 rounded-lg transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  Добавить
+                </button>
+                <button
+                  type="button"
+                  onClick={saveGallery}
+                  disabled={isSavingGallery}
+                  className="flex items-center gap-2 px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
+                >
+                  {isSavingGallery ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Save className="w-4 h-4" />
+                  )}
+                  Сохранить
+                </button>
+              </div>
+            </div>
+
+            {/* Add new item modal */}
+            {showAddGalleryItem && (
+              <div className="p-4 bg-muted/50 rounded-lg space-y-4">
+                <div className="flex items-center gap-4">
+                  <label className="text-sm font-medium">Тип:</label>
+                  <div className="flex rounded-lg border border-border overflow-hidden">
+                    <button
+                      type="button"
+                      onClick={() => setNewGalleryItem({ ...newGalleryItem, type: "IMAGE" })}
+                      className={`px-3 py-1.5 text-sm font-medium transition-colors flex items-center gap-1 ${
+                        newGalleryItem.type === "IMAGE"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-background text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      <ImageIcon className="w-4 h-4" />
+                      Фото
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setNewGalleryItem({ ...newGalleryItem, type: "VIDEO" })}
+                      className={`px-3 py-1.5 text-sm font-medium transition-colors flex items-center gap-1 ${
+                        newGalleryItem.type === "VIDEO"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-background text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      <Video className="w-4 h-4" />
+                      Видео
+                    </button>
+                  </div>
+                </div>
+
+                {newGalleryItem.type === "IMAGE" ? (
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Изображение:</label>
+                    <MediaPicker
+                      value={newGalleryItem.src}
+                      onChange={(url) => setNewGalleryItem({ ...newGalleryItem, src: url || "" })}
+                      label="Выбрать изображение"
+                    />
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">
+                        <Link className="w-4 h-4 inline mr-1" />
+                        Ссылка на видео (Vimeo/YouTube):
+                      </label>
+                      <input
+                        type="text"
+                        value={newGalleryItem.videoUrl}
+                        onChange={(e) => setNewGalleryItem({ ...newGalleryItem, videoUrl: e.target.value })}
+                        placeholder="https://player.vimeo.com/video/..."
+                        className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Превью (опционально):</label>
+                      <MediaPicker
+                        value={newGalleryItem.src}
+                        onChange={(url) => setNewGalleryItem({ ...newGalleryItem, src: url || "" })}
+                        label="Выбрать превью"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={addGalleryItem}
+                    className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                  >
+                    Добавить
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAddGalleryItem(false);
+                      setNewGalleryItem({ type: "IMAGE", src: "", videoUrl: "", videoProvider: "" });
+                    }}
+                    className="px-4 py-2 bg-muted hover:bg-muted/80 rounded-lg transition-colors"
+                  >
+                    Отмена
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Gallery items */}
+            {gallery.length === 0 ? (
+              <p className="text-muted-foreground text-sm py-8 text-center">
+                Нет элементов в галерее. Добавьте фото или видео.
+              </p>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {gallery.map((item, index) => {
+                  const translation = item.translations.find((t) => t.locale === activeLocale) || { alt: "", caption: "" };
+                  return (
+                    <div key={index} className="relative group bg-muted/50 rounded-lg overflow-hidden">
+                      <div className="aspect-video relative">
+                        {item.type === "VIDEO" ? (
+                          <>
+                            {item.src ? (
+                              <img
+                                src={item.src}
+                                alt={translation.alt || "Video preview"}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-muted flex items-center justify-center">
+                                <Video className="w-8 h-8 text-muted-foreground" />
+                              </div>
+                            )}
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                              <Video className="w-10 h-10 text-white" />
+                            </div>
+                          </>
+                        ) : (
+                          <img
+                            src={item.src}
+                            alt={translation.alt || "Gallery image"}
+                            className="w-full h-full object-cover"
+                          />
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => removeGalleryItem(index)}
+                          className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                        <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/50 text-white text-xs rounded">
+                          {item.type === "VIDEO" ? "Видео" : "Фото"}
+                        </div>
+                      </div>
+                      <div className="p-2 space-y-2">
+                        <input
+                          type="text"
+                          value={translation.alt}
+                          onChange={(e) => updateGalleryItemTranslation(index, activeLocale, "alt", e.target.value)}
+                          placeholder="Alt текст"
+                          className="w-full px-2 py-1 text-xs bg-background border border-border rounded focus:outline-none focus:ring-1 focus:ring-primary"
+                        />
+                        <input
+                          type="text"
+                          value={translation.caption || ""}
+                          onChange={(e) => updateGalleryItemTranslation(index, activeLocale, "caption", e.target.value)}
+                          placeholder="Подпись"
+                          className="w-full px-2 py-1 text-xs bg-background border border-border rounded focus:outline-none focus:ring-1 focus:ring-primary"
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
       </form>
