@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
@@ -38,12 +39,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Save to database
+    const submission = await prisma.contactSubmission.create({
+      data: {
+        name: data.name,
+        email: data.email,
+        subject: data.subject || null,
+        message: data.message,
+      },
+    });
+
     // Check if Telegram credentials are configured
     if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
       console.error("Telegram credentials not configured");
       // In development, just log and return success
       console.log("Contact form submission:", data);
-      return NextResponse.json({ success: true });
+      return NextResponse.json({ success: true, id: submission.id });
     }
 
     // Format message for Telegram
@@ -72,10 +83,10 @@ export async function POST(request: NextRequest) {
     if (!response.ok) {
       const errorData = await response.json();
       console.error("Telegram API error:", errorData);
-      throw new Error("Telegram API error");
+      // Still return success since we saved to database
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, id: submission.id });
   } catch (error) {
     console.error("Error sending message:", error);
     return NextResponse.json(
