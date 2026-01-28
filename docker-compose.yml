@@ -16,7 +16,7 @@ services:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
     volumes:
-      - ./uploads:/app/uploads
+      - ./public/uploads:/app/public/uploads
     networks:
       - webnet
     healthcheck:
