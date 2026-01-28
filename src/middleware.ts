@@ -104,8 +104,8 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     // Match all paths except:
-    // - API routes that start with /api (except /api/auth for NextAuth)
+    // - ALL API routes (including /api/auth for NextAuth)
     // - Static files (_next/static, _next/image, favicon.ico, etc.)
-    "/((?!api(?!/auth)|_next/static|_next/image|favicon.ico|.*\\..*$).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\..*$).*)",
   ],
 };
