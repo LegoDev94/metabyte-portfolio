@@ -46,23 +46,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           if (!isValid) {
             return null;
           }
+
+          // Update last login
+          await prisma.adminUser.update({
+            where: { id: admin.id },
+            data: { lastLoginAt: new Date() },
+          });
+
+          return {
+            id: admin.id,
+            email: admin.email,
+            name: admin.name,
+            role: admin.role,
+          };
         } catch (error) {
           console.error("[Auth] Error:", error);
           return null;
         }
-
-        // Update last login
-        await prisma.adminUser.update({
-          where: { id: admin.id },
-          data: { lastLoginAt: new Date() },
-        });
-
-        return {
-          id: admin.id,
-          email: admin.email,
-          name: admin.name,
-          role: admin.role,
-        };
       },
     }),
   ],
