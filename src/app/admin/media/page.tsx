@@ -67,6 +67,7 @@ export default function MediaPage() {
   const [seoData, setSeoData] = useState<Record<string, MediaTranslation>>({});
   const [isSavingSeo, setIsSavingSeo] = useState(false);
   const [generating, setGenerating] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -77,6 +78,7 @@ export default function MediaPage() {
         const params = new URLSearchParams({
           page: String(page),
           limit: "20",
+          includeTranslations: "true",
         });
         if (mediaType !== "all") {
           params.set("type", mediaType);
@@ -211,6 +213,7 @@ export default function MediaPage() {
   const saveSeoData = async () => {
     if (!previewItem) return;
     setIsSavingSeo(true);
+    setSaveSuccess(false);
 
     try {
       const translations = Object.values(seoData);
@@ -239,6 +242,10 @@ export default function MediaPage() {
         // Re-initialize seoData from server response
         initializeSeoData(updatedMedia);
       }
+
+      // Show success notification
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error) {
       console.error("Save SEO error:", error);
       alert("Ошибка сохранения SEO данных");
@@ -884,15 +891,21 @@ export default function MediaPage() {
                     {/* Save button */}
                     <button
                       onClick={saveSeoData}
-                      disabled={isSavingSeo}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors disabled:opacity-50"
+                      disabled={isSavingSeo || saveSuccess}
+                      className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors disabled:opacity-50 ${
+                        saveSuccess
+                          ? "bg-green-600 hover:bg-green-600 text-white"
+                          : "bg-primary hover:bg-primary/90 text-primary-foreground"
+                      }`}
                     >
                       {isSavingSeo ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : saveSuccess ? (
+                        <Check className="w-4 h-4" />
                       ) : (
                         <Save className="w-4 h-4" />
                       )}
-                      Сохранить SEO
+                      {saveSuccess ? "Сохранено!" : "Сохранить SEO"}
                     </button>
                   </div>
                 )}
