@@ -217,14 +217,14 @@ export default function ProjectsPage() {
                       </div>
 
                       {/* Technologies */}
-                      <div className="hidden lg:flex items-center gap-1">
+                      <div className="hidden lg:flex items-center gap-1 flex-wrap max-w-xs">
                         {project.technologies.slice(0, 4).map((tech, i) => (
                           <span
                             key={i}
-                            className="w-7 h-7 rounded bg-muted flex items-center justify-center text-sm"
+                            className="px-2 py-1 rounded bg-muted text-xs text-muted-foreground whitespace-nowrap"
                             title={tech.name}
                           >
-                            {tech.icon}
+                            {tech.name}
                           </span>
                         ))}
                         {project.technologies.length > 4 && (
