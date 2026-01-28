@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { AdminHeader } from "@/components/admin/AdminHeader";
+import { TranslationBlock } from "@/components/admin/TranslationBlock";
 import {
   MessageCircle,
   Radio,
@@ -169,6 +170,8 @@ export default function ChatsPage() {
         description="Мониторинг и управление AI чатами в реальном времени"
       />
       <div className="p-6 space-y-6">
+        {/* Quick Translation Tool */}
+        <TranslationBlock />
         {/* Live indicator */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm">

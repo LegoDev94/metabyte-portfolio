@@ -119,6 +119,50 @@ export async function getProjectsByCategory(
   return dbProjects.map((p) => mapDbProjectToProject(p, locale));
 }
 
+// Get project SEO metadata for generateMetadata
+export async function getProjectSEO(
+  slug: string,
+  locale: SupportedLocale = DEFAULT_LOCALE
+): Promise<{
+  metaTitle: string | null;
+  metaDescription: string | null;
+  metaKeywords: string[];
+  image: string | null;
+} | null> {
+  const dbProject = await prisma.project.findUnique({
+    where: { slug },
+    include: {
+      translations: {
+        where: { locale },
+      },
+    },
+  });
+
+  if (!dbProject) return null;
+
+  const trans = dbProject.translations[0];
+  if (!trans) {
+    // Fallback to default locale
+    const defaultTrans = await prisma.projectTranslation.findFirst({
+      where: { projectId: dbProject.id, locale: DEFAULT_LOCALE },
+    });
+
+    return {
+      metaTitle: defaultTrans?.metaTitle || null,
+      metaDescription: defaultTrans?.metaDescription || null,
+      metaKeywords: defaultTrans?.metaKeywords || [],
+      image: dbProject.image,
+    };
+  }
+
+  return {
+    metaTitle: trans.metaTitle,
+    metaDescription: trans.metaDescription,
+    metaKeywords: trans.metaKeywords || [],
+    image: dbProject.image,
+  };
+}
+
 // Get project categories with counts - from database translations
 export async function getProjectCategories(locale: SupportedLocale = DEFAULT_LOCALE) {
   // First try to get from database

@@ -16,7 +16,17 @@ import {
   X,
   Loader2,
   Filter,
+  Sparkles,
+  Save,
+  Globe,
 } from "lucide-react";
+
+interface MediaTranslation {
+  locale: string;
+  altText: string;
+  title: string;
+  description: string;
+}
 
 interface MediaItem {
   id: string;
@@ -28,6 +38,7 @@ interface MediaItem {
   path: string;
   linkedTo: string | null;
   createdAt: string;
+  translations?: MediaTranslation[];
 }
 
 interface PaginationInfo {
@@ -52,6 +63,10 @@ export default function MediaPage() {
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [previewItem, setPreviewItem] = useState<MediaItem | null>(null);
+  const [seoLocale, setSeoLocale] = useState<"ru" | "ro">("ru");
+  const [seoData, setSeoData] = useState<Record<string, MediaTranslation>>({});
+  const [isSavingSeo, setIsSavingSeo] = useState(false);
+  const [generating, setGenerating] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -161,6 +176,95 @@ export default function MediaPage() {
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
+  // Initialize SEO data when preview item changes
+  const initializeSeoData = (item: MediaItem) => {
+    const data: Record<string, MediaTranslation> = {};
+    ["ru", "ro"].forEach((locale) => {
+      const existing = item.translations?.find((t) => t.locale === locale);
+      data[locale] = existing || {
+        locale,
+        altText: "",
+        title: "",
+        description: "",
+      };
+    });
+    setSeoData(data);
+  };
+
+  const handlePreviewOpen = (item: MediaItem) => {
+    setPreviewItem(item);
+    initializeSeoData(item);
+  };
+
+  const updateSeoField = (locale: string, field: keyof MediaTranslation, value: string) => {
+    setSeoData((prev) => ({
+      ...prev,
+      [locale]: {
+        ...prev[locale],
+        [field]: value,
+      },
+    }));
+  };
+
+  const saveSeoData = async () => {
+    if (!previewItem) return;
+    setIsSavingSeo(true);
+
+    try {
+      const translations = Object.values(seoData);
+      const res = await fetch(`/api/admin/media/${previewItem.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ translations }),
+      });
+
+      if (!res.ok) throw new Error("Failed to save SEO");
+
+      // Update local media state with new translations
+      setMedia((prev) =>
+        prev.map((m) =>
+          m.id === previewItem.id ? { ...m, translations } : m
+        )
+      );
+    } catch (error) {
+      console.error("Save SEO error:", error);
+      alert("Ошибка сохранения SEO данных");
+    } finally {
+      setIsSavingSeo(false);
+    }
+  };
+
+  const generateAltText = async (locale: string) => {
+    if (!previewItem) return;
+    setGenerating(`${locale}-alt`);
+
+    try {
+      const res = await fetch("/api/admin/ai/seo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "media",
+          field: "altText",
+          locale,
+          context: {
+            mediaFilename: previewItem.originalName,
+            mediaLinkedTo: previewItem.linkedTo,
+          },
+        }),
+      });
+
+      if (!res.ok) throw new Error("AI generation failed");
+
+      const data = await res.json();
+      updateSeoField(locale, "altText", data.result);
+    } catch (error) {
+      console.error("AI generation error:", error);
+      alert("Ошибка генерации");
+    } finally {
+      setGenerating(null);
+    }
   };
 
   const getFileIcon = (mimeType: string) => {
@@ -290,7 +394,7 @@ export default function MediaPage() {
                       ? "border-primary ring-2 ring-primary/20"
                       : "border-border hover:border-muted-foreground"
                   }`}
-                  onClick={() => setPreviewItem(item)}
+                  onClick={() => handlePreviewOpen(item)}
                 >
                   {/* Checkbox */}
                   <div
@@ -481,7 +585,7 @@ export default function MediaPage() {
                             )}
                           </button>
                           <button
-                            onClick={() => setPreviewItem(item)}
+                            onClick={() => handlePreviewOpen(item)}
                             className="p-2 hover:bg-muted rounded-lg transition-colors"
                             title="Просмотр"
                           >
@@ -599,30 +703,136 @@ export default function MediaPage() {
                 </div>
               )}
 
-              {/* File info */}
-              <div className="mt-4 bg-card border border-border rounded-lg p-4 flex items-center justify-between">
-                <div>
-                  <p className="font-medium">{previewItem.originalName}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {previewItem.mimeType} • {formatFileSize(previewItem.size)}
-                  </p>
+              {/* File info & SEO */}
+              <div className="mt-4 bg-card border border-border rounded-lg overflow-hidden">
+                {/* File info header */}
+                <div className="p-4 flex items-center justify-between border-b border-border">
+                  <div>
+                    <p className="font-medium">{previewItem.originalName}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {previewItem.mimeType} • {formatFileSize(previewItem.size)}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => copyUrl(previewItem.url)}
+                    className="flex items-center gap-2 px-4 py-2 bg-muted rounded-lg hover:bg-muted/80 transition-colors"
+                  >
+                    {copiedUrl === previewItem.url ? (
+                      <>
+                        <Check className="w-4 h-4 text-green-500" />
+                        <span>Скопировано</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4" />
+                        <span>Копировать URL</span>
+                      </>
+                    )}
+                  </button>
                 </div>
-                <button
-                  onClick={() => copyUrl(previewItem.url)}
-                  className="flex items-center gap-2 px-4 py-2 bg-muted rounded-lg hover:bg-muted/80 transition-colors"
-                >
-                  {copiedUrl === previewItem.url ? (
-                    <>
-                      <Check className="w-4 h-4 text-green-500" />
-                      <span>Скопировано</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-4 h-4" />
-                      <span>Копировать URL</span>
-                    </>
-                  )}
-                </button>
+
+                {/* SEO section - only for images */}
+                {isImage(previewItem.mimeType) && (
+                  <div className="p-4 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium flex items-center gap-2">
+                        <Globe className="w-4 h-4" />
+                        SEO Настройки
+                      </h4>
+                      <div className="flex gap-1">
+                        <button
+                          onClick={() => setSeoLocale("ru")}
+                          className={`px-3 py-1 text-xs rounded ${
+                            seoLocale === "ru"
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          Русский
+                        </button>
+                        <button
+                          onClick={() => setSeoLocale("ro")}
+                          className={`px-3 py-1 text-xs rounded ${
+                            seoLocale === "ro"
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          Română
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Alt Text */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-sm font-medium">Alt Text</label>
+                        <span className="text-xs text-muted-foreground">
+                          {seoData[seoLocale]?.altText?.length || 0}/125
+                        </span>
+                      </div>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={seoData[seoLocale]?.altText || ""}
+                          onChange={(e) => updateSeoField(seoLocale, "altText", e.target.value)}
+                          placeholder="Описание изображения для поисковиков и скринридеров"
+                          className="flex-1 px-3 py-2 bg-background border border-border rounded-lg text-sm"
+                        />
+                        <button
+                          onClick={() => generateAltText(seoLocale)}
+                          disabled={generating === `${seoLocale}-alt`}
+                          className="px-3 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors disabled:opacity-50"
+                          title="Сгенерировать с AI"
+                        >
+                          {generating === `${seoLocale}-alt` ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Sparkles className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Title */}
+                    <div>
+                      <label className="text-sm font-medium block mb-1">Title</label>
+                      <input
+                        type="text"
+                        value={seoData[seoLocale]?.title || ""}
+                        onChange={(e) => updateSeoField(seoLocale, "title", e.target.value)}
+                        placeholder="Заголовок изображения"
+                        className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm"
+                      />
+                    </div>
+
+                    {/* Description */}
+                    <div>
+                      <label className="text-sm font-medium block mb-1">Description</label>
+                      <textarea
+                        value={seoData[seoLocale]?.description || ""}
+                        onChange={(e) => updateSeoField(seoLocale, "description", e.target.value)}
+                        placeholder="Подробное описание изображения"
+                        rows={2}
+                        className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm resize-none"
+                      />
+                    </div>
+
+                    {/* Save button */}
+                    <button
+                      onClick={saveSeoData}
+                      disabled={isSavingSeo}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors disabled:opacity-50"
+                    >
+                      {isSavingSeo ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Save className="w-4 h-4" />
+                      )}
+                      Сохранить SEO
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

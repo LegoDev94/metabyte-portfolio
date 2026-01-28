@@ -23,6 +23,10 @@ const updateProjectSchema = z.object({
     description: z.string().min(1),
     fullDescription: z.string().min(1),
     categoryLabel: z.string().min(1),
+    // SEO fields
+    metaTitle: z.string().optional(),
+    metaDescription: z.string().optional(),
+    metaKeywords: z.array(z.string()).optional(),
   })).optional(),
   technologies: z.array(z.object({
     id: z.string().optional(),

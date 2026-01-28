@@ -12,7 +12,12 @@ import {
   Star,
   Globe,
   Image as ImageIcon,
+  Search,
+  Sparkles,
+  Loader2,
+  Eye,
 } from "lucide-react";
+import { MediaPicker } from "@/components/admin/MediaPicker";
 
 interface ProjectTranslation {
   locale: string;
@@ -21,6 +26,10 @@ interface ProjectTranslation {
   description: string;
   fullDescription: string;
   categoryLabel: string;
+  // SEO fields
+  metaTitle?: string;
+  metaDescription?: string;
+  metaKeywords?: string[];
 }
 
 interface Technology {
@@ -49,6 +58,9 @@ const initialTranslation = (locale: string): ProjectTranslation => ({
   description: "",
   fullDescription: "",
   categoryLabel: locale === "ru" ? "Игры" : "Jocuri",
+  metaTitle: "",
+  metaDescription: "",
+  metaKeywords: [],
 });
 
 const categoryOptions = [
@@ -69,6 +81,7 @@ export default function ProjectEditPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeLocale, setActiveLocale] = useState<"ru" | "ro">("ru");
+  const [generating, setGenerating] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<ProjectData>({
     slug: "",
@@ -192,6 +205,52 @@ export default function ProjectEditPage() {
     }));
   };
 
+  const generateSEO = async (locale: string, field: "title" | "description" | "keywords") => {
+    const key = `${locale}-${field}`;
+    setGenerating(key);
+
+    try {
+      const translation = getTranslation(locale);
+      const res = await fetch("/api/admin/ai/seo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "project",
+          field,
+          locale,
+          context: {
+            projectTitle: translation.title,
+            projectDescription: translation.description || translation.fullDescription,
+            projectCategory: formData.category,
+            currentTitle: translation.metaTitle,
+            currentDescription: translation.metaDescription,
+          },
+        }),
+      });
+
+      if (!res.ok) throw new Error("AI generation failed");
+
+      const data = await res.json();
+
+      // Update the field
+      setFormData((prev) => ({
+        ...prev,
+        translations: prev.translations.map((t) => {
+          if (t.locale !== locale) return t;
+          if (field === "title") return { ...t, metaTitle: data.result };
+          if (field === "description") return { ...t, metaDescription: data.result };
+          if (field === "keywords") return { ...t, metaKeywords: data.result };
+          return t;
+        }),
+      }));
+    } catch (error) {
+      console.error("AI generation error:", error);
+      alert("Ошибка генерации");
+    } finally {
+      setGenerating(null);
+    }
+  };
+
   if (isLoading) {
     return (
       <>
@@ -276,23 +335,14 @@ export default function ProjectEditPage() {
               </select>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">Изображение (URL)</label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={formData.image}
-                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                  placeholder="/images/projects/..."
-                  required
-                  className="flex-1 px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-                {formData.image && (
-                  <div className="w-10 h-10 rounded-lg overflow-hidden bg-muted">
-                    <img src={formData.image} alt="" className="w-full h-full object-cover" />
-                  </div>
-                )}
-              </div>
+            <div className="md:col-span-2">
+              <MediaPicker
+                label="Изображение проекта"
+                value={formData.image}
+                onChange={(url) => setFormData({ ...formData, image: url || "/images/projects/placeholder.jpg" })}
+                placeholder="Выбрать изображение"
+                aspectRatio={16 / 9}
+              />
             </div>
 
             <div>
@@ -474,6 +524,167 @@ export default function ProjectEditPage() {
               ))}
             </div>
           )}
+        </div>
+
+        {/* SEO */}
+        <div className="bg-card border border-border rounded-xl p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <Search className="w-5 h-5" />
+              SEO Настройки
+            </h2>
+            <div className="flex rounded-lg border border-border overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setActiveLocale("ru")}
+                className={`px-4 py-1.5 text-sm font-medium transition-colors ${
+                  activeLocale === "ru"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-background text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Русский
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveLocale("ro")}
+                className={`px-4 py-1.5 text-sm font-medium transition-colors ${
+                  activeLocale === "ro"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-background text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Română
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {/* Meta Title */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-medium">Meta Title</label>
+                <span className={`text-xs ${(currentTranslation.metaTitle?.length || 0) > 60 ? "text-red-400" : "text-muted-foreground"}`}>
+                  {currentTranslation.metaTitle?.length || 0}/60
+                </span>
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={currentTranslation.metaTitle || ""}
+                  onChange={(e) => updateTranslation(activeLocale, "metaTitle" as keyof ProjectTranslation, e.target.value)}
+                  placeholder="SEO заголовок для поисковиков"
+                  className="flex-1 px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <button
+                  type="button"
+                  onClick={() => generateSEO(activeLocale, "title")}
+                  disabled={generating === `${activeLocale}-title`}
+                  className="px-3 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors disabled:opacity-50"
+                  title="Сгенерировать с AI"
+                >
+                  {generating === `${activeLocale}-title` ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Sparkles className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Meta Description */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-medium">Meta Description</label>
+                <span className={`text-xs ${(currentTranslation.metaDescription?.length || 0) > 160 ? "text-red-400" : "text-muted-foreground"}`}>
+                  {currentTranslation.metaDescription?.length || 0}/160
+                </span>
+              </div>
+              <div className="flex gap-2">
+                <textarea
+                  value={currentTranslation.metaDescription || ""}
+                  onChange={(e) => updateTranslation(activeLocale, "metaDescription" as keyof ProjectTranslation, e.target.value)}
+                  placeholder="SEO описание для поисковиков"
+                  rows={3}
+                  className="flex-1 px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => generateSEO(activeLocale, "description")}
+                  disabled={generating === `${activeLocale}-description`}
+                  className="px-3 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors disabled:opacity-50 h-fit"
+                  title="Сгенерировать с AI"
+                >
+                  {generating === `${activeLocale}-description` ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Sparkles className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Keywords */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-medium">Keywords</label>
+                <span className="text-xs text-muted-foreground">
+                  {currentTranslation.metaKeywords?.length || 0} ключевых слов
+                </span>
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={(currentTranslation.metaKeywords || []).join(", ")}
+                  onChange={(e) => {
+                    const keywords = e.target.value.split(",").map(k => k.trim()).filter(k => k);
+                    setFormData((prev) => ({
+                      ...prev,
+                      translations: prev.translations.map((t) =>
+                        t.locale === activeLocale ? { ...t, metaKeywords: keywords } : t
+                      ),
+                    }));
+                  }}
+                  placeholder="ключевое слово 1, ключевое слово 2, ..."
+                  className="flex-1 px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <button
+                  type="button"
+                  onClick={() => generateSEO(activeLocale, "keywords")}
+                  disabled={generating === `${activeLocale}-keywords`}
+                  className="px-3 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors disabled:opacity-50"
+                  title="Сгенерировать с AI"
+                >
+                  {generating === `${activeLocale}-keywords` ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Sparkles className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Preview */}
+            {currentTranslation.metaTitle && (
+              <div className="mt-4 p-4 bg-muted/30 rounded-lg">
+                <div className="flex items-center gap-2 mb-2 text-xs text-muted-foreground">
+                  <Eye className="w-3 h-3" />
+                  Превью в Google
+                </div>
+                <div className="space-y-1">
+                  <div className="text-blue-400 text-lg hover:underline cursor-pointer truncate">
+                    {currentTranslation.metaTitle}
+                  </div>
+                  <div className="text-green-400 text-sm">
+                    mtbyte.io/projects/{formData.slug}
+                  </div>
+                  <div className="text-muted-foreground text-sm line-clamp-2">
+                    {currentTranslation.metaDescription}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Note about case studies */}

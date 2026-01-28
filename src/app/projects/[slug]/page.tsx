@@ -4,7 +4,7 @@ import { Metadata } from "next";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ProjectDetail } from "@/components/project/ProjectDetail";
-import { getProjectBySlug } from "@/lib/db";
+import { getProjectBySlug, getProjectSEO } from "@/lib/db";
 import { normalizeLocale } from "@/lib/db/utils/i18n";
 import { projects } from "@/data/projects";
 import { getLocalizedProject } from "@/lib/utils/get-locale-projects";
@@ -27,25 +27,48 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const cookieStore = await cookies();
   const locale = normalizeLocale(cookieStore.get("locale")?.value);
 
-  // Try DB first, then localized static data
-  let project = await getProjectBySlug(slug, locale);
-  if (!project) {
-    project = getLocalizedProject(slug, locale) || null;
-  }
+  // Try to get SEO data from database
+  const seo = await getProjectSEO(slug, locale);
 
-  if (!project) {
+  // Fallback to project data if no SEO
+  if (!seo || (!seo.metaTitle && !seo.metaDescription)) {
+    let project = await getProjectBySlug(slug, locale);
+    if (!project) {
+      project = getLocalizedProject(slug, locale) || null;
+    }
+
+    if (!project) {
+      return {
+        title: locale === "ro" ? "Proiect negasit" : "Проект не найден",
+      };
+    }
+
     return {
-      title: locale === "ro" ? "Proiect negasit" : "Проект не найден",
+      title: `${project.title} | Metabyte`,
+      description: project.description,
+      openGraph: {
+        title: `${project.title} | Metabyte`,
+        description: project.description,
+        type: "article",
+        ...(project.image && { images: [project.image] }),
+      },
     };
   }
 
+  // Use SEO data from database
+  const title = seo.metaTitle || `${slug} | Metabyte`;
+  const description = seo.metaDescription || "";
+
   return {
-    title: `${project.title} | Metabyte`,
-    description: project.description,
+    title,
+    description,
+    keywords: seo.metaKeywords,
     openGraph: {
-      title: `${project.title} | Metabyte`,
-      description: project.description,
+      title,
+      description,
       type: "article",
+      locale: locale === "ru" ? "ru_RU" : "ro_RO",
+      ...(seo.image && { images: [seo.image] }),
     },
   };
 }

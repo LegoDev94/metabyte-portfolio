@@ -41,6 +41,9 @@ export async function GET(request: NextRequest) {
       ];
     }
 
+    // Check if translations should be included
+    const includeTranslations = searchParams.get("includeTranslations") === "true";
+
     // Fetch media with pagination
     const [media, total] = await Promise.all([
       prisma.mediaUpload.findMany({
@@ -48,6 +51,7 @@ export async function GET(request: NextRequest) {
         orderBy: { createdAt: "desc" },
         skip,
         take: limit,
+        include: includeTranslations ? { translations: true } : undefined,
       }),
       prisma.mediaUpload.count({ where }),
     ]);

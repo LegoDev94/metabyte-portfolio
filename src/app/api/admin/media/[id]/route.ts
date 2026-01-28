@@ -18,6 +18,7 @@ export async function GET(
   try {
     const media = await prisma.mediaUpload.findUnique({
       where: { id },
+      include: { translations: true },
     });
 
     if (!media) {
@@ -65,6 +66,83 @@ export async function PATCH(
     console.error("Update media error:", error);
     return NextResponse.json(
       { error: "Failed to update media" },
+      { status: 500 }
+    );
+  }
+}
+
+// PUT - Update media SEO translations
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await requireAdmin(request);
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await params;
+
+  try {
+    const body = await request.json();
+    const { translations } = body;
+
+    if (!translations || !Array.isArray(translations)) {
+      return NextResponse.json(
+        { error: "Translations array is required" },
+        { status: 400 }
+      );
+    }
+
+    // Check if media exists
+    const media = await prisma.mediaUpload.findUnique({
+      where: { id },
+    });
+
+    if (!media) {
+      return NextResponse.json({ error: "Media not found" }, { status: 404 });
+    }
+
+    // Upsert translations
+    for (const t of translations) {
+      if (!t.locale || !t.altText) continue;
+
+      await prisma.mediaUploadTranslation.upsert({
+        where: {
+          mediaId_locale: {
+            mediaId: id,
+            locale: t.locale,
+          },
+        },
+        update: {
+          altText: t.altText,
+          title: t.title || null,
+          description: t.description || null,
+        },
+        create: {
+          mediaId: id,
+          locale: t.locale,
+          altText: t.altText,
+          title: t.title || null,
+          description: t.description || null,
+        },
+      });
+    }
+
+    // Fetch updated media with translations
+    const updatedMedia = await prisma.mediaUpload.findUnique({
+      where: { id },
+      include: { translations: true },
+    });
+
+    return NextResponse.json({
+      success: true,
+      media: updatedMedia,
+    });
+  } catch (error) {
+    console.error("Update media SEO error:", error);
+    return NextResponse.json(
+      { error: "Failed to update media SEO" },
       { status: 500 }
     );
   }

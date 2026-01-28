@@ -17,6 +17,7 @@ import {
   Mail,
   LogOut,
   ChevronRight,
+  Search,
 } from "lucide-react";
 
 const menuItems = [
@@ -48,6 +49,7 @@ const menuItems = [
     items: [
       { href: "/admin/analytics", label: "Аналитика", icon: BarChart3 },
       { href: "/admin/media", label: "Медиатека", icon: Image },
+      { href: "/admin/seo", label: "SEO", icon: Search },
       { href: "/admin/settings", label: "Настройки", icon: Settings },
     ],
   },

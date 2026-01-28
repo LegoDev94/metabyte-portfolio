@@ -15,6 +15,7 @@ import {
   Send,
   Linkedin,
 } from "lucide-react";
+import { MediaPicker } from "@/components/admin/MediaPicker";
 
 interface TeamMemberTranslation {
   locale: string;
@@ -235,23 +236,14 @@ export default function TeamPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">Фото (URL)</label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={formData.photo}
-                    onChange={(e) => setFormData({ ...formData, photo: e.target.value })}
-                    placeholder="/images/team/..."
-                    className="flex-1 px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                  {formData.photo && (
-                    <div className="w-10 h-10 rounded-full overflow-hidden bg-muted">
-                      <img src={formData.photo} alt="" className="w-full h-full object-cover" />
-                    </div>
-                  )}
-                </div>
-              </div>
+              <MediaPicker
+                label="Фото"
+                value={formData.photo}
+                onChange={(url) => setFormData({ ...formData, photo: url || "/images/team/placeholder.jpg" })}
+                placeholder="Выбрать фото"
+                aspectRatio={1}
+                cropShape="round"
+              />
 
               <div>
                 <label className="block text-sm font-medium mb-2">Порядок</label>
