@@ -8,10 +8,15 @@ const additionalServiceSchema = z.object({
   order: z.number().int().default(0),
   translations: z.array(z.object({
     locale: z.string(),
-    name: z.string().min(1),
-    description: z.string().min(1),
+    name: z.string(),
+    description: z.string(),
   })),
 });
+
+// Filter out empty translations
+function filterValidTranslations(translations: { locale: string; name: string; description: string }[]) {
+  return translations.filter(t => t.name.trim() || t.description.trim());
+}
 
 // GET - List all additional services
 export async function GET(request: NextRequest) {
@@ -48,13 +53,21 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const validatedData = additionalServiceSchema.parse(body);
+    const validTranslations = filterValidTranslations(validatedData.translations);
+
+    if (validTranslations.length === 0) {
+      return NextResponse.json(
+        { error: "At least one translation with name is required" },
+        { status: 400 }
+      );
+    }
 
     const service = await prisma.additionalService.create({
       data: {
         price: validatedData.price,
         order: validatedData.order,
         translations: {
-          create: validatedData.translations,
+          create: validTranslations,
         },
       },
       include: {
@@ -102,6 +115,14 @@ export async function PUT(request: NextRequest) {
     }
 
     const validatedData = additionalServiceSchema.parse(data);
+    const validTranslations = filterValidTranslations(validatedData.translations);
+
+    if (validTranslations.length === 0) {
+      return NextResponse.json(
+        { error: "At least one translation with name is required" },
+        { status: 400 }
+      );
+    }
 
     const service = await prisma.$transaction(async (tx) => {
       await tx.additionalService.update({
@@ -117,7 +138,7 @@ export async function PUT(request: NextRequest) {
       });
 
       await tx.additionalServiceTranslation.createMany({
-        data: validatedData.translations.map((t) => ({
+        data: validTranslations.map((t) => ({
           serviceId: id,
           ...t,
         })),

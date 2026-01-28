@@ -16,6 +16,11 @@ import {
   AtSign,
   Eye,
   Info,
+  Languages,
+  Loader2,
+  Copy,
+  Check,
+  ArrowRightLeft,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -71,6 +76,14 @@ export default function ChatViewPage() {
   const [isSending, setIsSending] = useState(false);
   const [isTakingOver, setIsTakingOver] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Translator state
+  const [translateText, setTranslateText] = useState("");
+  const [translateResult, setTranslateResult] = useState("");
+  const [translateFrom, setTranslateFrom] = useState<"auto" | "ru" | "ro" | "en">("auto");
+  const [translateTo, setTranslateTo] = useState<"ru" | "ro" | "en">("ru");
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const fetchSession = useCallback(async () => {
     try {
@@ -194,6 +207,59 @@ export default function ChatViewPage() {
       hour: "2-digit",
       minute: "2-digit",
     }).format(new Date(dateString));
+  };
+
+  const handleTranslate = async () => {
+    if (!translateText.trim() || isTranslating) return;
+
+    setIsTranslating(true);
+    setTranslateResult("");
+
+    try {
+      const res = await fetch("/api/admin/ai/translate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: translateText,
+          sourceLocale: translateFrom,
+          targetLocale: translateTo,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setTranslateResult(data.translation || "");
+      } else {
+        setTranslateResult("Ошибка перевода");
+      }
+    } catch (error) {
+      console.error("Translation error:", error);
+      setTranslateResult("Ошибка перевода");
+    } finally {
+      setIsTranslating(false);
+    }
+  };
+
+  const swapLanguages = () => {
+    if (translateFrom !== "auto" && translateResult) {
+      setTranslateText(translateResult);
+      setTranslateResult("");
+      const temp = translateFrom;
+      setTranslateFrom(translateTo);
+      setTranslateTo(temp);
+    }
+  };
+
+  const copyTranslation = () => {
+    navigator.clipboard.writeText(translateResult);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const useInMessage = () => {
+    setMessage(translateResult);
+    setTranslateResult("");
+    setTranslateText("");
   };
 
   if (isLoading) {
@@ -459,6 +525,111 @@ export default function ChatViewPage() {
               <p>Язык: {session.locale.toUpperCase()}</p>
               <p>Сообщений: {session.messages.length}</p>
             </div>
+          </div>
+
+          {/* Quick Translator */}
+          <div className="space-y-3 border-t border-border pt-6">
+            <h3 className="font-medium flex items-center gap-2">
+              <Languages className="w-4 h-4" />
+              Быстрый перевод
+            </h3>
+
+            {/* Language selectors */}
+            <div className="flex items-center gap-2">
+              <select
+                value={translateFrom}
+                onChange={(e) => setTranslateFrom(e.target.value as "auto" | "ru" | "ro" | "en")}
+                className="flex-1 px-2 py-1.5 text-sm bg-muted border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              >
+                <option value="auto">Авто</option>
+                <option value="ru">Русский</option>
+                <option value="ro">Română</option>
+                <option value="en">English</option>
+              </select>
+
+              <button
+                onClick={swapLanguages}
+                disabled={translateFrom === "auto" || !translateResult}
+                className="p-1.5 text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
+                title="Поменять языки"
+              >
+                <ArrowRightLeft className="w-4 h-4" />
+              </button>
+
+              <select
+                value={translateTo}
+                onChange={(e) => setTranslateTo(e.target.value as "ru" | "ro" | "en")}
+                className="flex-1 px-2 py-1.5 text-sm bg-muted border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              >
+                <option value="ru">Русский</option>
+                <option value="ro">Română</option>
+                <option value="en">English</option>
+              </select>
+            </div>
+
+            {/* Input */}
+            <textarea
+              value={translateText}
+              onChange={(e) => setTranslateText(e.target.value)}
+              placeholder="Введите текст для перевода..."
+              rows={3}
+              className="w-full px-3 py-2 text-sm bg-muted border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+            />
+
+            {/* Translate button */}
+            <button
+              onClick={handleTranslate}
+              disabled={isTranslating || !translateText.trim()}
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
+            >
+              {isTranslating ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Перевод...
+                </>
+              ) : (
+                <>
+                  <Languages className="w-4 h-4" />
+                  Перевести
+                </>
+              )}
+            </button>
+
+            {/* Result */}
+            {translateResult && (
+              <div className="space-y-2">
+                <div className="p-3 bg-muted/50 border border-border rounded-lg text-sm whitespace-pre-wrap">
+                  {translateResult}
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={copyTranslation}
+                    className="flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 text-xs bg-muted hover:bg-muted/80 rounded-lg transition-colors"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="w-3 h-3 text-green-500" />
+                        Скопировано
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3 h-3" />
+                        Копировать
+                      </>
+                    )}
+                  </button>
+                  {session.isAdminTakeover && (
+                    <button
+                      onClick={useInMessage}
+                      className="flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 text-xs bg-primary/20 text-primary hover:bg-primary/30 rounded-lg transition-colors"
+                    >
+                      <Send className="w-3 h-3" />
+                      В сообщение
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
