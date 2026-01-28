@@ -223,10 +223,18 @@ export default function ProjectEditPage() {
       const url = isNew ? "/api/admin/projects" : `/api/admin/projects/${slug}`;
       const method = isNew ? "POST" : "PUT";
 
+      // Filter out empty translations (keep only those with at least title filled)
+      const filteredTranslations = formData.translations.filter(t => t.title.trim());
+
+      const dataToSend = {
+        ...formData,
+        translations: filteredTranslations,
+      };
+
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(dataToSend),
       });
 
       if (response.ok) {

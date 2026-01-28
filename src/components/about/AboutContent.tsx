@@ -8,6 +8,7 @@ import {
   Send,
   ArrowRight,
   Users,
+  Linkedin,
 } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import type { TeamMember } from "@/lib/db/team";
@@ -175,6 +176,18 @@ export function AboutContent({ founder, team, testimonials, testimonialStats, sk
                     {locale === "ro" ? "Contacteaza" : "Связаться"}
                   </Link>
                 </Button>
+                {founderData.socials.linkedin && (
+                  <Button asChild variant="outline" className="border-[#0A66C2]/30 text-[#0A66C2] hover:bg-[#0A66C2]/10">
+                    <a
+                      href={founderData.socials.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Linkedin className="w-4 h-4 mr-2" />
+                      LinkedIn
+                    </a>
+                  </Button>
+                )}
               </div>
             </motion.div>
 
@@ -346,6 +359,20 @@ export function AboutContent({ founder, team, testimonials, testimonialStats, sk
                         </span>
                       ))}
                     </div>
+                    {/* Social links */}
+                    {member.socials.linkedin && (
+                      <div className={`flex gap-3 mt-4 ${index % 2 === 0 ? 'justify-start md:justify-start' : 'justify-start md:justify-end'}`}>
+                        <a
+                          href={member.socials.linkedin}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg bg-[#0A66C2]/10 text-[#0A66C2] border border-[#0A66C2]/30 hover:bg-[#0A66C2]/20 transition-colors"
+                        >
+                          <Linkedin className="w-4 h-4" />
+                          LinkedIn
+                        </a>
+                      </div>
+                    )}
                   </div>
                 </div>
               </motion.div>
