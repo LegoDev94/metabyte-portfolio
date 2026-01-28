@@ -17,12 +17,25 @@ export async function middleware(request: NextRequest) {
     console.log("[Middleware] Cookies:", allCookies.map(c => c.name).join(", "));
 
     // Get session token (works in edge runtime)
+    // Auth.js v5 uses "authjs" prefix, need to specify cookie name for HTTPS
+    const cookieName = request.url.startsWith("https://")
+      ? "__Secure-authjs.session-token"
+      : "authjs.session-token";
+
+    // Auth.js v5 uses AUTH_SECRET, fallback to NEXTAUTH_SECRET
+    const secret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET;
+
     const token = await getToken({
       req: request,
-      secret: process.env.NEXTAUTH_SECRET,
+      secret,
+      cookieName,
     });
 
+    console.log("[Middleware] Cookie name:", cookieName);
     console.log("[Middleware] Token found:", !!token);
+    if (token) {
+      console.log("[Middleware] Token email:", token.email);
+    }
 
     // Allow access to login page
     if (pathname === "/admin/login") {
