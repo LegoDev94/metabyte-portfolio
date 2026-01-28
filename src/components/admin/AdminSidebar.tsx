@@ -56,6 +56,11 @@ const menuItems = [
 export function AdminSidebar() {
   const pathname = usePathname();
 
+  // Don't show sidebar on login page
+  if (pathname === "/admin/login") {
+    return null;
+  }
+
   const handleLogout = async () => {
     await signOut({ callbackUrl: "/admin/login" });
   };

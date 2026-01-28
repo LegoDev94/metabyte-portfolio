@@ -33,8 +33,9 @@ export default function AdminLoginPage() {
       if (result?.error) {
         setErrorMessage("Неверный email или пароль");
         setIsLoading(false);
-      } else {
-        router.push(callbackUrl);
+      } else if (result?.ok) {
+        // Use window.location for reliable redirect
+        window.location.href = callbackUrl;
       }
     } catch {
       setErrorMessage("Произошла ошибка. Попробуйте снова.");
