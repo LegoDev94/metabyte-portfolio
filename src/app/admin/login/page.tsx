@@ -30,12 +30,21 @@ export default function AdminLoginPage() {
         redirect: false,
       });
 
+      console.log("[Login] signIn result:", JSON.stringify(result, null, 2));
+      console.log("[Login] callbackUrl:", callbackUrl);
+
       if (result?.error) {
+        console.log("[Login] Error from signIn:", result.error);
         setErrorMessage("Неверный email или пароль");
         setIsLoading(false);
       } else if (result?.ok) {
+        console.log("[Login] Success, redirecting to:", callbackUrl);
         // Use window.location for reliable redirect
         window.location.href = callbackUrl;
+      } else {
+        console.log("[Login] Unexpected state - no error but not ok");
+        setErrorMessage("Неожиданная ошибка. Попробуйте снова.");
+        setIsLoading(false);
       }
     } catch {
       setErrorMessage("Произошла ошибка. Попробуйте снова.");
