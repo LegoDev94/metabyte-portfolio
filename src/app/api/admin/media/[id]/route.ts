@@ -105,7 +105,10 @@ export async function PUT(
 
     // Upsert translations
     for (const t of translations) {
-      if (!t.locale || !t.altText) continue;
+      if (!t.locale) continue;
+
+      // Skip if all fields are empty
+      if (!t.altText && !t.title && !t.description) continue;
 
       await prisma.mediaUploadTranslation.upsert({
         where: {
@@ -115,14 +118,14 @@ export async function PUT(
           },
         },
         update: {
-          altText: t.altText,
+          altText: t.altText || "",
           title: t.title || null,
           description: t.description || null,
         },
         create: {
           mediaId: id,
           locale: t.locale,
-          altText: t.altText,
+          altText: t.altText || "",
           title: t.title || null,
           description: t.description || null,
         },
