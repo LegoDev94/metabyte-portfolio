@@ -16,6 +16,8 @@ import {
   Sparkles,
   Loader2,
   Eye,
+  FileText,
+  CheckCircle,
 } from "lucide-react";
 import { MediaPicker } from "@/components/admin/MediaPicker";
 
@@ -39,6 +41,25 @@ interface Technology {
   color: string;
   order: number;
 }
+
+interface CaseStudyTranslation {
+  locale: string;
+  challenge: string;
+  solution: string;
+  results: string[];
+}
+
+interface CaseStudyData {
+  id?: string;
+  translations: CaseStudyTranslation[];
+}
+
+const initialCaseStudyTranslation = (locale: string): CaseStudyTranslation => ({
+  locale,
+  challenge: "",
+  solution: "",
+  results: [],
+});
 
 interface ProjectData {
   slug: string;
@@ -94,6 +115,12 @@ export default function ProjectEditPage() {
     technologies: [],
   });
 
+  const [caseStudy, setCaseStudy] = useState<CaseStudyData>({
+    translations: [initialCaseStudyTranslation("ru"), initialCaseStudyTranslation("ro")],
+  });
+  const [isSavingCaseStudy, setIsSavingCaseStudy] = useState(false);
+  const [resultInput, setResultInput] = useState("");
+
   useEffect(() => {
     if (!isNew) {
       fetchProject();
@@ -118,6 +145,21 @@ export default function ProjectEditPage() {
             : [initialTranslation("ru"), initialTranslation("ro")],
           technologies: data.project.technologies || [],
         });
+
+        // Load case study if exists
+        if (data.project.caseStudy) {
+          setCaseStudy({
+            id: data.project.caseStudy.id,
+            translations: data.project.caseStudy.translations.length > 0
+              ? data.project.caseStudy.translations.map((t: CaseStudyTranslation & { id?: string; caseStudyId?: string }) => ({
+                  locale: t.locale,
+                  challenge: t.challenge,
+                  solution: t.solution,
+                  results: t.results || [],
+                }))
+              : [initialCaseStudyTranslation("ru"), initialCaseStudyTranslation("ro")],
+          });
+        }
       } else {
         setError("Project not found");
       }
@@ -248,6 +290,98 @@ export default function ProjectEditPage() {
       alert("Ошибка генерации");
     } finally {
       setGenerating(null);
+    }
+  };
+
+  // Case Study functions
+  const getCaseStudyTranslation = (locale: string) => {
+    return caseStudy.translations.find((t) => t.locale === locale) || initialCaseStudyTranslation(locale);
+  };
+
+  const updateCaseStudyTranslation = (locale: string, field: keyof CaseStudyTranslation, value: string | string[]) => {
+    setCaseStudy((prev) => ({
+      ...prev,
+      translations: prev.translations.map((t) =>
+        t.locale === locale ? { ...t, [field]: value } : t
+      ),
+    }));
+  };
+
+  const addResult = () => {
+    if (resultInput.trim()) {
+      const currentResults = getCaseStudyTranslation(activeLocale).results;
+      updateCaseStudyTranslation(activeLocale, "results", [...currentResults, resultInput.trim()]);
+      setResultInput("");
+    }
+  };
+
+  const removeResult = (index: number) => {
+    const currentResults = getCaseStudyTranslation(activeLocale).results;
+    updateCaseStudyTranslation(activeLocale, "results", currentResults.filter((_, i) => i !== index));
+  };
+
+  const generateCaseStudyContent = async (locale: string, field: "challenge" | "solution" | "results") => {
+    const key = `casestudy-${locale}-${field}`;
+    setGenerating(key);
+
+    try {
+      const translation = getTranslation(locale);
+      const csTranslation = getCaseStudyTranslation(locale);
+      const res = await fetch("/api/admin/ai/case-study", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          field,
+          locale,
+          context: {
+            projectTitle: translation.title,
+            projectDescription: translation.description || translation.fullDescription,
+            projectCategory: formData.category,
+            technologies: formData.technologies.map((t) => t.name),
+            currentChallenge: csTranslation.challenge,
+            currentSolution: csTranslation.solution,
+          },
+        }),
+      });
+
+      if (!res.ok) throw new Error("AI generation failed");
+
+      const data = await res.json();
+      updateCaseStudyTranslation(locale, field, data.result);
+    } catch (error) {
+      console.error("AI case study generation error:", error);
+      alert("Ошибка генерации");
+    } finally {
+      setGenerating(null);
+    }
+  };
+
+  const saveCaseStudy = async () => {
+    setIsSavingCaseStudy(true);
+    try {
+      const res = await fetch(`/api/admin/projects/${slug}/case-study`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ translations: caseStudy.translations }),
+      });
+
+      if (!res.ok) throw new Error("Failed to save case study");
+
+      const data = await res.json();
+      setCaseStudy({
+        id: data.caseStudy.id,
+        translations: data.caseStudy.translations.map((t: CaseStudyTranslation & { id?: string; caseStudyId?: string }) => ({
+          locale: t.locale,
+          challenge: t.challenge,
+          solution: t.solution,
+          results: t.results || [],
+        })),
+      });
+    } catch (error) {
+      console.error("Save case study error:", error);
+      alert("Ошибка сохранения кейс-стади");
+    } finally {
+      setIsSavingCaseStudy(false);
     }
   };
 
@@ -687,14 +821,180 @@ export default function ProjectEditPage() {
           </div>
         </div>
 
-        {/* Note about case studies */}
+        {/* Case Study */}
         {!isNew && (
-          <div className="bg-muted/50 border border-border rounded-xl p-6">
-            <h2 className="text-lg font-semibold mb-2">Кейс-стади</h2>
-            <p className="text-muted-foreground text-sm">
-              Для редактирования кейс-стади (challenge, solution, архитектура, user flows и т.д.)
-              используйте отдельный раздел управления кейсами.
-            </p>
+          <div className="bg-card border border-border rounded-xl p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold flex items-center gap-2">
+                <FileText className="w-5 h-5" />
+                Кейс-стади
+              </h2>
+              <div className="flex items-center gap-3">
+                <div className="flex rounded-lg border border-border overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => setActiveLocale("ru")}
+                    className={`px-4 py-1.5 text-sm font-medium transition-colors ${
+                      activeLocale === "ru"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-background text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    Русский
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveLocale("ro")}
+                    className={`px-4 py-1.5 text-sm font-medium transition-colors ${
+                      activeLocale === "ro"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-background text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    Română
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  onClick={saveCaseStudy}
+                  disabled={isSavingCaseStudy}
+                  className="flex items-center gap-2 px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
+                >
+                  {isSavingCaseStudy ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Save className="w-4 h-4" />
+                  )}
+                  Сохранить кейс
+                </button>
+              </div>
+            </div>
+
+            {(() => {
+              const csTranslation = getCaseStudyTranslation(activeLocale);
+              return (
+                <div className="space-y-4">
+                  {/* Challenge */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-sm font-medium">Вызов / Проблема</label>
+                      <button
+                        type="button"
+                        onClick={() => generateCaseStudyContent(activeLocale, "challenge")}
+                        disabled={generating === `casestudy-${activeLocale}-challenge`}
+                        className="flex items-center gap-1 px-2 py-1 text-xs bg-primary/20 hover:bg-primary/30 text-primary rounded transition-colors disabled:opacity-50"
+                      >
+                        {generating === `casestudy-${activeLocale}-challenge` ? (
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                        ) : (
+                          <Sparkles className="w-3 h-3" />
+                        )}
+                        AI
+                      </button>
+                    </div>
+                    <textarea
+                      value={csTranslation.challenge}
+                      onChange={(e) => updateCaseStudyTranslation(activeLocale, "challenge", e.target.value)}
+                      placeholder={activeLocale === "ru"
+                        ? "Опишите бизнес-проблему или техническую задачу клиента..."
+                        : "Descrieți problema de afaceri sau sarcina tehnică a clientului..."}
+                      rows={6}
+                      className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                    />
+                  </div>
+
+                  {/* Solution */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-sm font-medium">Решение</label>
+                      <button
+                        type="button"
+                        onClick={() => generateCaseStudyContent(activeLocale, "solution")}
+                        disabled={generating === `casestudy-${activeLocale}-solution`}
+                        className="flex items-center gap-1 px-2 py-1 text-xs bg-primary/20 hover:bg-primary/30 text-primary rounded transition-colors disabled:opacity-50"
+                      >
+                        {generating === `casestudy-${activeLocale}-solution` ? (
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                        ) : (
+                          <Sparkles className="w-3 h-3" />
+                        )}
+                        AI
+                      </button>
+                    </div>
+                    <textarea
+                      value={csTranslation.solution}
+                      onChange={(e) => updateCaseStudyTranslation(activeLocale, "solution", e.target.value)}
+                      placeholder={activeLocale === "ru"
+                        ? "Опишите как METABYTE решил эту задачу..."
+                        : "Descrieți cum METABYTE a rezolvat această sarcină..."}
+                      rows={6}
+                      className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                    />
+                  </div>
+
+                  {/* Results */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-sm font-medium">Результаты</label>
+                      <button
+                        type="button"
+                        onClick={() => generateCaseStudyContent(activeLocale, "results")}
+                        disabled={generating === `casestudy-${activeLocale}-results`}
+                        className="flex items-center gap-1 px-2 py-1 text-xs bg-primary/20 hover:bg-primary/30 text-primary rounded transition-colors disabled:opacity-50"
+                      >
+                        {generating === `casestudy-${activeLocale}-results` ? (
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                        ) : (
+                          <Sparkles className="w-3 h-3" />
+                        )}
+                        AI
+                      </button>
+                    </div>
+                    <div className="flex gap-2 mb-3">
+                      <input
+                        type="text"
+                        value={resultInput}
+                        onChange={(e) => setResultInput(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addResult())}
+                        placeholder={activeLocale === "ru" ? "Новый результат..." : "Rezultat nou..."}
+                        className="flex-1 px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                      />
+                      <button
+                        type="button"
+                        onClick={addResult}
+                        className="px-3 py-2 bg-muted hover:bg-muted/80 rounded-lg transition-colors"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
+                    {csTranslation.results.length === 0 ? (
+                      <p className="text-muted-foreground text-sm py-4 text-center">
+                        Нет результатов. Добавьте или сгенерируйте с помощью AI.
+                      </p>
+                    ) : (
+                      <div className="space-y-2">
+                        {csTranslation.results.map((result, index) => (
+                          <div
+                            key={index}
+                            className="flex items-start gap-2 p-3 bg-muted/50 rounded-lg"
+                          >
+                            <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                            <span className="flex-1 text-sm">{result}</span>
+                            <button
+                              type="button"
+                              onClick={() => removeResult(index)}
+                              className="p-1 text-muted-foreground hover:text-red-500 transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         )}
       </form>
