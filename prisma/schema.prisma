@@ -359,15 +359,23 @@ model IntegrationTranslation {
 }
 
 model GalleryItem {
-  id          String @id @default(cuid())
-  caseStudyId String
-  src         String
-  order       Int    @default(0)
+  id            String          @id @default(cuid())
+  caseStudyId   String
+  type          GalleryItemType @default(IMAGE)
+  src           String          // For images and local videos
+  videoUrl      String?         // For external videos (Vimeo embed URL)
+  videoProvider String?         // vimeo, youtube, local
+  order         Int             @default(0)
 
   caseStudy    CaseStudy                @relation(fields: [caseStudyId], references: [id], onDelete: Cascade)
   translations GalleryItemTranslation[]
 
   @@index([caseStudyId])
+}
+
+enum GalleryItemType {
+  IMAGE
+  VIDEO
 }
 
 model GalleryItemTranslation {

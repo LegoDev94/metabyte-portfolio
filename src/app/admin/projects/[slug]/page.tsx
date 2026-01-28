@@ -101,7 +101,7 @@ export default function ProjectEditPage() {
   const [isLoading, setIsLoading] = useState(!isNew);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [activeLocale, setActiveLocale] = useState<"ru" | "ro">("ru");
+  const [activeLocale, setActiveLocale] = useState<"ru" | "ro" | "en">("ru");
   const [generating, setGenerating] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<ProjectData>({
@@ -111,12 +111,12 @@ export default function ProjectEditPage() {
     video: null,
     featured: false,
     order: 0,
-    translations: [initialTranslation("ru"), initialTranslation("ro")],
+    translations: [initialTranslation("ru"), initialTranslation("ro"), initialTranslation("en")],
     technologies: [],
   });
 
   const [caseStudy, setCaseStudy] = useState<CaseStudyData>({
-    translations: [initialCaseStudyTranslation("ru"), initialCaseStudyTranslation("ro")],
+    translations: [initialCaseStudyTranslation("ru"), initialCaseStudyTranslation("ro"), initialCaseStudyTranslation("en")],
   });
   const [isSavingCaseStudy, setIsSavingCaseStudy] = useState(false);
   const [resultInput, setResultInput] = useState("");
@@ -142,7 +142,7 @@ export default function ProjectEditPage() {
           order: data.project.order,
           translations: data.project.translations.length > 0
             ? data.project.translations
-            : [initialTranslation("ru"), initialTranslation("ro")],
+            : [initialTranslation("ru"), initialTranslation("ro"), initialTranslation("en")],
           technologies: data.project.technologies || [],
         });
 
@@ -253,6 +253,13 @@ export default function ProjectEditPage() {
 
     try {
       const translation = getTranslation(locale);
+
+      // Validate that we have enough context
+      if (!translation.title && !translation.description && !translation.fullDescription) {
+        alert("Сначала заполните название или описание проекта");
+        return;
+      }
+
       const res = await fetch("/api/admin/ai/seo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -261,8 +268,8 @@ export default function ProjectEditPage() {
           field,
           locale,
           context: {
-            projectTitle: translation.title,
-            projectDescription: translation.description || translation.fullDescription,
+            projectTitle: translation.title || "Проект",
+            projectDescription: translation.description || translation.fullDescription || "",
             projectCategory: formData.category,
             currentTitle: translation.metaTitle,
             currentDescription: translation.metaDescription,
@@ -270,7 +277,10 @@ export default function ProjectEditPage() {
         }),
       });
 
-      if (!res.ok) throw new Error("AI generation failed");
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || "AI generation failed");
+      }
 
       const data = await res.json();
 
@@ -287,7 +297,7 @@ export default function ProjectEditPage() {
       }));
     } catch (error) {
       console.error("AI generation error:", error);
-      alert("Ошибка генерации");
+      alert(`Ошибка генерации: ${error instanceof Error ? error.message : "Unknown error"}`);
     } finally {
       setGenerating(null);
     }
@@ -671,24 +681,35 @@ export default function ProjectEditPage() {
               <button
                 type="button"
                 onClick={() => setActiveLocale("ru")}
-                className={`px-4 py-1.5 text-sm font-medium transition-colors ${
+                className={`px-3 py-1.5 text-sm font-medium transition-colors ${
                   activeLocale === "ru"
                     ? "bg-primary text-primary-foreground"
                     : "bg-background text-muted-foreground hover:text-foreground"
                 }`}
               >
-                Русский
+                RU
               </button>
               <button
                 type="button"
                 onClick={() => setActiveLocale("ro")}
-                className={`px-4 py-1.5 text-sm font-medium transition-colors ${
+                className={`px-3 py-1.5 text-sm font-medium transition-colors ${
                   activeLocale === "ro"
                     ? "bg-primary text-primary-foreground"
                     : "bg-background text-muted-foreground hover:text-foreground"
                 }`}
               >
-                Română
+                RO
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveLocale("en")}
+                className={`px-3 py-1.5 text-sm font-medium transition-colors ${
+                  activeLocale === "en"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-background text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                EN
               </button>
             </div>
           </div>
@@ -834,24 +855,35 @@ export default function ProjectEditPage() {
                   <button
                     type="button"
                     onClick={() => setActiveLocale("ru")}
-                    className={`px-4 py-1.5 text-sm font-medium transition-colors ${
+                    className={`px-3 py-1.5 text-sm font-medium transition-colors ${
                       activeLocale === "ru"
                         ? "bg-primary text-primary-foreground"
                         : "bg-background text-muted-foreground hover:text-foreground"
                     }`}
                   >
-                    Русский
+                    RU
                   </button>
                   <button
                     type="button"
                     onClick={() => setActiveLocale("ro")}
-                    className={`px-4 py-1.5 text-sm font-medium transition-colors ${
+                    className={`px-3 py-1.5 text-sm font-medium transition-colors ${
                       activeLocale === "ro"
                         ? "bg-primary text-primary-foreground"
                         : "bg-background text-muted-foreground hover:text-foreground"
                     }`}
                   >
-                    Română
+                    RO
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveLocale("en")}
+                    className={`px-3 py-1.5 text-sm font-medium transition-colors ${
+                      activeLocale === "en"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-background text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    EN
                   </button>
                 </div>
                 <button
