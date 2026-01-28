@@ -3,9 +3,14 @@ import { requireAdmin } from "@/lib/admin/auth";
 import OpenAI from "openai";
 import { z } from "zod";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Lazy initialization to avoid build-time errors
+let openai: OpenAI | null = null;
+function getOpenAI() {
+  if (!openai) {
+    openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  }
+  return openai;
+}
 
 const generateSchema = z.object({
   field: z.enum(["challenge", "solution", "results"]),
@@ -33,7 +38,7 @@ export async function POST(request: NextRequest) {
 
     const prompt = buildPrompt(field, locale, context);
 
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAI().chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {
