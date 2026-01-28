@@ -23,10 +23,10 @@ const updateProjectSchema = z.object({
     description: z.string().min(1),
     fullDescription: z.string().min(1),
     categoryLabel: z.string().min(1),
-    // SEO fields
-    metaTitle: z.string().optional(),
-    metaDescription: z.string().optional(),
-    metaKeywords: z.array(z.string()).optional(),
+    // SEO fields (nullable from DB)
+    metaTitle: z.string().nullable().optional(),
+    metaDescription: z.string().nullable().optional(),
+    metaKeywords: z.array(z.string()).nullable().optional(),
   })).optional(),
   technologies: z.array(z.object({
     id: z.string().optional(),
@@ -187,11 +187,19 @@ export async function PUT(
         await tx.projectTranslation.deleteMany({
           where: { projectId: updated.id },
         });
-        // Create new translations
+        // Create new translations (sanitize null values)
         await tx.projectTranslation.createMany({
           data: validatedData.translations.map((t) => ({
             projectId: updated.id,
-            ...t,
+            locale: t.locale,
+            title: t.title,
+            subtitle: t.subtitle,
+            description: t.description,
+            fullDescription: t.fullDescription,
+            categoryLabel: t.categoryLabel,
+            metaTitle: t.metaTitle || undefined,
+            metaDescription: t.metaDescription || undefined,
+            metaKeywords: t.metaKeywords || [],
           })),
         });
       }

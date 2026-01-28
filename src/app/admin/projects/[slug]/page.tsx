@@ -224,13 +224,21 @@ export default function ProjectEditPage() {
       const method = isNew ? "POST" : "PUT";
 
       // Filter out incomplete translations (keep only fully filled ones)
-      const filteredTranslations = formData.translations.filter(t =>
-        t.title.trim() &&
-        t.subtitle.trim() &&
-        t.description.trim() &&
-        t.fullDescription.trim() &&
-        t.categoryLabel.trim()
-      );
+      // Also sanitize SEO fields (convert null to empty string)
+      const filteredTranslations = formData.translations
+        .filter(t =>
+          t.title.trim() &&
+          t.subtitle.trim() &&
+          t.description.trim() &&
+          t.fullDescription.trim() &&
+          t.categoryLabel.trim()
+        )
+        .map(t => ({
+          ...t,
+          metaTitle: t.metaTitle || "",
+          metaDescription: t.metaDescription || "",
+          metaKeywords: t.metaKeywords || [],
+        }));
 
       // For new projects, require at least one complete translation
       if (isNew && filteredTranslations.length === 0) {
