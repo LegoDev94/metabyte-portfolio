@@ -6,6 +6,7 @@ import "./globals.css";
 import { AIAssistant } from "@/components/ai-assistant";
 import { KeepAlive } from "@/components/KeepAlive";
 import { LocaleProvider } from "@/components/providers/LocaleProvider";
+import { PageViewTracker } from "@/components/analytics/PageViewTracker";
 import { getUIStrings } from "@/lib/db/ui-strings";
 import { normalizeLocale } from "@/lib/db/utils/i18n";
 
@@ -69,6 +70,7 @@ export default async function RootLayout({
             {children}
             <AIAssistant />
             <KeepAlive />
+            <PageViewTracker />
           </LocaleProvider>
         </NextIntlClientProvider>
       </body>

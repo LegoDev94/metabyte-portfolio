@@ -75,7 +75,14 @@ interface ClientInfo {
 // ============================================
 
 const STORAGE_KEY = "metabyte_ai_assistant";
+const VISITOR_ID_KEY = "metabyte_visitor_id";
+const SESSION_TOKEN_KEY = "metabyte_session_token";
 const INTRO_DELAY = 2000; // Задержка перед появлением (после загрузки страницы)
+
+// Generate a random ID
+const generateId = () => {
+  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+};
 
 // ============================================
 // COMPONENT
@@ -110,6 +117,11 @@ export function AIAssistant() {
   const [showGame, setShowGame] = useState(false);
   const [hasPlayedGame, setHasPlayedGame] = useState(false);
   const [wonDiscount, setWonDiscount] = useState(false);
+
+  // Session tracking for admin chat monitoring
+  const [visitorId, setVisitorId] = useState<string | null>(null);
+  const [sessionToken, setSessionToken] = useState<string | null>(null);
+  const [adminTakeover, setAdminTakeover] = useState(false);
 
   // AI Effects hook
   const aiEffects = useAIEffects();
@@ -160,6 +172,22 @@ export function AIAssistant() {
     // Получаем город по IP
     fetchUserCity();
 
+    // Initialize visitor ID (persistent)
+    let storedVisitorId = localStorage.getItem(VISITOR_ID_KEY);
+    if (!storedVisitorId) {
+      storedVisitorId = generateId();
+      localStorage.setItem(VISITOR_ID_KEY, storedVisitorId);
+    }
+    setVisitorId(storedVisitorId);
+
+    // Initialize session token (new for each browser session)
+    let storedSessionToken = sessionStorage.getItem(SESSION_TOKEN_KEY);
+    if (!storedSessionToken) {
+      storedSessionToken = generateId();
+      sessionStorage.setItem(SESSION_TOKEN_KEY, storedSessionToken);
+    }
+    setSessionToken(storedSessionToken);
+
     // Отмечаем что загрузились
     const timer = setTimeout(() => {
       setIsLoaded(true);
@@ -184,6 +212,63 @@ export function AIAssistant() {
   useEffect(() => {
     clientInfoRef.current = clientInfo;
   }, [clientInfo]);
+
+  // SSE connection for admin messages
+  useEffect(() => {
+    if (!sessionToken || typeof window === "undefined") return;
+
+    const eventSource = new EventSource(`/api/chat/sse?sessionToken=${sessionToken}`);
+
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+
+        if (data.type === "new_message" && data.data?.message) {
+          const msg = data.data.message;
+          // Only add messages from admin (AI messages are already added locally)
+          if (msg.role === "ADMIN") {
+            setMessages((prev) => [
+              ...prev,
+              { role: "assistant", content: `[Администратор]: ${msg.content}` },
+            ]);
+            setHasNewMessage(true);
+          }
+        } else if (data.type === "admin_joined") {
+          setAdminTakeover(true);
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: "assistant",
+              content: locale === "ro"
+                ? "Dezvoltatorul s-a alaturat conversatiei! Acum puteti vorbi direct cu el. 👨‍💻"
+                : "К разговору подключился разработчик! Теперь вы общаетесь напрямую с ним. 👨‍💻",
+            },
+          ]);
+        } else if (data.type === "admin_left") {
+          setAdminTakeover(false);
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: "assistant",
+              content: locale === "ro"
+                ? "Dezvoltatorul a plecat. Eu, asistentul AI, sunt din nou aici! 🤖"
+                : "Разработчик отключился. Снова с вами я, AI-ассистент! 🤖",
+            },
+          ]);
+        }
+      } catch (error) {
+        console.error("SSE message parse error:", error);
+      }
+    };
+
+    eventSource.onerror = () => {
+      console.log("SSE connection error, will retry...");
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, [sessionToken, locale]);
 
   // Сохранение в localStorage при изменениях
   useEffect(() => {
@@ -239,6 +324,8 @@ export function AIAssistant() {
           isFirstVisit: true,
           isIntroduction: true,
           locale,
+          visitorId,
+          sessionToken,
         }),
       });
 
@@ -693,12 +780,21 @@ export function AIAssistant() {
           hasPlayedGame, // Играл ли уже в крестики-нолики
           wonDiscount, // Выиграл ли скидку
           locale, // Язык интерфейса для ответов AI
+          visitorId,
+          sessionToken,
         }),
       });
 
       if (response.ok) {
         const data = await response.json();
         console.log("AI Response:", data);
+
+        // If admin has taken over, don't process AI response
+        if (data.adminTakeover) {
+          setAdminTakeover(true);
+          // Message will come via SSE from admin
+          return;
+        }
 
         let messageText = data.message || "";
 

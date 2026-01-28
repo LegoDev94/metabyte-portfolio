@@ -1,4 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  getOrCreateVisitor,
+  getOrCreateChatSession,
+  addChatMessage,
+  isSessionAdminTakeover,
+  updateVisitorContact,
+} from "@/lib/db/chat";
+import { broadcastNewMessage, broadcastContactCollected, broadcastSessionStarted } from "@/lib/admin/sse";
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
@@ -523,6 +531,9 @@ export async function POST(request: NextRequest) {
       hasPlayedGame,
       wonDiscount,
       locale,
+      // New fields for session tracking
+      visitorId,
+      sessionToken,
     } = body as {
       actions: UserAction[];
       conversationHistory: Message[];
@@ -536,7 +547,86 @@ export async function POST(request: NextRequest) {
       clientContact?: string;
       hasPlayedGame?: boolean;
       wonDiscount?: boolean;
+      visitorId?: string;
+      sessionToken?: string;
     };
+
+    // Session tracking (if visitorId and sessionToken provided)
+    let chatSessionId: string | null = null;
+    let adminTakeover = false;
+
+    if (visitorId && sessionToken) {
+      try {
+        // Get IP and user agent for visitor tracking
+        const ipAddress = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+                         request.headers.get("x-real-ip") || undefined;
+        const userAgent = request.headers.get("user-agent") || undefined;
+
+        // Get or create visitor
+        await getOrCreateVisitor({
+          visitorId,
+          ipAddress,
+          userAgent,
+          city: userCity,
+        });
+
+        // Get or create chat session
+        const chatSession = await getOrCreateChatSession({
+          visitorId,
+          sessionToken,
+          currentPage,
+          locale,
+        });
+
+        chatSessionId = chatSession.id;
+
+        // Check if admin has taken over
+        adminTakeover = await isSessionAdminTakeover(chatSessionId);
+
+        // Broadcast session started if new session
+        if (chatSession.messages.length === 0 && isIntroduction) {
+          broadcastSessionStarted(chatSessionId, {
+            id: chatSession.visitor.id,
+            city: chatSession.visitor.city,
+            country: chatSession.visitor.country,
+          });
+        }
+
+        // Store user message (if not introduction)
+        if (!isIntroduction && conversationHistory.length > 0) {
+          const lastUserMessage = conversationHistory[conversationHistory.length - 1];
+          if (lastUserMessage?.role === "user") {
+            const storedMessage = await addChatMessage({
+              sessionId: chatSessionId,
+              role: "USER",
+              content: lastUserMessage.content,
+            });
+            broadcastNewMessage(
+              chatSessionId,
+              {
+                id: storedMessage.id,
+                role: "USER",
+                content: storedMessage.content,
+                createdAt: storedMessage.createdAt,
+              },
+              sessionToken
+            );
+          }
+        }
+      } catch (sessionError) {
+        // Log but don't fail the request if session tracking fails
+        console.error("Session tracking error:", sessionError);
+      }
+    }
+
+    // If admin has taken over, don't process with AI
+    if (adminTakeover) {
+      return NextResponse.json({
+        message: "",
+        functionCalls: [],
+        adminTakeover: true,
+      });
+    }
 
     // Уведомление о новом посетителе
     if (isIntroduction && isFirstVisit) {
@@ -689,6 +779,25 @@ export async function POST(request: NextRequest) {
             `📍 Страница: ${currentPage}\n\n` +
             `⏰ ${new Date().toLocaleString("ru-RU", { timeZone: "Europe/Moscow" })}`
           );
+
+          // Store contact in database and broadcast
+          if (visitorId && chatSessionId) {
+            try {
+              await updateVisitorContact({
+                visitorId,
+                name: args.name,
+                contact: args.contact,
+                message: args.message,
+                source: "ai_assistant",
+              });
+              broadcastContactCollected(chatSessionId, {
+                name: args.name,
+                contact: args.contact,
+              });
+            } catch (contactError) {
+              console.error("Error saving visitor contact:", contactError);
+            }
+          }
         }
 
         if (call.name === "askForContact") {
@@ -724,6 +833,30 @@ export async function POST(request: NextRequest) {
             );
           }
         }
+      }
+    }
+
+    // Store AI response in database and broadcast
+    if (chatSessionId && assistantMessage.content) {
+      try {
+        const storedResponse = await addChatMessage({
+          sessionId: chatSessionId,
+          role: "ASSISTANT",
+          content: assistantMessage.content,
+          metadata: functionCalls.length > 0 ? { functionCalls } : undefined,
+        });
+        broadcastNewMessage(
+          chatSessionId,
+          {
+            id: storedResponse.id,
+            role: "ASSISTANT",
+            content: storedResponse.content,
+            createdAt: storedResponse.createdAt,
+          },
+          sessionToken
+        );
+      } catch (storeError) {
+        console.error("Error storing AI response:", storeError);
       }
     }
 

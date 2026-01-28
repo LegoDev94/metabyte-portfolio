@@ -714,3 +714,187 @@ model ProjectCategoryTranslation {
   @@unique([categoryId, locale])
   @@index([locale])
 }
+
+// ==================== ADMIN PANEL ====================
+
+model AdminUser {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  role         AdminRole @default(ADMIN)
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  auditLogs AdminAuditLog[]
+
+  @@map("admin_users")
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+}
+
+model AdminAuditLog {
+  id         String   @id @default(cuid())
+  adminId    String
+  action     String
+  targetType String?
+  targetId   String?
+  details    Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  admin AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([action])
+  @@index([targetType, targetId])
+  @@index([createdAt])
+  @@map("admin_audit_logs")
+}
+
+// ==================== VISITOR TRACKING ====================
+
+model Visitor {
+  id           String   @id @default(cuid())
+  visitorId    String   @unique // UUID from localStorage
+  ipAddress    String?
+  userAgent    String?
+  city         String?
+  country      String?
+  firstVisitAt DateTime @default(now())
+  lastVisitAt  DateTime @updatedAt
+  totalVisits  Int      @default(1)
+
+  chatSessions ChatSession[]
+  pageViews    PageView[]
+  contact      VisitorContact?
+
+  @@index([city])
+  @@index([country])
+  @@index([lastVisitAt])
+  @@map("visitors")
+}
+
+model VisitorContact {
+  id          String   @id @default(cuid())
+  visitorId   String   @unique
+  name        String
+  contact     String // Telegram or phone
+  message     String?  @db.Text
+  source      String   @default("ai_assistant") // ai_assistant, contact_form
+  collectedAt DateTime @default(now())
+
+  visitor Visitor @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+
+  @@map("visitor_contacts")
+}
+
+// ==================== CHAT SESSIONS ====================
+
+model ChatSession {
+  id              String     @id @default(cuid())
+  visitorId       String
+  sessionToken    String     @unique @default(cuid())
+  status          ChatStatus @default(ACTIVE)
+  startedAt       DateTime   @default(now())
+  endedAt         DateTime?
+  lastActivityAt  DateTime   @updatedAt
+  currentPage     String?
+  locale          String     @default("ru")
+  isAdminTakeover Boolean    @default(false)
+  adminTakeoverBy String?
+
+  visitor  Visitor       @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  messages ChatMessage[]
+
+  @@index([status])
+  @@index([lastActivityAt])
+  @@index([isAdminTakeover])
+  @@map("chat_sessions")
+}
+
+enum ChatStatus {
+  ACTIVE
+  ADMIN_ACTIVE
+  ENDED
+  ABANDONED
+}
+
+model ChatMessage {
+  id        String      @id @default(cuid())
+  sessionId String
+  role      MessageRole
+  content   String      @db.Text
+  metadata  Json? // Function calls, effects shown, etc.
+  createdAt DateTime    @default(now())
+
+  session ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, createdAt])
+  @@map("chat_messages")
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  ADMIN
+  SYSTEM
+}
+
+// ==================== PAGE ANALYTICS ====================
+
+model PageView {
+  id          String   @id @default(cuid())
+  visitorId   String
+  path        String
+  title       String?
+  referrer    String?
+  duration    Int? // Seconds on page
+  scrollDepth Int? // Max scroll percentage
+  createdAt   DateTime @default(now())
+
+  visitor Visitor @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+
+  @@index([path])
+  @@index([createdAt])
+  @@index([visitorId])
+  @@map("page_views")
+}
+
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  visitorId String?
+  eventType String // click, scroll, form_submit, project_view, etc.
+  eventData Json?
+  page      String
+  createdAt DateTime @default(now())
+
+  @@index([eventType])
+  @@index([createdAt])
+  @@map("analytics_events")
+}
+
+// ==================== MEDIA UPLOADS ====================
+
+model MediaUpload {
+  id           String   @id @default(cuid())
+  filename     String
+  originalName String
+  mimeType     String
+  size         Int // bytes
+  url          String
+  bucket       String   @default("portfolio-media")
+  path         String
+  uploadedBy   String // AdminUser id
+  linkedTo     String? // project:slug, testimonial:id, etc.
+  createdAt    DateTime @default(now())
+
+  @@index([linkedTo])
+  @@index([createdAt])
+  @@map("media_uploads")
+}

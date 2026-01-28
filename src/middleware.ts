@@ -1,11 +1,35 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getLocaleFromCountry, defaultLocale, locales, type Locale } from "./i18n/config";
+import { auth } from "@/lib/admin/auth";
 
 const LOCALE_COOKIE = "locale";
 const COUNTRY_COOKIE = "user-country";
 
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Admin route protection
+  if (pathname.startsWith("/admin")) {
+    // Allow access to login page
+    if (pathname === "/admin/login") {
+      // If already authenticated, redirect to dashboard
+      const session = await auth();
+      if (session?.user) {
+        return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+      }
+      return NextResponse.next();
+    }
+
+    // Check authentication for all other admin routes
+    const session = await auth();
+    if (!session?.user) {
+      const loginUrl = new URL("/admin/login", request.url);
+      loginUrl.searchParams.set("callbackUrl", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
   const response = NextResponse.next();
 
   // Check if locale cookie already exists
@@ -76,8 +100,8 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     // Match all paths except:
-    // - API routes that start with /api
+    // - API routes that start with /api (except /api/auth for NextAuth)
     // - Static files (_next/static, _next/image, favicon.ico, etc.)
-    "/((?!api|_next/static|_next/image|favicon.ico|.*\\..*$).*)",
+    "/((?!api(?!/auth)|_next/static|_next/image|favicon.ico|.*\\..*$).*)",
   ],
 };
