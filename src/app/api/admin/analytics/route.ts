@@ -53,10 +53,11 @@ export async function GET(request: NextRequest) {
         },
       }),
 
-      // Total page views in period
+      // Total page views in period (excluding admin pages)
       prisma.pageView.count({
         where: {
           createdAt: { gte: startDate },
+          NOT: { path: { startsWith: "/admin" } },
         },
       }),
 
@@ -93,11 +94,12 @@ export async function GET(request: NextRequest) {
         take: 10,
       }),
 
-      // Top pages (top 10)
+      // Top pages (top 10, excluding admin pages)
       prisma.pageView.groupBy({
         by: ["path"],
         where: {
           createdAt: { gte: startDate },
+          NOT: { path: { startsWith: "/admin" } },
         },
         _count: { path: true },
         orderBy: { _count: { path: "desc" } },

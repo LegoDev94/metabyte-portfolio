@@ -18,6 +18,9 @@ export function PageViewTracker() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
+    // Skip tracking for admin pages
+    if (pathname.startsWith("/admin")) return;
+
     // Get or create visitor ID
     let visitorId = localStorage.getItem(VISITOR_ID_KEY);
     if (!visitorId) {
