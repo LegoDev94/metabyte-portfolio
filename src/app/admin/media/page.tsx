@@ -63,7 +63,7 @@ export default function MediaPage() {
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [previewItem, setPreviewItem] = useState<MediaItem | null>(null);
-  const [seoLocale, setSeoLocale] = useState<"ru" | "ro">("ru");
+  const [seoLocale, setSeoLocale] = useState<"ru" | "ro" | "en">("ru");
   const [seoData, setSeoData] = useState<Record<string, MediaTranslation>>({});
   const [isSavingSeo, setIsSavingSeo] = useState(false);
   const [generating, setGenerating] = useState<string | null>(null);
@@ -181,7 +181,7 @@ export default function MediaPage() {
   // Initialize SEO data when preview item changes
   const initializeSeoData = (item: MediaItem) => {
     const data: Record<string, MediaTranslation> = {};
-    ["ru", "ro"].forEach((locale) => {
+    ["ru", "ro", "en"].forEach((locale) => {
       const existing = item.translations?.find((t) => t.locale === locale);
       data[locale] = existing || {
         locale,
@@ -220,14 +220,25 @@ export default function MediaPage() {
         body: JSON.stringify({ translations }),
       });
 
-      if (!res.ok) throw new Error("Failed to save SEO");
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to save SEO");
+      }
 
-      // Update local media state with new translations
-      setMedia((prev) =>
-        prev.map((m) =>
-          m.id === previewItem.id ? { ...m, translations } : m
-        )
-      );
+      const { media: updatedMedia } = await res.json();
+
+      // Update local media state with server response
+      if (updatedMedia) {
+        setMedia((prev) =>
+          prev.map((m) =>
+            m.id === previewItem.id ? updatedMedia : m
+          )
+        );
+        // Update preview item too
+        setPreviewItem(updatedMedia);
+        // Re-initialize seoData from server response
+        initializeSeoData(updatedMedia);
+      }
     } catch (error) {
       console.error("Save SEO error:", error);
       alert("Ошибка сохранения SEO данных");
@@ -752,7 +763,7 @@ export default function MediaPage() {
                               : "bg-muted text-muted-foreground"
                           }`}
                         >
-                          Русский
+                          RU
                         </button>
                         <button
                           onClick={() => setSeoLocale("ro")}
@@ -762,7 +773,17 @@ export default function MediaPage() {
                               : "bg-muted text-muted-foreground"
                           }`}
                         >
-                          Română
+                          RO
+                        </button>
+                        <button
+                          onClick={() => setSeoLocale("en")}
+                          className={`px-3 py-1 text-xs rounded ${
+                            seoLocale === "en"
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          EN
                         </button>
                       </div>
                     </div>
