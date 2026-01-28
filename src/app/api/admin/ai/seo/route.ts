@@ -9,7 +9,7 @@ const openai = new OpenAI({
 
 const generateSchema = z.object({
   type: z.enum(["page", "project", "media"]),
-  field: z.enum(["title", "description", "keywords", "altText"]),
+  field: z.enum(["title", "description", "keywords", "altText", "name"]),
   locale: z.enum(["ru", "ro", "en"]),
   context: z.object({
     pageKey: z.string().optional(),
@@ -17,7 +17,7 @@ const generateSchema = z.object({
     projectDescription: z.string().optional(),
     projectCategory: z.string().optional(),
     mediaFilename: z.string().optional(),
-    mediaLinkedTo: z.string().optional(),
+    mediaLinkedTo: z.string().optional().nullable(),
     currentTitle: z.string().optional(),
     currentDescription: z.string().optional(),
   }),
@@ -69,6 +69,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
+      console.error("AI SEO validation error:", error.issues);
       return NextResponse.json(
         { error: "Validation failed", details: error.issues },
         { status: 400 }
@@ -190,6 +191,15 @@ Filename: ${context.mediaFilename || "image.jpg"}
 Used for: ${context.mediaLinkedTo || "portfolio website"}
 Language: ${localeName}
 Character limit: 70`;
+    }
+
+    if (field === "name") {
+      return `Generate a short, descriptive display name for an image file.
+Current filename: ${context.mediaFilename || "image.jpg"}
+Used for: ${context.mediaLinkedTo || "portfolio website"}
+Language: ${localeName}
+Character limit: 50
+Make it human-readable and descriptive. No file extension needed.`;
     }
 
     if (field === "description") {

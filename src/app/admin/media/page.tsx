@@ -236,9 +236,9 @@ export default function MediaPage() {
     }
   };
 
-  const generateAltText = async (locale: string) => {
+  const generateSeoField = async (locale: string, field: "altText" | "title" | "description") => {
     if (!previewItem) return;
-    setGenerating(`${locale}-alt`);
+    setGenerating(`${locale}-${field}`);
 
     try {
       const res = await fetch("/api/admin/ai/seo", {
@@ -246,19 +246,23 @@ export default function MediaPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           type: "media",
-          field: "altText",
+          field,
           locale,
           context: {
             mediaFilename: previewItem.originalName,
-            mediaLinkedTo: previewItem.linkedTo,
+            mediaLinkedTo: previewItem.linkedTo || null,
           },
         }),
       });
 
-      if (!res.ok) throw new Error("AI generation failed");
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        console.error("AI generation error response:", errorData);
+        throw new Error("AI generation failed");
+      }
 
       const data = await res.json();
-      updateSeoField(locale, "altText", data.result);
+      updateSeoField(locale, field, data.result);
     } catch (error) {
       console.error("AI generation error:", error);
       alert("Ошибка генерации");
@@ -780,12 +784,12 @@ export default function MediaPage() {
                           className="flex-1 px-3 py-2 bg-background border border-border rounded-lg text-sm"
                         />
                         <button
-                          onClick={() => generateAltText(seoLocale)}
-                          disabled={generating === `${seoLocale}-alt`}
+                          onClick={() => generateSeoField(seoLocale, "altText")}
+                          disabled={generating === `${seoLocale}-altText`}
                           className="px-3 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors disabled:opacity-50"
                           title="Сгенерировать с AI"
                         >
-                          {generating === `${seoLocale}-alt` ? (
+                          {generating === `${seoLocale}-altText` ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
                           ) : (
                             <Sparkles className="w-4 h-4" />
@@ -796,26 +800,64 @@ export default function MediaPage() {
 
                     {/* Title */}
                     <div>
-                      <label className="text-sm font-medium block mb-1">Title</label>
-                      <input
-                        type="text"
-                        value={seoData[seoLocale]?.title || ""}
-                        onChange={(e) => updateSeoField(seoLocale, "title", e.target.value)}
-                        placeholder="Заголовок изображения"
-                        className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm"
-                      />
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-sm font-medium">Title</label>
+                        <span className="text-xs text-muted-foreground">
+                          {seoData[seoLocale]?.title?.length || 0}/70
+                        </span>
+                      </div>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={seoData[seoLocale]?.title || ""}
+                          onChange={(e) => updateSeoField(seoLocale, "title", e.target.value)}
+                          placeholder="Заголовок изображения"
+                          className="flex-1 px-3 py-2 bg-background border border-border rounded-lg text-sm"
+                        />
+                        <button
+                          onClick={() => generateSeoField(seoLocale, "title")}
+                          disabled={generating === `${seoLocale}-title`}
+                          className="px-3 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors disabled:opacity-50"
+                          title="Сгенерировать с AI"
+                        >
+                          {generating === `${seoLocale}-title` ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Sparkles className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
                     </div>
 
                     {/* Description */}
                     <div>
-                      <label className="text-sm font-medium block mb-1">Description</label>
-                      <textarea
-                        value={seoData[seoLocale]?.description || ""}
-                        onChange={(e) => updateSeoField(seoLocale, "description", e.target.value)}
-                        placeholder="Подробное описание изображения"
-                        rows={2}
-                        className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm resize-none"
-                      />
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-sm font-medium">Description</label>
+                        <span className="text-xs text-muted-foreground">
+                          {seoData[seoLocale]?.description?.length || 0}/200
+                        </span>
+                      </div>
+                      <div className="flex gap-2">
+                        <textarea
+                          value={seoData[seoLocale]?.description || ""}
+                          onChange={(e) => updateSeoField(seoLocale, "description", e.target.value)}
+                          placeholder="Подробное описание изображения"
+                          rows={2}
+                          className="flex-1 px-3 py-2 bg-background border border-border rounded-lg text-sm resize-none"
+                        />
+                        <button
+                          onClick={() => generateSeoField(seoLocale, "description")}
+                          disabled={generating === `${seoLocale}-description`}
+                          className="px-3 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors disabled:opacity-50 self-start"
+                          title="Сгенерировать с AI"
+                        >
+                          {generating === `${seoLocale}-description` ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Sparkles className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
                     </div>
 
                     {/* Save button */}
