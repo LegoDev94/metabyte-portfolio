@@ -6,11 +6,16 @@ import { z } from "zod";
 const caseStudySchema = z.object({
   translations: z.array(z.object({
     locale: z.string(),
-    challenge: z.string().min(1),
-    solution: z.string().min(1),
+    challenge: z.string(),
+    solution: z.string(),
     results: z.array(z.string()),
   })),
 });
+
+// Filter translations - keep only those with at least challenge or solution filled
+function filterValidTranslations(translations: { locale: string; challenge: string; solution: string; results: string[] }[]) {
+  return translations.filter(t => t.challenge.trim() || t.solution.trim());
+}
 
 // GET - Get case study for project
 export async function GET(
@@ -66,6 +71,9 @@ export async function PUT(
     const body = await request.json();
     const validatedData = caseStudySchema.parse(body);
 
+    // Filter out empty translations
+    const validTranslations = filterValidTranslations(validatedData.translations);
+
     // Find project
     const project = await prisma.project.findUnique({
       where: { slug },
@@ -86,13 +94,15 @@ export async function PUT(
           where: { caseStudyId: project.caseStudy!.id },
         });
 
-        // Create new translations
-        await tx.caseStudyTranslation.createMany({
-          data: validatedData.translations.map((t) => ({
-            caseStudyId: project.caseStudy!.id,
-            ...t,
-          })),
-        });
+        // Create new translations (only valid ones)
+        if (validTranslations.length > 0) {
+          await tx.caseStudyTranslation.createMany({
+            data: validTranslations.map((t) => ({
+              caseStudyId: project.caseStudy!.id,
+              ...t,
+            })),
+          });
+        }
 
         return tx.caseStudy.findUnique({
           where: { id: project.caseStudy!.id },
@@ -100,12 +110,18 @@ export async function PUT(
         });
       });
     } else {
-      // Create new case study
+      // Create new case study only if we have valid translations
+      if (validTranslations.length === 0) {
+        return NextResponse.json({
+          error: "At least one translation with challenge or solution is required"
+        }, { status: 400 });
+      }
+
       caseStudy = await prisma.caseStudy.create({
         data: {
           projectId: project.id,
           translations: {
-            create: validatedData.translations,
+            create: validTranslations,
           },
         },
         include: { translations: true },
