@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
 import { getLocaleFromCountry, defaultLocale, locales, type Locale } from "./i18n/config";
-import { auth } from "@/lib/admin/auth";
 
 const LOCALE_COOKIE = "locale";
 const COUNTRY_COOKIE = "user-country";
@@ -11,19 +11,23 @@ export async function middleware(request: NextRequest) {
 
   // Admin route protection
   if (pathname.startsWith("/admin")) {
+    // Get session token (works in edge runtime)
+    const token = await getToken({
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+
     // Allow access to login page
     if (pathname === "/admin/login") {
       // If already authenticated, redirect to dashboard
-      const session = await auth();
-      if (session?.user) {
+      if (token) {
         return NextResponse.redirect(new URL("/admin/dashboard", request.url));
       }
       return NextResponse.next();
     }
 
     // Check authentication for all other admin routes
-    const session = await auth();
-    if (!session?.user) {
+    if (!token) {
       const loginUrl = new URL("/admin/login", request.url);
       loginUrl.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(loginUrl);
