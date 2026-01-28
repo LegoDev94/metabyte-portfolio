@@ -11,11 +11,18 @@ export async function middleware(request: NextRequest) {
 
   // Admin route protection
   if (pathname.startsWith("/admin")) {
+    // Debug: log all cookies
+    const allCookies = request.cookies.getAll();
+    console.log("[Middleware] Path:", pathname);
+    console.log("[Middleware] Cookies:", allCookies.map(c => c.name).join(", "));
+
     // Get session token (works in edge runtime)
     const token = await getToken({
       req: request,
       secret: process.env.NEXTAUTH_SECRET,
     });
+
+    console.log("[Middleware] Token found:", !!token);
 
     // Allow access to login page
     if (pathname === "/admin/login") {
