@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
@@ -55,8 +56,38 @@ const menuItems = [
   },
 ];
 
+interface BadgeCounts {
+  contacts: number;
+}
+
 export function AdminSidebar() {
   const pathname = usePathname();
+  const [badges, setBadges] = useState<BadgeCounts>({ contacts: 0 });
+
+  const fetchBadgeCounts = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/contacts/count");
+      if (res.ok) {
+        const data = await res.json();
+        setBadges((prev) => ({ ...prev, contacts: data.total || 0 }));
+      }
+    } catch (error) {
+      console.error("Failed to fetch badge counts:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Don't fetch on login page
+    if (pathname === "/admin/login") return;
+
+    // Initial fetch
+    fetchBadgeCounts();
+
+    // Poll every 30 seconds for real-time updates
+    const interval = setInterval(fetchBadgeCounts, 30000);
+
+    return () => clearInterval(interval);
+  }, [pathname, fetchBadgeCounts]);
 
   // Don't show sidebar on login page
   if (pathname === "/admin/login") {
@@ -65,6 +96,12 @@ export function AdminSidebar() {
 
   const handleLogout = async () => {
     await signOut({ callbackUrl: "/admin/login" });
+  };
+
+  // Get badge count for a specific menu item
+  const getBadgeCount = (href: string): number => {
+    if (href === "/admin/contacts") return badges.contacts;
+    return 0;
   };
 
   return (
@@ -91,6 +128,7 @@ export function AdminSidebar() {
               {group.items.map((item) => {
                 const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
                 const Icon = item.icon;
+                const badgeCount = getBadgeCount(item.href);
 
                 return (
                   <li key={item.href}>
@@ -104,7 +142,12 @@ export function AdminSidebar() {
                     >
                       <Icon className={`w-5 h-5 ${isActive ? "text-primary" : ""}`} />
                       <span className="flex-1">{item.label}</span>
-                      {isActive && (
+                      {badgeCount > 0 && (
+                        <span className="flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-semibold bg-primary text-primary-foreground rounded-full">
+                          {badgeCount > 99 ? "99+" : badgeCount}
+                        </span>
+                      )}
+                      {isActive && badgeCount === 0 && (
                         <ChevronRight className="w-4 h-4 opacity-50" />
                       )}
                     </Link>
