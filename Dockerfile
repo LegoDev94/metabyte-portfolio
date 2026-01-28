@@ -19,6 +19,9 @@ RUN npx prisma generate
 # Build the application
 RUN npm run build
 
+# Remove symlinks that can't be copied
+RUN rm -rf /app/public/uploads /app/.next/standalone/public/uploads || true
+
 # Production stage
 FROM node:20-alpine AS runner
 
@@ -37,8 +40,8 @@ COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/prisma ./prisma
 
-# Create uploads directory
-RUN mkdir -p /app/uploads && chown -R nextjs:nodejs /app/uploads
+# Create uploads directory (will be mounted as volume)
+RUN mkdir -p /app/uploads /app/public/uploads && chown -R nextjs:nodejs /app/uploads /app/public/uploads
 
 # Set user
 USER nextjs
