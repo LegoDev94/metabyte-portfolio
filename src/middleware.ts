@@ -11,18 +11,11 @@ export async function middleware(request: NextRequest) {
 
   // Admin route protection
   if (pathname.startsWith("/admin")) {
-    // Debug: log all cookies
-    const allCookies = request.cookies.getAll();
-    console.log("[Middleware] Path:", pathname);
-    console.log("[Middleware] Cookies:", allCookies.map(c => c.name).join(", "));
-
-    // Get session token (works in edge runtime)
-    // Auth.js v5 uses "authjs" prefix, need to specify cookie name for HTTPS
+    // Auth.js v5 uses "authjs" prefix for cookies
     const cookieName = request.url.startsWith("https://")
       ? "__Secure-authjs.session-token"
       : "authjs.session-token";
 
-    // Auth.js v5 uses AUTH_SECRET, fallback to NEXTAUTH_SECRET
     const secret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET;
 
     const token = await getToken({
@@ -30,12 +23,6 @@ export async function middleware(request: NextRequest) {
       secret,
       cookieName,
     });
-
-    console.log("[Middleware] Cookie name:", cookieName);
-    console.log("[Middleware] Token found:", !!token);
-    if (token) {
-      console.log("[Middleware] Token email:", token.email);
-    }
 
     // Allow access to login page
     if (pathname === "/admin/login") {
