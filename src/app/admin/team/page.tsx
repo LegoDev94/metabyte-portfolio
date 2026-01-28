@@ -88,15 +88,31 @@ export default function TeamPage() {
   }
 
   function startEditing(member: TeamMember) {
+    // Clean up socialLinks - remove DB fields (id, memberId)
+    const cleanSocialLinks = member.socialLinks ? {
+      github: member.socialLinks.github || undefined,
+      telegram: member.socialLinks.telegram || undefined,
+      linkedin: member.socialLinks.linkedin || undefined,
+    } : null;
+
+    // Clean up translations - keep only required fields
+    const cleanTranslations = member.translations.length > 0
+      ? member.translations.map(t => ({
+          locale: t.locale,
+          name: t.name,
+          role: t.role,
+          description: t.description,
+          bio: t.bio || "",
+        }))
+      : [initialTranslation("ru"), initialTranslation("ro")];
+
     setFormData({
-      photo: member.photo,
-      skills: member.skills,
+      photo: member.photo || "/images/team/placeholder.jpg",
+      skills: member.skills || [],
       isFounder: member.isFounder,
       order: member.order,
-      translations: member.translations.length > 0
-        ? member.translations
-        : [initialTranslation("ru"), initialTranslation("ro")],
-      socialLinks: member.socialLinks,
+      translations: cleanTranslations,
+      socialLinks: cleanSocialLinks,
     });
     setEditingId(member.id);
     setIsCreating(false);
@@ -126,7 +142,34 @@ export default function TeamPage() {
     try {
       const url = "/api/admin/team";
       const method = isCreating ? "POST" : "PUT";
-      const body = isCreating ? formData : { id: editingId, ...formData };
+
+      // Clean up data before sending
+      const cleanedSocialLinks = formData.socialLinks && (
+        formData.socialLinks.github ||
+        formData.socialLinks.telegram ||
+        formData.socialLinks.linkedin
+      ) ? {
+        github: formData.socialLinks.github || undefined,
+        telegram: formData.socialLinks.telegram || undefined,
+        linkedin: formData.socialLinks.linkedin || undefined,
+      } : undefined;
+
+      const cleanedData = {
+        photo: formData.photo || "/images/team/placeholder.jpg",
+        skills: formData.skills || [],
+        isFounder: formData.isFounder,
+        order: formData.order,
+        translations: formData.translations.map(t => ({
+          locale: t.locale,
+          name: t.name,
+          role: t.role,
+          description: t.description,
+          bio: t.bio || undefined,
+        })),
+        socialLinks: cleanedSocialLinks,
+      };
+
+      const body = isCreating ? cleanedData : { id: editingId, ...cleanedData };
 
       const response = await fetch(url, {
         method,
@@ -137,6 +180,9 @@ export default function TeamPage() {
       if (response.ok) {
         await fetchMembers();
         cancelEdit();
+      } else {
+        const errorData = await response.json();
+        console.error("Save error response:", errorData);
       }
     } catch (error) {
       console.error("Save error:", error);
@@ -239,7 +285,7 @@ export default function TeamPage() {
               <MediaPicker
                 label="Фото"
                 value={formData.photo}
-                onChange={(url) => setFormData({ ...formData, photo: url || "/images/team/placeholder.jpg" })}
+                onChange={(url) => setFormData({ ...formData, photo: (url && url.trim()) ? url.trim() : "/images/team/placeholder.jpg" })}
                 placeholder="Выбрать фото"
                 aspectRatio={1}
                 cropShape="round"
