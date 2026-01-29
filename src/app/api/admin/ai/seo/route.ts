@@ -23,8 +23,8 @@ const generateSchema = z.object({
     projectCategory: z.string().optional(),
     mediaFilename: z.string().optional(),
     mediaLinkedTo: z.string().optional().nullable(),
-    currentTitle: z.string().optional(),
-    currentDescription: z.string().optional(),
+    currentTitle: z.string().optional().nullable(),
+    currentDescription: z.string().optional().nullable(),
   }),
 });
 
