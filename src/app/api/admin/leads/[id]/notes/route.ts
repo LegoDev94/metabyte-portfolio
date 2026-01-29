@@ -19,7 +19,7 @@ export async function POST(
     const note = await prisma.leadNote.create({
       data: {
         leadId: id,
-        authorId: session.user.id,
+        authorId: session.adminId,
         content: body.content,
         isInternal: body.isInternal ?? true,
       },

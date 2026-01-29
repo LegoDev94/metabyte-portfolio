@@ -69,7 +69,7 @@ export async function PATCH(
           leadId: id,
           fromStatus: existingLead.status,
           toStatus: body.status,
-          changedBy: session.user.id,
+          changedBy: session.adminId,
         },
       });
     }
