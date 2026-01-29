@@ -1102,6 +1102,8 @@ model LeadStatusHistory {
   changedBy  String     // AdminUser id
   createdAt  DateTime   @default(now())
 
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
   @@index([leadId])
   @@map("lead_status_history")
 }
