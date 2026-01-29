@@ -1052,14 +1052,14 @@ model Lead {
   telegram    String?
   phone       String?
   budget      String?
-  source      String     @default("website") // website, referral, ai_assistant
-  projectType String?
+  source      String     @default("website")
+  projectType String?    @map("project_type")
   message     String     @db.Text
   status      LeadStatus @default(NEW)
-  priority    Int        @default(0) // 0=normal, 1=high, 2=urgent
-  assignedTo  String?    // AdminUser id
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  priority    Int        @default(0)
+  assignedTo  String?    @map("assigned_to")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
 
   notes   LeadNote[]
   history LeadStatusHistory[]
@@ -1082,11 +1082,11 @@ enum LeadStatus {
 
 model LeadNote {
   id        String   @id @default(cuid())
-  leadId    String
-  authorId  String   // AdminUser id
+  leadId    String   @map("lead_id")
+  authorId  String   @map("author_id")
   content   String   @db.Text
-  isInternal Boolean @default(true) // True = only visible to admins
-  createdAt DateTime @default(now())
+  isInternal Boolean @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
 
   lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
 
@@ -1095,12 +1095,12 @@ model LeadNote {
 }
 
 model LeadStatusHistory {
-  id        String     @id @default(cuid())
-  leadId    String
-  fromStatus LeadStatus?
-  toStatus   LeadStatus
-  changedBy  String     // AdminUser id
-  createdAt  DateTime   @default(now())
+  id         String     @id @default(cuid())
+  leadId     String     @map("lead_id")
+  fromStatus LeadStatus? @map("from_status")
+  toStatus   LeadStatus @map("to_status")
+  changedBy  String     @map("changed_by")
+  createdAt  DateTime   @default(now()) @map("created_at")
 
   lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
 
