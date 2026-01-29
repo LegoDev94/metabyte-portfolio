@@ -19,6 +19,8 @@ import {
   LogOut,
   ChevronRight,
   Search,
+  Target,
+  FileText,
 } from "lucide-react";
 
 const menuItems = [
@@ -29,8 +31,15 @@ const menuItems = [
     ],
   },
   {
+    title: "CRM",
+    items: [
+      { href: "/admin/leads", label: "Лиды", icon: Target },
+    ],
+  },
+  {
     title: "Контент",
     items: [
+      { href: "/admin/blog", label: "Блог", icon: FileText },
       { href: "/admin/projects", label: "Проекты", icon: FolderKanban },
       { href: "/admin/testimonials", label: "Отзывы", icon: MessageSquareQuote },
       { href: "/admin/team", label: "Команда", icon: Users },

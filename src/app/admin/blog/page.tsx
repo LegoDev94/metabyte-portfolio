@@ -22,6 +22,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
 
 interface Post {
@@ -61,7 +62,21 @@ export default function BlogPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [selectedPost, setSelectedPost] = useState<Post | null>(null)
   const [showDetail, setShowDetail] = useState(false)
+  const [showCreate, setShowCreate] = useState(false)
   const [locale, setLocale] = useState("ru")
+  
+  // Create form state
+  const [formData, setFormData] = useState({
+    slug: "",
+    titleRU: "",
+    contentRU: "",
+    excerptRU: "",
+    titleRO: "",
+    contentRO: "",
+    excerptRO: "",
+    coverImage: "",
+    published: false,
+  })
 
   useEffect(() => {
     fetchPosts()
@@ -123,6 +138,36 @@ export default function BlogPage() {
     }
   }
 
+  const handleCreatePost = async () => {
+    if (!formData.titleRU.trim() || !formData.slug.trim()) return
+
+    try {
+      const response = await fetch("/api/admin/blog/posts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      })
+
+      if (response.ok) {
+        setShowCreate(false)
+        setFormData({
+          slug: "",
+          titleRU: "",
+          contentRU: "",
+          excerptRU: "",
+          titleRO: "",
+          contentRO: "",
+          excerptRO: "",
+          coverImage: "",
+          published: false,
+        })
+        fetchPosts()
+      }
+    } catch (error) {
+      console.error("Error creating post:", error)
+    }
+  }
+
   const formatDate = (date: string) => {
     try {
       const d = new Date(date)
@@ -146,7 +191,7 @@ export default function BlogPage() {
             Управление статьями и публикациями
           </p>
         </div>
-        <Button>
+        <Button onClick={() => setShowCreate(true)}>
           <Plus className="mr-2 h-4 w-4" />
           Новая статья
         </Button>
@@ -368,6 +413,123 @@ export default function BlogPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Create Post Dialog */}
+      {showCreate && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-background rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h2 className="text-lg font-semibold">Создать статью</h2>
+              <Button variant="ghost" size="icon" onClick={() => setShowCreate(false)}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <div className="p-4 space-y-4">
+              <div>
+                <label className="text-sm font-medium">URL slug *</label>
+                <Input
+                  placeholder="my-post-title"
+                  value={formData.slug}
+                  onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
+                  required
+                />
+                <p className="text-xs text-muted-foreground mt-1">Будет доступно по /blog/your-slug</p>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium">Заголовок (RU) *</label>
+                  <Input
+                    placeholder="Заголовок на русском"
+                    value={formData.titleRU}
+                    onChange={(e) => setFormData({ ...formData, titleRU: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Заголовок (RO)</label>
+                  <Input
+                    placeholder="Titlu în română"
+                    value={formData.titleRO}
+                    onChange={(e) => setFormData({ ...formData, titleRO: e.target.value })}
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium">Краткое описание (RU)</label>
+                <Textarea
+                  placeholder="Краткое описание статьи для превью..."
+                  value={formData.excerptRU}
+                  onChange={(e) => setFormData({ ...formData, excerptRU: e.target.value })}
+                  rows={2}
+                />
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium">Краткое описание (RO)</label>
+                <Textarea
+                  placeholder="Descriere scurtă pentru previzualizare..."
+                  value={formData.excerptRO}
+                  onChange={(e) => setFormData({ ...formData, excerptRO: e.target.value })}
+                  rows={2}
+                />
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium">Содержание (RU) *</label>
+                <Textarea
+                  placeholder="Текст статьи на русском..."
+                  value={formData.contentRU}
+                  onChange={(e) => setFormData({ ...formData, contentRU: e.target.value })}
+                  rows={6}
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium">Содержание (RO)</label>
+                <Textarea
+                  placeholder="Conținut articol în română..."
+                  value={formData.contentRO}
+                  onChange={(e) => setFormData({ ...formData, contentRO: e.target.value })}
+                  rows={6}
+                />
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium">URL изображения</label>
+                <Input
+                  placeholder="https://example.com/image.jpg"
+                  value={formData.coverImage}
+                  onChange={(e) => setFormData({ ...formData, coverImage: e.target.value })}
+                />
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="published"
+                  checked={formData.published}
+                  onChange={(e) => setFormData({ ...formData, published: e.target.checked })}
+                  className="rounded border-gray-300"
+                />
+                <label htmlFor="published" className="text-sm font-medium">Опубликовать сразу</label>
+              </div>
+              
+              <div className="flex justify-end gap-2 pt-4">
+                <Button variant="outline" onClick={() => setShowCreate(false)}>
+                  Отмена
+                </Button>
+                <Button onClick={handleCreatePost} disabled={!formData.titleRU.trim() || !formData.slug.trim() || !formData.contentRU.trim()}>
+                  Создать статью
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -84,9 +84,22 @@ export default function LeadsPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
   const [showDetail, setShowDetail] = useState(false)
+  const [showCreate, setShowCreate] = useState(false)
   const [newNote, setNewNote] = useState("")
   const [locale, setLocale] = useState("ru")
   const [activeTab, setActiveTab] = useState("notes")
+  
+  // Create form state
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    telegram: "",
+    phone: "",
+    budget: "",
+    projectType: "",
+    message: "",
+    source: "website",
+  })
 
   useEffect(() => {
     fetchLeads()
@@ -159,6 +172,35 @@ export default function LeadsPage() {
     }
   }
 
+  const handleCreateLead = async () => {
+    if (!formData.message.trim()) return
+
+    try {
+      const response = await fetch("/api/admin/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      })
+
+      if (response.ok) {
+        setShowCreate(false)
+        setFormData({
+          name: "",
+          email: "",
+          telegram: "",
+          phone: "",
+          budget: "",
+          projectType: "",
+          message: "",
+          source: "website",
+        })
+        fetchLeads()
+      }
+    } catch (error) {
+      console.error("Error creating lead:", error)
+    }
+  }
+
   const getInitials = (name: string | null) => {
     if (!name) return "?"
     return name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
@@ -191,7 +233,7 @@ export default function LeadsPage() {
             Управление входящими заявками и потенциальными клиентами
           </p>
         </div>
-        <Button>
+        <Button onClick={() => setShowCreate(true)}>
           <Plus className="mr-2 h-4 w-4" />
           Добавить лид
         </Button>
@@ -495,6 +537,113 @@ export default function LeadsPage() {
                   </Button>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create Lead Dialog */}
+      {showCreate && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-background rounded-lg w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h2 className="text-lg font-semibold">Создать лид</h2>
+              <Button variant="ghost" size="icon" onClick={() => setShowCreate(false)}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <div className="p-4 space-y-4">
+              <div>
+                <label className="text-sm font-medium">Имя</label>
+                <Input
+                  placeholder="Имя клиента"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium">Email</label>
+                  <Input
+                    type="email"
+                    placeholder="email@example.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Телефон</label>
+                  <Input
+                    placeholder="+373..."
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium">Telegram</label>
+                  <Input
+                    placeholder="@username"
+                    value={formData.telegram}
+                    onChange={(e) => setFormData({ ...formData, telegram: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Бюджет</label>
+                  <Input
+                    placeholder="$1000-2000"
+                    value={formData.budget}
+                    onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium">Тип проекта</label>
+                <Input
+                  placeholder="Сайт, приложение, дизайн..."
+                  value={formData.projectType}
+                  onChange={(e) => setFormData({ ...formData, projectType: e.target.value })}
+                />
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium">Источник</label>
+                <select
+                  value={formData.source}
+                  onChange={(e) => setFormData({ ...formData, source: e.target.value })}
+                  className="w-full border rounded-md px-3 py-2 text-sm"
+                >
+                  <option value="website">С сайта</option>
+                  <option value="referral">Рекомендация</option>
+                  <option value="ai_assistant">AI Ассистент</option>
+                  <option value="other">Другое</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium">Сообщение *</label>
+                <Textarea
+                  placeholder="Описание проекта..."
+                  value={formData.message}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  rows={4}
+                  required
+                />
+              </div>
+              
+              <div className="flex justify-end gap-2 pt-4">
+                <Button variant="outline" onClick={() => setShowCreate(false)}>
+                  Отмена
+                </Button>
+                <Button onClick={handleCreateLead} disabled={!formData.message.trim()}>
+                  Создать лид
+                </Button>
+              </div>
             </div>
           </div>
         </div>
