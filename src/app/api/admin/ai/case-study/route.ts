@@ -14,7 +14,7 @@ function getOpenAI() {
 
 const generateSchema = z.object({
   field: z.enum(["challenge", "solution", "results"]),
-  locale: z.enum(["ru", "ro"]),
+  locale: z.enum(["ru", "ro", "en"]),
   context: z.object({
     projectTitle: z.string(),
     projectDescription: z.string().optional(),
@@ -90,6 +90,7 @@ function getSystemPrompt(locale: string): string {
   const langInstructions = {
     ru: "Отвечай на русском языке.",
     ro: "Răspunde în limba română.",
+    en: "Respond in English.",
   };
 
   return `You are a technical writer creating case studies for METABYTE, a professional web development studio.
@@ -110,7 +111,8 @@ function buildPrompt(
   context: z.infer<typeof generateSchema>["context"]
 ): string {
   const techStack = context.technologies?.join(", ") || "modern web technologies";
-  const localeName = locale === "ru" ? "Russian" : "Romanian";
+  const localeNames: Record<string, string> = { ru: "Russian", ro: "Romanian", en: "English" };
+  const localeName = localeNames[locale] || "English";
 
   if (field === "challenge") {
     return `Write the "Challenge" section for a case study.
