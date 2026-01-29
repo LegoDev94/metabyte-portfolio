@@ -955,3 +955,153 @@ model PageSEOTranslation {
   @@index([locale])
   @@map("page_seo_translations")
 }
+
+// ==================== BLOG ====================
+
+model Post {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  coverImage  String?
+  published   Boolean   @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  order       Int       @default(0)
+
+  translations PostTranslation[]
+  categories   PostCategory[]
+  tags         PostTag[]
+
+  @@index([published])
+  @@index([publishedAt])
+  @@map("posts")
+}
+
+model PostTranslation {
+  id          String  @id @default(cuid())
+  postId      String
+  locale      String
+  title       String
+  excerpt     String? @db.Text
+  content     String  @db.Text
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, locale])
+  @@index([locale])
+  @@map("post_translations")
+}
+
+model PostCategory {
+  id    String @id @default(cuid())
+  slug  String @unique
+  order Int    @default(0)
+
+  posts Post[]
+
+  translations PostCategoryTranslation[]
+
+  @@map("post_categories")
+}
+
+model PostCategoryTranslation {
+  id         String @id @default(cuid())
+  categoryId String
+  locale     String
+  name       String
+
+  category PostCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([categoryId, locale])
+  @@index([locale])
+  @@map("post_category_translations")
+}
+
+model PostTag {
+  id    String @id @default(cuid())
+  slug  String @unique
+  color String @default("#6366f1")
+  order Int    @default(0)
+
+  posts Post[]
+
+  translations PostTagTranslation[]
+
+  @@map("post_tags")
+}
+
+model PostTagTranslation {
+  id     String @id @default(cuid())
+  tagId  String
+  locale String
+  name   String
+
+  tag PostTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([tagId, locale])
+  @@index([locale])
+  @@map("post_tag_translations")
+}
+
+// ==================== LEADS CRM ====================
+
+model Lead {
+  id          String     @id @default(cuid())
+  name        String?
+  email       String?
+  telegram    String?
+  phone       String?
+  budget      String?
+  source      String     @default("website") // website, referral, ai_assistant
+  projectType String?
+  message     String     @db.Text
+  status      LeadStatus @default(NEW)
+  priority    Int        @default(0) // 0=normal, 1=high, 2=urgent
+  assignedTo  String?    // AdminUser id
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  notes   LeadNote[]
+  history LeadStatusHistory[]
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([priority])
+  @@map("leads")
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  PROPOSAL
+  NEGOTIATION
+  WON
+  LOST
+}
+
+model LeadNote {
+  id        String   @id @default(cuid())
+  leadId    String
+  authorId  String   // AdminUser id
+  content   String   @db.Text
+  isInternal Boolean @default(true) // True = only visible to admins
+  createdAt DateTime @default(now())
+
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId])
+  @@map("lead_notes")
+}
+
+model LeadStatusHistory {
+  id        String     @id @default(cuid())
+  leadId    String
+  fromStatus LeadStatus?
+  toStatus   LeadStatus
+  changedBy  String     // AdminUser id
+  createdAt  DateTime   @default(now())
+
+  @@index([leadId])
+  @@map("lead_status_history")
+}
