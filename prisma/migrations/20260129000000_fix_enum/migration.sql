@@ -1,13 +1,11 @@
--- Fix LeadStatus enum type name
+-- Check current enum type and fix if needed
 -- Run this in Supabase SQL Editor
 
--- Drop the old enum type and all dependent objects (columns, constraints, etc.)
+-- Check if LeadStatus type exists
+SELECT typname, typtype FROM pg_type WHERE typname = 'LeadStatus';
+
+-- If lead_status exists but LeadStatus doesn't, rename it
+ALTER TYPE lead_status RENAME TO "LeadStatus";
+
+-- If both exist and lead_status has data, drop the duplicate
 DROP TYPE IF EXISTS lead_status CASCADE;
-
--- Create enum with correct case-sensitive name (LeadStatus)
-CREATE TYPE "LeadStatus" AS ENUM ('NEW', 'CONTACTED', 'QUALIFIED', 'PROPOSAL', 'NEGOTIATION', 'WON', 'LOST');
-
--- Recreate the columns with the new enum type
-ALTER TABLE leads ALTER COLUMN status TYPE "LeadStatus" USING status::text::"LeadStatus";
-ALTER TABLE lead_status_history ALTER COLUMN from_status TYPE "LeadStatus" USING from_status::text::"LeadStatus";
-ALTER TABLE lead_status_history ALTER COLUMN to_status TYPE "LeadStatus" USING to_status::text::"LeadStatus";
