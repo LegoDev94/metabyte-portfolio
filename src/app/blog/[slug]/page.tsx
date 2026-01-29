@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const translation = post.translations.find((t) =>
-    locale === "ru" ? true : t.language === "RO"
+    locale === "ru" ? t.locale === "ru" : t.locale === "ro"
   ) || post.translations[0]
 
   return {
@@ -59,7 +59,7 @@ export default async function BlogPostPage({ params }: Props) {
   }
 
   const translation = post.translations.find((t) =>
-    locale === "ru" ? true : t.language === "RO"
+    locale === "ru" ? t.locale === "ru" : t.locale === "ro"
   ) || post.translations[0]
 
   const title = translation?.title || "Без названия"

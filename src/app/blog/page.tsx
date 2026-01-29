@@ -59,7 +59,7 @@ export default async function BlogPage({
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {posts.map((post) => {
             const translation = post.translations.find((t) =>
-              locale === "ru" ? true : t.language === "RO"
+              locale === "ru" ? t.locale === "ru" : t.locale === "ro"
             ) || post.translations[0]
 
             const title = translation?.title || "Без названия"
