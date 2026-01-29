@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
       data: {
         leadId: lead.id,
         toStatus: "NEW",
-        changedBy: session.user.id,
+        changedBy: session.adminId,
       },
     });
 
