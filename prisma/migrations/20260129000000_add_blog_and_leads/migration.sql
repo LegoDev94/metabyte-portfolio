@@ -85,9 +85,9 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_post_tags_a_b ON _post_tags(A, B);
 -- LEADS CRM TABLES
 -- ============================================
 
--- Lead Status Enum type
+-- Lead Status Enum type (must match Prisma schema name)
 DO $$ BEGIN
-    CREATE TYPE lead_status AS ENUM ('NEW', 'CONTACTED', 'QUALIFIED', 'PROPOSAL', 'NEGOTIATION', 'WON', 'LOST');
+    CREATE TYPE "LeadStatus" AS ENUM ('NEW', 'CONTACTED', 'QUALIFIED', 'PROPOSAL', 'NEGOTIATION', 'WON', 'LOST');
 EXCEPTION
     WHEN duplicate_object THEN null;
 END $$;
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS leads (
     source TEXT NOT NULL DEFAULT 'website',
     project_type TEXT,
     message TEXT NOT NULL,
-    status lead_status NOT NULL DEFAULT 'NEW',
+    status "LeadStatus" NOT NULL DEFAULT 'NEW',
     priority INTEGER NOT NULL DEFAULT 0,
     assigned_to TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -127,8 +127,8 @@ ALTER TABLE lead_notes ADD CONSTRAINT fk_lead_notes_lead FOREIGN KEY (lead_id) R
 CREATE TABLE IF NOT EXISTS lead_status_history (
     id TEXT PRIMARY KEY DEFAULT ('lsh_' || substr(md5(random()::text), 0, 9)),
     lead_id TEXT NOT NULL,
-    from_status lead_status,
-    to_status lead_status NOT NULL,
+    from_status "LeadStatus",
+    to_status "LeadStatus" NOT NULL,
     changed_by TEXT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
