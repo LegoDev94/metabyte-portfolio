@@ -64,10 +64,10 @@ export async function GET(request: NextRequest) {
         pages: Math.ceil(total / limit),
       },
     });
-  } catch (error) {
-    console.error("Error fetching leads:", error);
+  } catch (error: any) {
+    console.error("Error fetching leads:", error.message, error.stack);
     return NextResponse.json(
-      { error: "Failed to fetch leads" },
+      { error: "Failed to fetch leads", details: error.message },
       { status: 500 }
     );
   }
@@ -108,10 +108,10 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({ lead }, { status: 201 });
-  } catch (error) {
-    console.error("Error creating lead:", error);
+  } catch (error: any) {
+    console.error("Error creating lead:", error.message, error.stack);
     return NextResponse.json(
-      { error: "Failed to create lead" },
+      { error: "Failed to create lead", details: error.message },
       { status: 500 }
     );
   }
